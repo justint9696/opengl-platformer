@@ -9,7 +9,7 @@ OBJS = $(patsubst $(SRC)%, $(OBJ)%, $(SRCS:.c=.o))
 
 CFLAGS := -g -O2 -Wall -Wextra
 CFLAGS += -Wno-unused-parameter
-CFLAGS += -Isrc/
+CFLAGS += -Isrc
 CFLAGS += -Ilib/glad/include
 CFLAGS += -Ilib/stb
 
@@ -34,11 +34,11 @@ libs:
 
 $(TARGET): $(OBJS)
 	@mkdir -p $(dir $@)
-	$(CC) -o $@ $< $(LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 $(OBJ)%.o: $(SRC)%.c
 	@mkdir -p $(dir $@)
-	$(CC) -o $@ -c $^ $(CFLAGS)
+	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
 	rm -rf $(BIN) $(OBJ)
