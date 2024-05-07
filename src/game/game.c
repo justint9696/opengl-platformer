@@ -8,6 +8,7 @@
 #include "graphics/window.h"
 
 #include "util/time.h"
+#include "world/world.h"
 
 #include <glad/glad.h>
 #include <string.h>
@@ -53,23 +54,28 @@ static void init(game_s *self) {
     buttons_init();
     time_init(&self->time);
     camera_init(&self->world.camera, self->window.width, self->window.height);
+    world_init(&self->world);
 }
 
 static void destroy(game_s *self) {
     window_destroy(&self->window);
+    world_destroy(&self->world);
 }
 
 static void update(game_s *self) {
     time_update(&self->time);
+    world_update(&self->world);
 }
 
 static void tick(game_s *self) {
     if (!time_tick(&self->time))
         return;
+
+    world_tick(&self->world);
 }
 
 static void render(game_s *self) {
-    draw_quad((vec2s) { 0.f, 0.f }, (vec2s) { 50.f, 50.f }, COLOR_WHITE);
+    world_render(&self->world);
 }
 
 void game_run(game_s *self) {
