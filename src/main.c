@@ -1,68 +1,87 @@
-#include <glad/glad.h>
+#include "game/buttons.h"
+#include "game/game.h"
+
+#include "graphics/color.h"
+#include "graphics/drawing.h"
+#include "graphics/renderer.h"
+
+#include <string.h>
 
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
 
-#include <stdbool.h>
-#include <stdio.h>
+static void monitor_input(game_s *game) {
+    if (button_pressed(SDL_SCANCODE_Q, 0)) {
+        game->quit = true;
+    }
+}
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
+static void poll_events(game_s *game) {
+    SDL_Event ev;
+    while (SDL_PollEvent(&ev)) {
+        switch (ev.type) {
+            case SDL_KEYDOWN:
+            case SDL_KEYUP:
+                buttons_update(ev.key);
+                break;
+            case SDL_QUIT:
+                game->quit = true;
+                break;
+            case SDL_WINDOWEVENT:
+                if (ev.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+                    window_resize(&game->window, ev.window.data1, ev.window.data2);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+static void init(game_s *game) {
+    memset(game, 0, sizeof(game_s));
+    window_init(&game->window, "Game");
+    renderer_init();
+    time_init(&game->time);
+}
+
+static void destroy(game_s *game) {
+    window_destroy(&game->window);
+    renderer_destroy();
+}
+
+static void update(game_s *game) {
+    time_update(&game->time);
+}
+
+static void tick(game_s *game) {
+    if (!time_tick(&game->time))
+        return;
+}
+
+static void render(game_s *game) {
+    draw_quad((vec2s) { 0 }, (vec2s) { 0 }, COLOR_WHITE);
+}
 
 int main(int argc, char *argv[]) {
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    game_s game;
+    init(&game);
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        fprintf(stderr, "Could not initialize SDL: %s\n", SDL_GetError());
-        exit(1);
-    }
+    while (!game.quit) {
+        poll_events(&game);
+        monitor_input(&game);
 
-    SDL_Window *window =
-        SDL_CreateWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                         SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL);
-    if (!window) {
-        fprintf(stderr, "Could not create SDL Window: %s\n", SDL_GetError());
-        exit(1);
-    }
-
-    SDL_GLContext context = SDL_GL_CreateContext(window);
-    if (!gladLoadGLLoader(SDL_GL_GetProcAddress)) {
-        fprintf(stderr, "Failed to initialize GLAD: %s\n", SDL_GetError());
-        exit(1);
-    }
-
-    glDisable(GL_DEPTH_TEST);
-    glClearColor(0.53f, 0.81f, 0.92f, 1.f);
-    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    bool quit = false;
-    while (!quit) {
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        SDL_Event ev;
-        while (SDL_PollEvent(&ev)) {
-            switch (ev.type) {
-                case SDL_KEYDOWN:
-                    if (ev.key.keysym.scancode == SDL_SCANCODE_Q)
-                        quit = true;
-                    break;
-
-                case SDL_QUIT:
-                    quit = true;
-                    break;
-            }
+        renderer_prepare_scene();
+        {
+            update(&game);
+            tick(&game);
+            render(&game);
         }
+        renderer_present_scene();
 
-        SDL_GL_SwapWindow(window);
+        window_swap_buffers(&game.window);
     }
 
-    SDL_GL_DeleteContext(context);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    destroy(&game);
 
     return 0;
 }
