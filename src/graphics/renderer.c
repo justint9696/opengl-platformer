@@ -3,6 +3,7 @@
 #include "graphics/drawing.h"
 #include "graphics/window.h"
 
+#include <cglm/struct.h>
 #include <string.h>
 
 static renderer_s renderer;
@@ -30,12 +31,17 @@ void renderer_destroy() {
     shader_destroy(renderer.shader);
 }
 
-void renderer_prepare_scene() {
+void renderer_prepare_scene(const camera_s *camera) {
+    renderer.camera = camera;
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void renderer_present_scene() {
     glUseProgram(renderer.shader.handle);
+    glUniformMatrix4fv(glGetUniformLocation(renderer.shader.handle, "projection"), 1, GL_FALSE,
+            (const GLfloat *)&renderer.camera->projection);
+    glUniformMatrix4fv(glGetUniformLocation(renderer.shader.handle, "view"), 1, GL_FALSE,
+            (const GLfloat *)&renderer.camera->view);
 }
 
 void draw_quad(vec2s pos, vec2s dim, uint32_t color) {
@@ -51,6 +57,10 @@ void draw_quad(vec2s pos, vec2s dim, uint32_t color) {
         1, 2, 3
     };
 
+    mat4s model = glms_mat4_identity();
+    model = glms_translate(model, (vec3s) { pos.x, pos.y, 0.f });
+    model = glms_scale(model, (vec3s) { dim.x, dim.y, 1.f });
+
     glBindVertexArray(renderer.vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, renderer.vbo);
@@ -62,8 +72,14 @@ void draw_quad(vec2s pos, vec2s dim, uint32_t color) {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
-     glUniform4fv(glGetUniformLocation(renderer.shader.handle, "color"), 1,
-            (const GLfloat *)&RGBA(color));
+    glUniform4fv(glGetUniformLocation(renderer.shader.handle, "color"), 1,
+                 (const GLfloat *)&RGBA(color));
 
-     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glUniformMatrix4fv(glGetUniformLocation(renderer.shader.handle, "model"), 1,
+                       GL_FALSE, (const GLfloat *)&model);
+
+    glUniform4fv(glGetUniformLocation(renderer.shader.handle, "color"), 1,
+                 (const GLfloat *)&RGBA(color));
+
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
