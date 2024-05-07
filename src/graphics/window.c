@@ -1,10 +1,14 @@
 #include "graphics/window.h"
+#include "graphics/renderer.h"
 
 #include <SDL2/SDL.h>
 #include <glad/glad.h>
 
 void window_init(window_s *self, const char *title) {
     memset(self, 0, sizeof(window_s));
+
+    self->width = SCREEN_WIDTH;
+    self->height = SCREEN_HEIGHT;
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -16,6 +20,7 @@ void window_init(window_s *self, const char *title) {
         exit(1);
     }
 
+    // create window
     self->handle =
         SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                          SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL);
@@ -30,12 +35,19 @@ void window_init(window_s *self, const char *title) {
         exit(1);
     }
 
+    // disble vsync
     if (SDL_GL_SetSwapInterval(0) < 0) {
-        fprintf(stderr, "Warning: Could not disable VSync: %s\n", SDL_GetError());
+        fprintf(stderr, "WARNING: Could not disable VSync: %s\n", SDL_GetError());
     }
+
+    renderer_init();
 }
 
 void window_destroy(window_s *self) {
+    // destroy renderer
+    renderer_destroy();
+
+    // destroy window
     SDL_GL_DeleteContext(self->context);
     SDL_DestroyWindow(self->handle);
     SDL_Quit();

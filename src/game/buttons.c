@@ -8,10 +8,8 @@ void buttons_init() {
 }
 
 void buttons_update(SDL_KeyboardEvent ev) {
-    keyboard.buttons[ev.keysym.scancode] = (button_s) {
-        .pressed = ev.state == SDL_PRESSED,
-        .tick = NOW(),
-    };
+    button_s *btn = &keyboard.buttons[ev.keysym.scancode];
+    btn->pressed = ev.state == SDL_PRESSED;
 }
 
 bool button_pressed(SDL_Scancode scancode, time_t delay_ms) {
