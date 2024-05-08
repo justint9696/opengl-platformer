@@ -64,14 +64,14 @@ static void destroy(game_s *self) {
 
 static void update(game_s *self) {
     time_update(&self->time);
-    world_update(&self->world);
+    world_update(&self->world, self->time.delta);
 }
 
 static void tick(game_s *self) {
     if (!time_tick(&self->time))
         return;
 
-    world_tick(&self->world);
+    world_tick(&self->world, self->time.delta_fixed);
 }
 
 static void render(game_s *self) {

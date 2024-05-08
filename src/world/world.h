@@ -11,6 +11,6 @@ typedef struct world_s {
 
 void world_init(world_s *);
 void world_destroy(world_s *);
-void world_update(world_s *);
+void world_update(world_s *, float dt);
 void world_render(world_s *);
-void world_tick(world_s *);
+void world_tick(world_s *, float dt);
