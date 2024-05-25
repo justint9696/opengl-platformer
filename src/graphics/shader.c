@@ -21,7 +21,8 @@ static GLint shader_compile(const char *fpath, GLenum type) {
     fclose(fp);
 
     GLuint handle = glCreateShader(type);
-    glShaderSource(handle, 1, (const GLchar *const *)&text, (const GLint *)&size);
+    glShaderSource(handle, 1, (const GLchar *const *)&text,
+                   (const GLint *)&size);
     glCompileShader(handle);
 
     GLint result;
@@ -38,8 +39,8 @@ static GLint shader_compile(const char *fpath, GLenum type) {
     return handle;
 }
 
-shader_s shader_create(const char *vs_path, const char *fs_path) {
-    shader_s self;
+shader_t shader_create(const char *vs_path, const char *fs_path) {
+    shader_t self;
     self.vs = shader_compile(vs_path, GL_VERTEX_SHADER);
     self.fs = shader_compile(fs_path, GL_FRAGMENT_SHADER);
     self.handle = glCreateProgram();
@@ -51,7 +52,7 @@ shader_s shader_create(const char *vs_path, const char *fs_path) {
     return self;
 }
 
-void shader_destroy(shader_s self) {
+void shader_destroy(shader_t self) {
     glDeleteProgram(self.handle);
     glDeleteShader(self.vs);
     glDeleteShader(self.fs);

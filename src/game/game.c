@@ -1,9 +1,6 @@
 #include "game/game.h"
 #include "game/buttons.h"
-#include "game/camera.h"
 
-#include "graphics/color.h"
-#include "graphics/drawing.h"
 #include "graphics/renderer.h"
 #include "graphics/window.h"
 
@@ -13,7 +10,7 @@
 #include <glad/glad.h>
 #include <string.h>
 
-static void monitor_input(game_s *game) {
+static void monitor_input(game_t *game) {
     if (button_pressed(SDL_SCANCODE_Q, 0)) {
         game->quit = true;
     }
@@ -26,7 +23,7 @@ static void monitor_input(game_s *game) {
     }
 }
 
-static void poll_events(game_s *game) {
+static void poll_events(game_t *game) {
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
         switch (ev.type) {
@@ -39,7 +36,8 @@ static void poll_events(game_s *game) {
                 break;
             case SDL_WINDOWEVENT:
                 if (ev.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-                    window_resize(&game->window, ev.window.data1, ev.window.data2);
+                    window_resize(
+                            &game->window, ev.window.data1, ev.window.data2);
                 break;
             default:
                 break;
@@ -47,38 +45,36 @@ static void poll_events(game_s *game) {
     }
 }
 
-
-static void init(game_s *self) {
-    memset(self, 0, sizeof(game_s));
+static void init(game_t *self) {
+    memset(self, 0, sizeof(game_t));
     window_init(&self->window, "Game");
     buttons_init();
     time_init(&self->time);
-    camera_init(&self->world.camera, self->window.width, self->window.height);
     world_init(&self->world);
 }
 
-static void destroy(game_s *self) {
+static void destroy(game_t *self) {
     window_destroy(&self->window);
     world_destroy(&self->world);
 }
 
-static void update(game_s *self) {
+static void update(game_t *self) {
     time_update(&self->time);
     world_update(&self->world, self->time.delta);
 }
 
-static void tick(game_s *self) {
+static void tick(game_t *self) {
     if (!time_tick(&self->time))
         return;
 
     world_tick(&self->world, self->time.delta_fixed);
 }
 
-static void render(game_s *self) {
+static void render(game_t *self) {
     world_render(&self->world);
 }
 
-void game_run(game_s *self) {
+void game_run(game_t *self) {
     init(self);
     while (!self->quit) {
         poll_events(self);

@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 
 int main(int argc, char *argv[]) {
-    game_s game;
+    game_t game;
     game_run(&game);
     return 0;
 }

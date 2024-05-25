@@ -1,32 +1,42 @@
-#pragma once
+#ifndef _GAME_TYPES_H_
+#define _GAME_TYPES_H_
+
+#include "util/aabb.h"
 
 #include <cglm/types-struct.h>
 #include <stdbool.h>
 #include <time.h>
 
-struct entity_s;
-
-typedef enum {
-    DIR_UP = 1 << 0,
-    DIR_DOWN = 1 << 1,
-    DIR_LEFT = 1 << 2,
-    DIR_RIGHT = 1 << 3,
-} direction_t;
-
-typedef struct {
-    vec2s pos, dim;
-} Box;
+struct entity_t;
+struct tile_t;
 
 typedef struct {
     union {
-        Box box;
+        box_t box;
         struct {
             vec2s pos, dim;
         };
     };
+
     vec2s vel;
+    bool solid;
     bool grounded;
+    float jump_speed;
+    float movement_speed;
     time_t grounded_tick;
-    direction_t direction;
-    void (*collision_callback)(struct entity_s *, struct entity_s *, float dt);
-} rigid_body_s;
+    void (*collision_callback)(struct entity_t *, struct entity_t *);
+} rigid_body_t;
+
+typedef struct {
+    union {
+        box_t box;
+        struct {
+            vec2s pos, dim;
+        };
+    };
+
+    bool solid;
+    void (*collision_callback)(struct tile_t *, struct entity_t *);
+} static_body_t;
+
+#endif

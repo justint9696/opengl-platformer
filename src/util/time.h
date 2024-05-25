@@ -1,8 +1,6 @@
-#pragma once
+#ifndef _UTIL_TIME_H_
+#define _UTIL_TIME_H_
 
-#pragma once
-
-#include <float.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <time.h>
@@ -18,6 +16,8 @@
 #define TICK_DELAY    (NS_PER_SECOND / TICK_TARGET)
 #define FRAME_DELAY   (NS_PER_SECOND / FRAME_TARGET)
 
+#define DELTA_FIXED   ((double)TICK_DELAY / (double)NS_PER_SECOND)
+
 #define NS(_ms)       ((_ms) * NS_PER_MS)
 #define MS(_ns)       ((_ns) / NS_PER_MS)
 
@@ -28,8 +28,8 @@
     })
 
 typedef struct {
-    time_t last_second, last_tick, last_frame, now;
-    time_t delta_ns;
+    time_t now, delta_ns;
+    time_t last_second, last_tick, last_frame;
     float delta, delta_fixed;
     uint32_t frames, ticks;
     uint32_t fps, tps;
@@ -37,4 +37,7 @@ typedef struct {
 
 void time_init(time_s *);
 void time_update(time_s *);
+
 bool time_tick(time_s *);
+
+#endif

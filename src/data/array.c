@@ -1,6 +1,7 @@
 #include "data/array.h"
 
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -9,8 +10,7 @@ typedef struct {
     void *data;
 } array_t;
 
-#define array_header(_a)\
-    ((array_t *)((void *)(_a) - sizeof(array_t) + sizeof(void *)))
+#define array_header(_a) ((array_t *)(((void *)(_a)) - offsetof(array_t, data)))
 
 void *array_alloc(size_t size, size_t capacity) {
     array_t *array = calloc(1, sizeof(array_t) + (size * capacity));
@@ -55,7 +55,11 @@ void array_remove(void *data, void *item) {
         if (!memcmp(dst, item, array->size))
             break;
     }
-    assert(idx < array->len);
+
+    if (idx >= array->len) {
+        fprintf(stderr, "WARNING: Attempted to remove item not contained in array.\n");
+        return;
+    }
 
     // check if the item is at the last index of the array
     if (idx < array->len - 1) {
@@ -87,6 +91,7 @@ size_t array_len(void *data) {
 
 void *array_slice(void *data, uint32_t start, uint32_t end) {
     array_t *array = array_header(data);
+    assert(array);
     void *slice = array_alloc(array->size, array->capacity);
     memcpy(slice, array_get(array, start), (end - start) * array->size);
     array_header(slice)->len = (end - start);

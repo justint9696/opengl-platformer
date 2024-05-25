@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _GAME_GAME_H_
+#define _GAME_GAME_H_
 
 #include "graphics/window.h"
 #include "util/time.h"
@@ -9,9 +10,11 @@
 typedef struct {
     bool quit: 1;
     bool debug: 1;
-    window_s window; 
+    window_t window; 
     time_s time;
-    world_s world;
-} game_s;
+    world_t world;
+} game_t;
 
-void game_run(game_s *);
+void game_run(game_t *);
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _GRAPHICS_COLOR_H_
+#define _GRAPHICS_COLOR_H_
 
 #include <cglm/types-struct.h>
 
@@ -17,3 +18,5 @@
         ((c >>  8) & 0xFF) / 255.f,\
         ((c >>  0) & 0xFF) / 255.f,\
     })
+
+#endif

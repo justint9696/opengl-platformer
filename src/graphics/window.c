@@ -4,8 +4,8 @@
 #include <SDL2/SDL.h>
 #include <glad/glad.h>
 
-void window_init(window_s *self, const char *title) {
-    memset(self, 0, sizeof(window_s));
+void window_init(window_t *self, const char *title) {
+    memset(self, 0, sizeof(window_t));
 
     self->width = SCREEN_WIDTH;
     self->height = SCREEN_HEIGHT;
@@ -43,7 +43,7 @@ void window_init(window_s *self, const char *title) {
     renderer_init();
 }
 
-void window_destroy(window_s *self) {
+void window_destroy(window_t *self) {
     // destroy renderer
     renderer_destroy();
 
@@ -53,12 +53,12 @@ void window_destroy(window_s *self) {
     SDL_Quit();
 }
 
-void window_resize(window_s *self, int width, int height) {
+void window_resize(window_t *self, int width, int height) {
     self->width = width; 
     self->height = height;
     glViewport(0, 0, width, height);
 }
 
-void window_swap_buffers(window_s *self) {
+void window_swap_buffers(window_t *self) {
     SDL_GL_SwapWindow(self->handle);
 }
