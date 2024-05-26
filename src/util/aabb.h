@@ -9,7 +9,7 @@ typedef struct {
 } aabb_t, box_t;
 
 vec2s box_center(const box_t *);
-void bbb_create(box_t *, vec2s vel, short axis, float dt);
+void bbb_create(box_t *, vec2s vel, short axis);
 bool aabb_collision_2d(const box_t *, const box_t *);
 
 #endif
