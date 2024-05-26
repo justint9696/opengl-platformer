@@ -16,7 +16,7 @@ void kdtree_init(kdtree_t *self) {
     self->root = NULL;
 }
 
-static void destroy(tnode_t *root) {
+static void destroy(kdnode_t *root) {
     if (!root)
         return;
 
@@ -30,16 +30,16 @@ void kdtree_destroy(kdtree_t *self) {
     destroy(self->root);
 }
 
-static tnode_t *node_init(vec2s pos, void *data) {
-    tnode_t *self = calloc(1, sizeof(tnode_t));
+static kdnode_t *node_init(vec2s pos, void *data) {
+    kdnode_t *self = calloc(1, sizeof(kdnode_t));
     assert(self);
     self->pos = pos;
     self->data = data;
     return self;
 }
 
-static void insert(tnode_t **rootptr, vec2s pos, void *data, short depth) {
-    tnode_t *root = *rootptr;
+static void insert(kdnode_t **rootptr, vec2s pos, void *data, short depth) {
+    kdnode_t *root = *rootptr;
     if (!root) {
         *rootptr = node_init(pos, data);
         return;
@@ -76,7 +76,7 @@ static int tile_compare_y(const void *a, const void *b) {
     return 0;
 }
 
-static void kdtree(tnode_t **rootptr, void *arr[], size_t len, short depth) {
+static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth) {
     if (len < 1)
         return;
 
@@ -102,16 +102,20 @@ static void kdtree(tnode_t **rootptr, void *arr[], size_t len, short depth) {
         return;
 
     // slice array from 0 to mid
-    len = mid;
-    void *left[len];
-    memcpy(left, arr, sizeof(void *) * len);
-    kdtree(&((*rootptr)->left), left, len, depth + 1);
+    size_t n = mid;
+    void *left[n];
+    memcpy(left, arr, sizeof(void *) * n);
+    kdtree(&((*rootptr)->left), left, n, depth + 1);
+
+    // ensure there are items on the right side of mid
+    if (len == mid + 1)
+        return;
 
     // slice array from mid to len
-    len = (len - mid + 1);
-    void *right[len];
-    memcpy(right, &arr[mid + 1], sizeof(void *) * len);
-    kdtree(&((*rootptr)->right), right, len, depth + 1);
+    n = (len - mid);
+    void *right[n];
+    memcpy(right, &arr[mid + 1], sizeof(void *) * n);
+    kdtree(&((*rootptr)->right), right, n, depth + 1);
 }
 
 void kdtree_from(kdtree_t *self, void *arr, size_t len) {
@@ -124,15 +128,15 @@ void kdtree_from(kdtree_t *self, void *arr, size_t len) {
         points[i] = array_get(arr, i);
     }
 
-    // build kdtree with array of pointers
+    // build kdtree from array of pointers
     kdtree(&self->root, points, len, 0);
 }
 
-static bool is_leaf(const tnode_t *root) {
+static bool is_leaf(const kdnode_t *root) {
     return (!root->left && !root->right);
 }
 
-static void *nearest_neighbor(tnode_t *root, vec2s pos, float *distance,
+static void *nearest_neighbor(kdnode_t *root, vec2s pos, float *distance,
                               short depth) {
     assert(root);
     if (is_leaf(root)) {
@@ -147,7 +151,7 @@ static void *nearest_neighbor(tnode_t *root, vec2s pos, float *distance,
     short axis = depth % 2;
     float a = pos.raw[axis], b = root->pos.raw[axis];
 
-    tnode_t *node = NULL;
+    kdnode_t *node = NULL;
     if (root->left && (a <= b || !root->right)) {
         // if item->pos <= root->pos or there is not a right child
         node = nearest_neighbor(root->left, pos, distance, depth + 1);
@@ -179,6 +183,7 @@ static void *nearest_neighbor(tnode_t *root, vec2s pos, float *distance,
 
 void *kdtree_nearest(kdtree_t *self, vec2s pos) {
     float distance = INT_MAX;
-    tnode_t *node = nearest_neighbor(self->root, pos, &distance, 0);
+    kdnode_t *node = nearest_neighbor(self->root, pos, &distance, 0);
+    assert(node);
     return node->data;
 }

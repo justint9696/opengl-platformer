@@ -4,14 +4,14 @@
 #include <cglm/types-struct.h>
 #include <stddef.h>
 
-typedef struct tnode_t {
+typedef struct kdnode_t {
     vec2s pos;
     void *data;
-    struct tnode_t *left, *right;
-} tnode_t;
+    struct kdnode_t *left, *right;
+} kdnode_t;
 
 typedef struct {
-    tnode_t *root;
+    kdnode_t *root;
 } kdtree_t;
 
 void kdtree_init(kdtree_t *);
