@@ -64,10 +64,9 @@ static void update(game_t *self) {
 }
 
 static void tick(game_t *self) {
-    if (!time_tick(&self->time))
-        return;
-
-    world_tick(&self->world, self->time.delta_fixed);
+    while (time_tick(&self->time)) {
+        world_tick(&self->world, self->time.delta_fixed);
+    }
 }
 
 static void render(game_t *self) {
