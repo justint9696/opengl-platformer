@@ -14,7 +14,7 @@
 #include <math.h>
 #include <string.h>
 
-static inline void create_platforms(world_t *self) {
+static void create_platforms(world_t *self) {
     platform_create((vec2s) { 0.f, -100.f }, (vec2s) { 50.f, 50.f }, self);
     platform_create((vec2s) { -50.f, -100.f }, (vec2s) { 50.f, 50.f }, self);
     platform_create((vec2s) { +50.f, -100.f }, (vec2s) { 50.f, 50.f }, self);

@@ -8,7 +8,7 @@ tile_t *tile_create(void *data, world_t *world) {
     tile_t *self = array_get(world->tiles, id);
 
     self->id = id;
-    if (self->init != NULL) {
+    if (self->init) {
         self->init(self, world);
     }
 
@@ -16,14 +16,14 @@ tile_t *tile_create(void *data, world_t *world) {
 }
 
 void tile_destroy(tile_t *self, world_t *world) {
-    if (self->destroy != NULL) {
+    if (self->destroy) {
         self->destroy(self, world);
     }
     array_remove(world->tiles, self);
 }
 
 void tile_render(tile_t *self, world_t *world) {
-    if (self->render != NULL) {
+    if (self->render) {
         self->render(self, world);
     }
 }
