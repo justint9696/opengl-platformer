@@ -5,7 +5,6 @@
 void time_init(time_s *self) {
     memset(self, 0, sizeof(time_s));
     const time_t now = NOW();
-    self->now = now;
     self->last_tick = now;
     self->last_second = now;
     self->delta_fixed = DELTA_FIXED;
@@ -16,6 +15,8 @@ void time_update(time_s *self) {
     self->delta_ns = now - self->last_frame;
     self->delta
         = (self->delta_ns ? (1.f * self->delta_ns / NS_PER_SECOND) : 1.f);
+
+    self->last_frame = now;
 
     self->frames++;
 

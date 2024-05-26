@@ -28,7 +28,7 @@
     })
 
 typedef struct {
-    time_t now, delta_ns;
+    time_t delta_ns;
     time_t last_second, last_tick, last_frame;
     float delta, delta_fixed;
     uint32_t frames, ticks;
