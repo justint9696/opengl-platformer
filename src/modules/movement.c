@@ -8,8 +8,7 @@ void movement_tick(entity_t *self, world_t *world, float dt) {
     vec2s prev_pos = world_to_screen(world, self->body.pos);
 
     // apply movement
-    self->body.pos = glms_vec2_muladds(self->body.vel, dt, self->body.pos);
-    /* self->body.pos = glms_vec2_add(self->body.vel, self->body.pos); */
+    self->body.pos = glms_vec2_add(self->body.vel, self->body.pos);
     vec2s pos = world_to_screen(world, self->body.pos);
 
     // update position within uniform grid
