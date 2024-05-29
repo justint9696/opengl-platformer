@@ -6,7 +6,8 @@ vec2s box_center(const box_t *self) {
     return glms_vec2_muladds(self->dim, 0.5f, self->pos);
 }
 
-void bbb_create(box_t *self, vec2s vel, short axis) {
+void bbb_create(box_t *self, vec2s vel, short axis, float dt) {
+    vel = glms_vec2_scale(vel, dt);
     self->dim.raw[axis] += fabsf(vel.raw[axis]);
     self->pos.raw[axis] = vel.raw[axis] >= 0.f
                               ? self->pos.raw[axis]
