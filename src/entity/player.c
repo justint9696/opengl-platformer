@@ -11,7 +11,6 @@
 #include "world/world.h"
 
 #include <cglm/struct.h>
-#include <cglm/struct/io.h>
 
 static void collision_callback(entity_t *self, entity_t *entity) {}
 
@@ -22,17 +21,10 @@ static void init(entity_t *self, world_t *world) {
 static void tick(entity_t *self, world_t *world, float dt) {}
 
 static void render(entity_t *self, world_t *world) {
-    box_t bbb = self->body.box;
-    for (int i = 0; i < 2; i++) {
-        bbb_create(&bbb, self->body.vel, i);
-    }
-
     vec2s a = box_center(&self->body.box);
     tile_t *tile = kdtree_nearest(&world->kdtree, a);
     vec2s b = box_center(&tile->body.box);
     draw_line(a, b, COLOR_RED);
-
-    draw_quad(bbb.pos, bbb.dim, COLOR_RED);
     draw_quad(self->body.pos, self->body.dim, COLOR_BLUE);
 }
 
@@ -45,8 +37,9 @@ entity_t *player_create(vec2s pos, vec2s dim, world_t *world) {
             .pos = pos, 
             .dim = dim,
             .solid = true,
-            .movement_speed = 3.f,
-            .jump_speed = GRAVITY * 0.34f,
+            .mass = 3.f,
+            .movement_speed = 18.f,
+            .jump_speed = GRAVITY * 0.8f,
             .collision_callback = collision_callback,
         },
         .flags = F_PLAYER_CONTROLLED | F_KINEMATIC | F_GRAVITY,
