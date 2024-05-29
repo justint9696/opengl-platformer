@@ -34,7 +34,7 @@ static vec2s try_move(entity_t *self, world_t *world, void *arr[], size_t len,
                 continue;
 
             box_t bbb = self->body.box;
-            bbb_create(&bbb, movement, i);
+            bbb_create(&bbb, movement, i, dt);
             if (aabb_collision_2d(&bbb, &tmp->body.box)) {
                 // handle collision along axis
                 handle_collision(&self->body.box, &tmp->body.box, &movement, i);
@@ -52,11 +52,12 @@ static vec2s try_move(entity_t *self, world_t *world, void *arr[], size_t len,
             continue;
 
         box_t bbb = self->body.box;
-        bbb_create(&bbb, movement, i);
+        bbb_create(&bbb, movement, i, dt);
         tile_t *tmp = kdtree_nearest(&world->kdtree, box_center(&bbb));
         assert(tmp);
 
         if (aabb_collision_2d(&bbb, &tmp->body.box)) {
+            /* printf("%d\n", tmp->id); */
             // handle collision along axis
             handle_collision(&self->body.box, &tmp->body.box, &movement, i);
             if (tmp->body.collision_callback) {
