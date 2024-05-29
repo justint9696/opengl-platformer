@@ -58,6 +58,8 @@ static int tile_compare_x(const void *a, const void *b) {
     const tile_t *x = *(const tile_t **)a;
     const tile_t *y = *(const tile_t **)b;
 
+    assert(x && y);
+
     if (x->body.pos.x < y->body.pos.x)
         return -1;
     else if (x->body.pos.x > y->body.pos.x)
@@ -68,6 +70,8 @@ static int tile_compare_x(const void *a, const void *b) {
 static int tile_compare_y(const void *a, const void *b) {
     const tile_t *x = *(const tile_t **)a;
     const tile_t *y = *(const tile_t **)b;
+
+    assert(x && y);
 
     if (x->body.pos.y < y->body.pos.y)
         return -1;
@@ -108,11 +112,11 @@ static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth) {
     kdtree(&((*rootptr)->left), left, n, depth + 1);
 
     // ensure there are items on the right side of mid
-    if (len == mid + 1)
+    if (len - mid == 1)
         return;
 
     // slice array from mid to len
-    n = (len - mid);
+    n = (len - mid - 1);
     void *right[n];
     memcpy(right, &arr[mid + 1], sizeof(void *) * n);
     kdtree(&((*rootptr)->right), right, n, depth + 1);
