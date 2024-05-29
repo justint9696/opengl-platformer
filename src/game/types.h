@@ -19,8 +19,10 @@ typedef struct {
     };
 
     vec2s vel;
+    vec2s movement;
     bool solid;
     bool grounded;
+    float mass;
     float jump_speed;
     float movement_speed;
     time_t grounded_tick;
