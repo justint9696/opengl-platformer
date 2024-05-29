@@ -9,7 +9,7 @@
 
 typedef struct {
     bool quit: 1;
-    bool debug: 1;
+    bool wireframe: 1;
     window_t window; 
     time_s time;
     world_t world;

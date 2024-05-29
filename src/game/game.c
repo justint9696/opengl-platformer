@@ -1,9 +1,8 @@
 #include "game/game.h"
-#include "game/buttons.h"
 
+#include "game/buttons.h"
 #include "graphics/renderer.h"
 #include "graphics/window.h"
-
 #include "util/time.h"
 #include "world/world.h"
 
@@ -15,8 +14,8 @@ static void monitor_input(game_t *game) {
         game->quit = true;
     }
     if (button_pressed(SDL_SCANCODE_T, 250)) {
-        game->debug ^= 1;
-        if (game->debug)
+        game->wireframe ^= 1;
+        if (game->wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         else
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -36,8 +35,8 @@ static void poll_events(game_t *game) {
                 break;
             case SDL_WINDOWEVENT:
                 if (ev.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-                    window_resize(
-                            &game->window, ev.window.data1, ev.window.data2);
+                    window_resize(&game->window, ev.window.data1,
+                                  ev.window.data2);
                 break;
             default:
                 break;
