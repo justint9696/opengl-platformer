@@ -15,10 +15,17 @@
 #include <string.h>
 
 static void create_platforms(world_t *self) {
-    platform_create((vec2s) { 0.f, -100.f }, (vec2s) { 50.f, 50.f }, self);
-    platform_create((vec2s) { -50.f, -100.f }, (vec2s) { 50.f, 50.f }, self);
-    platform_create((vec2s) { +50.f, -100.f }, (vec2s) { 50.f, 50.f }, self);
-    platform_create((vec2s) { -200.f, -100.f }, (vec2s) { 50.f, 50.f }, self);
+    float size = 50.f;
+    float pos_y = -(SCREEN_HEIGHT * 0.5f) + (size * 0.5f);
+    vec2s dim = (vec2s) { size, size };
+    platform_create((vec2s) { 0.f, pos_y }, dim, self);
+    platform_create((vec2s) { -50.f, pos_y }, dim, self);
+    platform_create((vec2s) { +50.f, pos_y }, dim, self);
+    platform_create((vec2s) { -200.f, pos_y }, dim, self);
+    platform_create((vec2s) { +100.f, pos_y + size }, dim, self);
+    platform_create((vec2s) { +100.f, pos_y + (size * 2) }, dim, self);
+    platform_create((vec2s) { -100.f, pos_y + size }, dim, self);
+    platform_create((vec2s) { -100.f, pos_y + (size * 2) }, dim, self);
 }
 
 void world_init(world_t *self) {
@@ -29,7 +36,7 @@ void world_init(world_t *self) {
     self->tiles = array_alloc(sizeof(tile_t), 64);
     self->player
         = player_create((vec2s) { 0.f, 0.f }, (vec2s) { 50.f, 50.f }, self);
-    enemy_create((vec2s) { 30.f, 80.f }, (vec2s) { 50.f, 50.f }, self);
+    /* enemy_create((vec2s) { 30.f, 80.f }, (vec2s) { 50.f, 50.f }, self); */
 
     create_platforms(self);
     kdtree_from(&self->kdtree, self->tiles, array_len(self->tiles));
