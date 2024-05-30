@@ -54,46 +54,12 @@ void kdtree_insert(kdtree_t *self, vec2s pos, void *data) {
     insert(&self->root, pos, data, 0);
 }
 
-static int tile_compare_x(const void *a, const void *b) {
-    const tile_t *x = *(const tile_t **)a;
-    const tile_t *y = *(const tile_t **)b;
-
-    assert(x && y);
-
-    if (x->body.pos.x < y->body.pos.x)
-        return -1;
-    else if (x->body.pos.x > y->body.pos.x)
-        return 1;
-    return 0;
-}
-
-static int tile_compare_y(const void *a, const void *b) {
-    const tile_t *x = *(const tile_t **)a;
-    const tile_t *y = *(const tile_t **)b;
-
-    assert(x && y);
-
-    if (x->body.pos.y < y->body.pos.y)
-        return -1;
-    else if (x->body.pos.y > y->body.pos.y)
-        return 1;
-    return 0;
-}
-
-static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth) {
+static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth, sort_fn_t sort) {
     if (len < 1)
         return;
 
-    switch (depth % 2) {
-        case 0:
-            qsort(arr, len, sizeof(void *), tile_compare_x);
-            break;
-        case 1:
-            qsort(arr, len, sizeof(void *), tile_compare_y);
-            break;
-        default:
-            break;
-    }
+    // sort items along current axis
+    sort(arr, len, depth % 2);
 
     short mid = floorf(len / 2.f);
     tile_t *tile = arr[mid];
@@ -108,7 +74,7 @@ static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth) {
     size_t n = mid;
     void *left[n];
     memcpy(left, arr, sizeof(void *) * n);
-    kdtree(&((*rootptr)->left), left, n, depth + 1);
+    kdtree(&((*rootptr)->left), left, n, depth + 1, sort);
 
     // ensure there are items on the right side of mid
     if (len - mid == 1)
@@ -118,10 +84,10 @@ static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth) {
     n = (len - mid - 1);
     void *right[n];
     memcpy(right, &arr[mid + 1], sizeof(void *) * n);
-    kdtree(&((*rootptr)->right), right, n, depth + 1);
+    kdtree(&((*rootptr)->right), right, n, depth + 1, sort);
 }
 
-void kdtree_from(kdtree_t *self, void *arr, size_t len) {
+void kdtree_from(kdtree_t *self, void *arr, size_t len, sort_fn_t sort) {
     // initialize kdtee
     kdtree_init(self);
 
@@ -132,7 +98,7 @@ void kdtree_from(kdtree_t *self, void *arr, size_t len) {
     }
 
     // build kdtree from array of pointers
-    kdtree(&self->root, points, len, 0);
+    kdtree(&self->root, points, len, 0, sort);
 }
 
 static bool is_leaf(const kdnode_t *root) {
