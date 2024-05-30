@@ -7,8 +7,8 @@
 #include <stdbool.h>
 #include <time.h>
 
-struct entity_t;
-struct tile_t;
+struct entity_s;
+struct tile_s;
 
 typedef struct {
     union {
@@ -26,7 +26,7 @@ typedef struct {
     float jump_speed;
     float movement_speed;
     time_t grounded_tick;
-    void (*collision_callback)(struct entity_t *, struct entity_t *);
+    void (*collision_callback)(struct entity_s *, struct entity_s *);
 } rigid_body_t;
 
 typedef struct {
@@ -38,7 +38,7 @@ typedef struct {
     };
 
     bool solid;
-    void (*collision_callback)(struct tile_t *, struct entity_t *);
+    void (*collision_callback)(struct tile_s *, struct entity_s *);
 } static_body_t;
 
 #endif

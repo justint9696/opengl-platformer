@@ -25,7 +25,7 @@ static void create_platforms(world_t *self) {
     platform_create((vec2s) { +100.f, pos_y + size }, dim, self);
     platform_create((vec2s) { +100.f, pos_y + (size * 2) }, dim, self);
     platform_create((vec2s) { -100.f, pos_y + size }, dim, self);
-    platform_create((vec2s) { -100.f, pos_y + (size * 2) }, dim, self);
+    /* platform_create((vec2s) { -100.f, pos_y + (size * 2) }, dim, self); */
 }
 
 void world_init(world_t *self) {
@@ -39,7 +39,7 @@ void world_init(world_t *self) {
     /* enemy_create((vec2s) { 30.f, 80.f }, (vec2s) { 50.f, 50.f }, self); */
 
     create_platforms(self);
-    kdtree_from(&self->kdtree, self->tiles, array_len(self->tiles));
+    kdtree_from(&self->kdtree, self->tiles, array_len(self->tiles), tile_sort);
 }
 
 void world_destroy(world_t *self) {

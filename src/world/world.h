@@ -9,7 +9,7 @@
 
 #include <cglm/types-struct.h>
 
-typedef struct world_t {
+typedef struct world_s {
     grid_t grid;
     camera_t camera;
 
