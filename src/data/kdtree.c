@@ -98,8 +98,7 @@ static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth) {
     short mid = floorf(len / 2.f);
     tile_t *tile = arr[mid];
     const box_t *box = &tile->body.box;
-    vec2s center = box_center(box);
-    *rootptr = node_init(center, tile);
+    *rootptr = node_init(box->pos, tile);
 
     // ensure array can be sliced
     if (mid == 0)
