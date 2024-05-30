@@ -57,7 +57,9 @@ void array_remove(void *data, void *item) {
     }
 
     if (idx >= array->len) {
-        fprintf(stderr, "WARNING: Attempted to remove an item not contained in array.\n");
+        fprintf(
+            stderr,
+            "WARNING: Attempted to remove an item not contained in array.\n");
         return;
     }
 
