@@ -1,13 +1,10 @@
 #include "entity/player.h"
 
-#include "data/kdtree.h"
 #include "entity/entity.h"
 #include "game/defs.h"
 #include "graphics/color.h"
 #include "graphics/drawing.h"
 #include "graphics/window.h"
-#include "tile/tile.h"
-#include "util/aabb.h"
 #include "world/world.h"
 
 #include <cglm/struct.h>
@@ -21,10 +18,6 @@ static void init(entity_t *self, world_t *world) {
 static void tick(entity_t *self, world_t *world, float dt) {}
 
 static void render(entity_t *self, world_t *world) {
-    vec2s a = box_center(&self->body.box);
-    tile_t *tile = kdtree_nearest(&world->kdtree, a);
-    vec2s b = box_center(&tile->body.box);
-    draw_line(a, b, COLOR_RED);
     draw_quad(self->body.pos, self->body.dim, COLOR_BLUE);
 }
 
