@@ -8,6 +8,7 @@
 #include "graphics/window.h"
 #include "tile/platform.h"
 #include "tile/tile.h"
+#include "util/io.h"
 #include "util/util.h"
 
 #include <cglm/struct.h>
@@ -22,8 +23,9 @@ static void create_platforms(world_t *self) {
     platform_create((vec2s) { -50.f, pos_y }, dim, self);
     platform_create((vec2s) { +50.f, pos_y }, dim, self);
     platform_create((vec2s) { -200.f, pos_y }, dim, self);
+    platform_create((vec2s) { 0.f, pos_y + (size * 2) }, dim, self);
     platform_create((vec2s) { +100.f, pos_y + size }, dim, self);
-    platform_create((vec2s) { +100.f, pos_y + (size * 2) }, dim, self);
+    platform_create((vec2s) { +100.f, pos_y + (size * 3) }, dim, self);
     platform_create((vec2s) { -100.f, pos_y + size }, dim, self);
     /* platform_create((vec2s) { -100.f, pos_y + (size * 2) }, dim, self); */
 }
@@ -92,7 +94,12 @@ size_t world_get_colliders(world_t *self, entity_t *entity, entity_t *arr[],
                            size_t len) {
     cell_t *cell
         = grid_cell_pos(&self->grid, world_to_screen(self, entity->body.pos));
-    assert(cell && cell->items);
+    assert(cell);
+
+    if (!cell->items) {
+        WARN(0, "Current cell has not been initialized.\n");
+        return 0;
+    }
 
     size_t n = 0;
     ivec2s pos = cell->pos, dim = self->grid.dim;

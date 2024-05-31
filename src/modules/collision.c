@@ -60,6 +60,8 @@ static vec2s try_move(entity_t *self, world_t *world, void *arr[], size_t len,
         tile_t *tmp = kdtree_nearest(&world->kdtree, pos);
         assert(tmp);
 
+        
+
         if (aabb_collision_2d(&bbb, &tmp->body.box)) {
             // handle collision along current axis
             handle_collision(&self->body.box, &tmp->body.box, &movement, i);

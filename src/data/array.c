@@ -1,4 +1,5 @@
 #include "data/array.h"
+#include "util/io.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -57,9 +58,7 @@ void array_remove(void *data, void *item) {
     }
 
     if (idx >= array->len) {
-        fprintf(
-            stderr,
-            "WARNING: Attempted to remove an item not contained in array.\n");
+        WARN(0, "Attempted to remove an item not contained in array.\n");
         return;
     }
 
