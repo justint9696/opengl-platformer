@@ -15,6 +15,7 @@ CFLAGS += -Ilib/glad/include
 CFLAGS += -Ilib/stb
 CFLAGS += -Isrc
 CFLAGS += $(shell sdl2-config --cflags)
+CFLAGS += -DDEBUG
 
 LDFLAGS := -lm
 LDFLAGS += -Llib/glad
