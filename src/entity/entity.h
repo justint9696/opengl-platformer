@@ -4,21 +4,28 @@
 #include "game/types.h"
 
 #include <inttypes.h>
+#include <stddef.h>
 
 struct world_s;
 
 typedef enum {
     F_NONE              = 0,
-    F_PLAYER_CONTROLLED = 1,
-    F_AI_CONTROLLED     = 2,
-    F_KINEMATIC         = 4,
-    F_GRAVITY           = 8,
+    F_PLAYER_CONTROLLED = 1 << 0,
+    F_AI_CONTROLLED     = 1 << 1,
+    F_KINEMATIC         = 1 << 2,
+    F_GRAVITY           = 1 << 3,
 } flag_t;
 
 typedef struct entity_s {
     uint32_t id;
     uint32_t flags;
-    rigid_body_t body;
+    rigidbody_t body;
+
+#ifdef DEBUG
+    struct {
+        vec2s *lines;
+    } debug;
+#endif
 
     void (*init)(struct entity_s *, struct world_s *);
     void (*destroy)(struct entity_s *, struct world_s *);
