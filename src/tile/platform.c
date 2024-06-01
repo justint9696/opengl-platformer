@@ -1,7 +1,6 @@
 #include "tile/platform.h"
 
 #include "entity/entity.h"
-#include "graphics/color.h"
 #include "graphics/drawing.h"
 #include "world/world.h"
 

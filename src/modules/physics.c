@@ -25,6 +25,7 @@ void physics_tick(entity_t *self, world_t *world, float dt) {
     // player jump
     if (movement.y > 0.f) {
         self->body.vel.y = self->body.jump_speed * MOVEMENT_SCALAR;
+        self->body.grounded = false;
     }
 
     // gravity

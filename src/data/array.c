@@ -2,7 +2,6 @@
 #include "util/io.h"
 
 #include <assert.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -26,21 +25,21 @@ void array_free(void *data) {
     free(array);
 }
 
-void array_resize(void **data_ptr, size_t capacity) {
-    array_t *array = array_header(*data_ptr);
+void array_resize(void **dataptr, size_t capacity) {
+    array_t *array = array_header(*dataptr);
     assert(array && capacity >= array->len);
     array->capacity = capacity;
     array = realloc(array, array->size * capacity);
-    *data_ptr = (void *)&array->data;
+    *dataptr = (void *)&array->data;
 }
 
-uint32_t array_push(void **data_ptr, void *item) {
-    array_t *array = array_header(*data_ptr);
+uint32_t array_push(void **dataptr, void *item) {
+    array_t *array = array_header(*dataptr);
     assert(array);
     if (array->len >= array->capacity) {
-        array_resize(data_ptr, array->capacity * 2);
+        array_resize(dataptr, array->capacity * 2);
     }
-    void *ptr = array_get(*data_ptr, array->len);
+    void *ptr = array_get(*dataptr, array->len);
     memcpy(ptr, item, array->size);
     return array->len++;
 }
@@ -58,7 +57,7 @@ void array_remove(void *data, void *item) {
     }
 
     if (idx >= array->len) {
-        WARN(0, "Attempted to remove an item not contained in array.\n");
+        WARN( 0, "Attempted to remove an item not contained within the array.\n");
         return;
     }
 

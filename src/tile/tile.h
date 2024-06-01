@@ -9,7 +9,7 @@ struct world_s;
 
 typedef struct tile_s {
     uint32_t id;
-    static_body_t body;
+    staticbody_t body;
 
     void (*init)(struct tile_s *, struct world_s *);
     void (*destroy)(struct tile_s *, struct world_s *);

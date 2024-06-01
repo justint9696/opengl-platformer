@@ -1,28 +1,41 @@
 #include "data/array.h"
-#include "data/kdtree.h"
 #include "entity/entity.h"
-#include "game/types.h"
-#include "util/aabb.h"
 #include "world/world.h"
 
 #include <assert.h>
 #include <cglm/struct.h>
 #include <stdbool.h>
 
-static void handle_collision(box_t *a, box_t *b, vec2s *movement, short axis) {
+static void resolve_collision(entity_t *self, world_t *world, box_t *box,
+                              vec2s *movement, short axis) {
+    // store current position
+    vec2s prev_pos = world_to_screen(world, self->body.pos);
+
     // set position to entry point of collision along the current axis
     if (movement->raw[axis] < 0.f) {
-        a->pos.raw[axis] = b->pos.raw[axis] + b->dim.raw[axis];
+        self->body.pos.raw[axis] = box->pos.raw[axis] + box->dim.raw[axis];
     } else if (movement->raw[axis] > 0.f) {
-        a->pos.raw[axis] = b->pos.raw[axis] - a->dim.raw[axis];
+        self->body.pos.raw[axis]
+            = box->pos.raw[axis] - self->body.dim.raw[axis];
+    }
+
+    // update position within uniform grid
+    vec2s pos = world_to_screen(world, self->body.pos);
+    if (self->body.solid) {
+        grid_update(&world->grid, &self, prev_pos, pos);
     }
 
     // stop further movement along collision axis
     movement->raw[axis] = 0.f;
 }
 
-static vec2s try_move(entity_t *self, world_t *world, void *arr[], size_t len,
-                      float dt) {
+static vec2s try_move(
+        entity_t *self, world_t *world, void *arr[], size_t len, float dt) {
+#ifdef DEBUG
+    // clear debug lines array
+    array_clear(self->debug.lines);
+#endif
+
     vec2s movement = glms_vec2_make(self->body.vel.raw);
 
     // check for collision with entities
@@ -36,8 +49,7 @@ static vec2s try_move(entity_t *self, world_t *world, void *arr[], size_t len,
             box_t bbb = self->body.box;
             bbb_create(&bbb, movement, i, dt);
             if (aabb_collision_2d(&bbb, &tmp->body.box)) {
-                // handle collision along axis
-                handle_collision(&self->body.box, &tmp->body.box, &movement, i);
+                resolve_collision(self, world, &tmp->body.box, &movement, i);
                 collision = true;
             }
         }
@@ -60,11 +72,13 @@ static vec2s try_move(entity_t *self, world_t *world, void *arr[], size_t len,
         tile_t *tmp = kdtree_nearest(&world->kdtree, pos);
         assert(tmp);
 
-        
+#ifdef DEBUG
+        array_push((void **)&self->debug.lines, &pos);
+        array_push((void **)&self->debug.lines, &tmp->body.pos);
+#endif
 
         if (aabb_collision_2d(&bbb, &tmp->body.box)) {
-            // handle collision along current axis
-            handle_collision(&self->body.box, &tmp->body.box, &movement, i);
+            resolve_collision(self, world, &tmp->body.box, &movement, i);
             if (tmp->body.collision_callback) {
                 tmp->body.collision_callback(tmp, self);
             }

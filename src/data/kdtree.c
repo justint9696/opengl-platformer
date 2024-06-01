@@ -2,7 +2,6 @@
 
 #include "data/array.h"
 #include "tile/tile.h"
-#include "util/aabb.h"
 
 #include <assert.h>
 #include <cglm/struct.h>
@@ -54,7 +53,8 @@ void kdtree_insert(kdtree_t *self, vec2s pos, void *data) {
     insert(&self->root, pos, data, 0);
 }
 
-static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth, sort_fn_t sort) {
+static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth,
+                   sort_fn_t sort) {
     if (len < 1)
         return;
 
@@ -63,8 +63,7 @@ static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth, sor
 
     short mid = floorf(len / 2.f);
     tile_t *tile = arr[mid];
-    const box_t *box = &tile->body.box;
-    *rootptr = node_init(box->pos, tile);
+    *rootptr = node_init(tile->body.pos, tile);
 
     // ensure array can be sliced
     if (mid == 0)
@@ -77,10 +76,10 @@ static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth, sor
     kdtree(&((*rootptr)->left), left, n, depth + 1, sort);
 
     // ensure there are items on the right side of mid
-    if (len - mid == 1)
+    if (len - mid <= 1)
         return;
 
-    // slice array from mid to len
+    // slice array from mid+1 to len
     n = (len - mid - 1);
     void *right[n];
     memcpy(right, &arr[mid + 1], sizeof(void *) * n);
@@ -101,12 +100,12 @@ void kdtree_from(kdtree_t *self, void *arr, size_t len, sort_fn_t sort) {
     kdtree(&self->root, points, len, 0, sort);
 }
 
-static bool is_leaf(const kdnode_t *root) {
+static inline bool is_leaf(const kdnode_t *root) {
     return (!root->left && !root->right);
 }
 
-static void *nearest_neighbor(kdnode_t *root, vec2s pos, float *distance,
-                              short depth) {
+static void *nearest_neighbor(
+        kdnode_t *root, vec2s pos, float *distance, short depth) {
     assert(root);
     if (is_leaf(root)) {
         float current = glms_vec2_distance2(pos, root->pos);
@@ -121,7 +120,7 @@ static void *nearest_neighbor(kdnode_t *root, vec2s pos, float *distance,
     float a = pos.raw[axis], b = root->pos.raw[axis];
 
     kdnode_t *node = NULL;
-    if (root->left && (a <= b || !root->right)) {
+    if (root->left && a <= b) {
         // if item->pos <= root->pos or there is not a right child
         node = nearest_neighbor(root->left, pos, distance, depth + 1);
 
@@ -130,7 +129,7 @@ static void *nearest_neighbor(kdnode_t *root, vec2s pos, float *distance,
             && glms_vec2_distance2(pos, root->right->pos) < *distance) {
             node = nearest_neighbor(root->right, pos, distance, depth + 1);
         }
-    } else if (root->right && (a > b || !root->left)) {
+    } else if (root->right && a > b) {
         // if item->pos > root->pos or there is not a left child
         node = nearest_neighbor(root->right, pos, distance, depth + 1);
 

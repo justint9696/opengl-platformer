@@ -28,8 +28,8 @@ void grid_init(grid_t *self, ivec2s cell_size, ivec2s res) {
 }
 
 void grid_destroy(grid_t *self) {
-    for (size_t y = 0; y < self->dim.y; y++) {
-        for (size_t x = 0; x < self->dim.x; x++) {
+    for (int y = 0; y < self->dim.y; y++) {
+        for (int x = 0; x < self->dim.x; x++) {
             cell_t *cell = &self->cells[offset(x, y, self->dim.x)];
             if (!cell->items)
                 continue;
