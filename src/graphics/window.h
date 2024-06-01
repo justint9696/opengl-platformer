@@ -8,6 +8,7 @@
 #define SCREEN_HEIGHT 480
 
 typedef struct {
+    char title[64];
     int width, height;
     SDL_Window *handle;
     SDL_GLContext context;
@@ -18,5 +19,7 @@ void window_destroy(window_t *);
 
 void window_resize(window_t *, int width, int height);
 void window_swap_buffers(window_t *);
+
+void window_title(window_t *, const char *format, ...);
 
 #endif

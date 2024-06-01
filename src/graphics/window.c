@@ -5,6 +5,8 @@
 
 #include <SDL2/SDL.h>
 #include <glad/glad.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 void window_init(window_t *self, const char *title) {
     memset(self, 0, sizeof(window_t));
@@ -57,4 +59,12 @@ void window_resize(window_t *self, int width, int height) {
 
 void window_swap_buffers(window_t *self) {
     SDL_GL_SwapWindow(self->handle);
+}
+
+void window_title(window_t *self, const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    vsnprintf(self->title, 64, format, args);
+    SDL_SetWindowTitle(self->handle, self->title);
+    va_end(args);
 }
