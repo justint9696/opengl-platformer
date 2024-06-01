@@ -10,7 +10,6 @@ OBJS = $(patsubst $(SRC)%, $(OBJ)%, $(SRCS:.c=.o))
 CFLAGS := -g -O2 -Wall -Wextra
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-missing-braces
-CFLAGS += -Wno-sign-compare
 CFLAGS += -Ilib/glad/include
 CFLAGS += -Ilib/stb
 CFLAGS += -Isrc
