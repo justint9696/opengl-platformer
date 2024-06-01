@@ -8,10 +8,10 @@
 #include <stdbool.h>
 
 typedef struct {
-    bool quit: 1;
-    bool wireframe: 1;
+    bool quit;
+    bool wireframe;
     window_t window; 
-    time_s time;
+    struct time_s time;
     world_t world;
 } game_t;
 
