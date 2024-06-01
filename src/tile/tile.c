@@ -1,6 +1,7 @@
 #include "tile/tile.h"
 
 #include "data/array.h"
+#include "util/io.h"
 #include "world/world.h"
 
 #include <assert.h>
@@ -42,8 +43,7 @@ void tile_sort(void *arr, size_t len, short axis) {
             qsort(arr, len, sizeof(tile_t *), sort_y);
             break;
         default:
-            fprintf(stderr, "ERROR: Invalid sorting axis %d.\n", axis);
-            exit(1);
+            ASSERT(0, "Invalid sorting axis %d.\n", axis);
             break;
     }
 }

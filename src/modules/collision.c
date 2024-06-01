@@ -73,7 +73,8 @@ static vec2s try_move(
         assert(tmp);
 
 #ifdef DEBUG
-        array_push((void **)&self->debug.lines, &pos);
+        vec2s center = box_center(&self->body.box);
+        array_push((void **)&self->debug.lines, &center);
         array_push((void **)&self->debug.lines, &tmp->body.pos);
 #endif
 
