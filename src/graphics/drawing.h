@@ -1,6 +1,8 @@
 #ifndef _GRAPHICS_DRAWING_H_
 #define _GRAPHICS_DRAWING_H_
 
+#include "graphics/color.h"
+
 #include <cglm/types-struct.h>
 #include <inttypes.h>
 
