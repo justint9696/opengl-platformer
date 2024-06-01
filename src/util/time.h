@@ -27,17 +27,17 @@
         ((ts.tv_sec * NS_PER_SECOND) + ts.tv_nsec);\
     })
 
-typedef struct {
+struct time_s {
     time_t delta_ns;
     time_t last_second, last_tick, last_frame;
     float delta, delta_fixed;
     uint32_t frames, ticks;
     uint32_t fps, tps;
-} time_s;
+};
 
-void time_init(time_s *);
-void time_update(time_s *);
+void time_init(struct time_s *);
+void time_update(struct time_s *);
 
-bool time_tick(time_s *);
+bool time_tick(struct time_s *);
 
 #endif
