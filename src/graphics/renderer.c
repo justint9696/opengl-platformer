@@ -1,6 +1,5 @@
 #include "graphics/renderer.h"
 
-#include "graphics/color.h"
 #include "graphics/drawing.h"
 #include "graphics/window.h"
 
