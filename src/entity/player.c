@@ -2,7 +2,6 @@
 
 #include "entity/entity.h"
 #include "game/defs.h"
-#include "graphics/color.h"
 #include "graphics/drawing.h"
 #include "graphics/window.h"
 #include "world/world.h"
