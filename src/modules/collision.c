@@ -69,7 +69,7 @@ static vec2s try_move(
         vec2s pos = bbb.pos;
         pos.raw[i] += movement.raw[i] > 0.f ? bbb.dim.raw[i] : 0.f;
 
-        tile_t *tmp = kdtree_nearest(&world->kdtree, pos);
+        tile_t *tmp = kdtree_nearest(&world->kdtree, pos.raw);
         assert(tmp);
 
 #ifdef DEBUG
