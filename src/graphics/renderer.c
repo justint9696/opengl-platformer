@@ -57,7 +57,7 @@ void draw_quad(vec2s pos, vec2s dim, uint32_t color) {
         1, 2, 3
     };
 
-    mat4s model = glms_mat4_identity();
+    mat4s model = GLMS_MAT4_IDENTITY_INIT;
     model = glms_translate(model, (vec3s) { pos.x, pos.y, 0.f });
     model = glms_scale(model, (vec3s) { dim.x, dim.y, 1.f });
 
@@ -91,7 +91,7 @@ void draw_line(vec2s start, vec2s end, uint32_t color) {
         x,   y, 0.f,
     };
 
-    mat4s model = glms_mat4_identity();
+    mat4s model = GLMS_MAT4_IDENTITY_INIT;
     model = glms_translate(model, (vec3s) { start.x, start.y, 0.f });
 
     glBindVertexArray(renderer.vao);
