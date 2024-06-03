@@ -4,6 +4,7 @@
 #include "graphics/renderer.h"
 #include "graphics/window.h"
 #include "util/io.h"
+#include "util/time.h"
 #include "world/world.h"
 
 #include <glad/glad.h>
@@ -75,7 +76,7 @@ static void render(game_t *self) {
 void game_run(game_t *self) {
     init(self);
     while (!self->quit) {
-        if (NOW() - self->time.last_second > NS_PER_SECOND) {
+        if (time_since(self->time.last_second) > NS_PER_SECOND) {
             window_title(&self->window, 
                          "FPS: %d TPS: %d", self->time.fps, self->time.tps);
             LOG("%s\n", self->window.title);

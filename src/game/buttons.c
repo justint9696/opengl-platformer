@@ -1,4 +1,5 @@
 #include "game/buttons.h"
+
 #include "util/time.h"
 
 static keyboard_t keyboard;
@@ -15,7 +16,7 @@ void buttons_update(SDL_KeyboardEvent ev) {
 bool button_pressed(SDL_Scancode scancode, time_t delay_ms) {
     const time_t now = NOW();
     button_t *btn = &keyboard.buttons[scancode];
-    if (!btn->pressed || now - btn->tick < NS(delay_ms))
+    if (!btn->pressed || time_since_ms(btn->tick) < delay_ms)
         return false;
 
     btn->tick = now;
