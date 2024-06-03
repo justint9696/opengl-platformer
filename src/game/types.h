@@ -19,13 +19,21 @@ typedef struct {
     };
 
     vec2s vel;
-    vec2s movement;
+    vec2s accel;
+    vec2s direction;
+
     bool solid;
     bool grounded;
+
     float mass;
     float jump_speed;
     float movement_speed;
+    float dash_speed;
+
+    time_t dash_tick;
+    time_t dash_duration_ms;
     time_t grounded_tick;
+
     void (*collision_callback)(struct entity_s *, struct entity_s *);
 } rigidbody_t;
 
