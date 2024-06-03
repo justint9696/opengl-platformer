@@ -40,3 +40,13 @@ bool time_tick(struct time_s *self) {
     }
     return false;
 }
+
+time_t time_since(time_t tick) {
+    const time_t now = NOW();
+    return (now - tick);
+}
+
+time_t time_since_ms(time_t tick) {
+    const time_t now = NOW();
+    return (now - tick) / NS_PER_MS;
+}

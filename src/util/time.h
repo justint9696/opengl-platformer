@@ -18,9 +18,6 @@
 
 #define DELTA_FIXED   ((double)TICK_DELAY / (double)NS_PER_SECOND)
 
-#define NS(_ms)       ((_ms) * NS_PER_MS)
-#define MS(_ns)       ((_ns) / NS_PER_MS)
-
 #define NOW() ({\
         struct timespec ts;\
         timespec_get(&ts, TIME_UTC);\
@@ -39,5 +36,8 @@ void time_init(struct time_s *);
 void time_update(struct time_s *);
 
 bool time_tick(struct time_s *);
+
+time_t time_since(time_t);
+time_t time_since_ms(time_t);
 
 #endif
