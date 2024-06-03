@@ -2,7 +2,6 @@
 
 #include "data/array.h"
 #include "data/kdtree.h"
-#include "entity/enemy.h"
 #include "entity/entity.h"
 #include "entity/player.h"
 #include "graphics/window.h"
@@ -20,15 +19,16 @@ static void create_platforms(world_t *self) {
     float pos_y = -(SCREEN_HEIGHT * 0.5f) + (size * 0.5f);
     vec2s dim = (vec2s) { size, size };
     platform_create((vec2s) { 0.f, pos_y }, dim, self);
-    platform_create((vec2s) { -50.f, pos_y }, dim, self);
-    platform_create((vec2s) { +50.f, pos_y }, dim, self);
-    platform_create((vec2s) { -200.f, pos_y }, dim, self);
-    platform_create((vec2s) { -250.f, pos_y }, dim, self);
+    platform_create((vec2s) { -size, pos_y }, dim, self);
+    platform_create((vec2s) { +size, pos_y }, dim, self);
+    platform_create((vec2s) { -size * 4, pos_y }, dim, self);
+    platform_create((vec2s) { -size * 5, pos_y }, dim, self);
     platform_create((vec2s) { 0.f, pos_y + (size * 2) }, dim, self);
-    platform_create((vec2s) { +100.f, pos_y + size }, dim, self);
-    platform_create((vec2s) { +100.f, pos_y + (size * 3) }, dim, self);
-    platform_create((vec2s) { -100.f, pos_y + size }, dim, self);
-    /* platform_create((vec2s) { -100.f, pos_y + (size * 2) }, dim, self); */
+    platform_create((vec2s) { -size * 3, pos_y + (size * 4) }, dim, self);
+    platform_create((vec2s) { +size * 2, pos_y + size }, dim, self);
+    platform_create((vec2s) { +size * 2, pos_y + (size * 3) }, dim, self);
+    platform_create((vec2s) { -size * 2, pos_y + size }, dim, self);
+    /* platform_create((vec2s) { -size * 2, pos_y + (size * 2) }, dim, self); */
 }
 
 void world_init(world_t *self) {
@@ -42,7 +42,10 @@ void world_init(world_t *self) {
     /* enemy_create((vec2s) { 30.f, 80.f }, (vec2s) { 50.f, 50.f }, self); */
 
     create_platforms(self);
-    kdtree_from(&self->kdtree, self->tiles, array_len(self->tiles), tile_sort);
+    
+    size_t len = array_len(self->tiles);
+    int offset = offsetof(tile_t, body.pos);
+    kdtree_from(&self->kdtree, self->tiles, len, offset, tile_sort);
 }
 
 void world_destroy(world_t *self) {
