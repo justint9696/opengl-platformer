@@ -1,5 +1,7 @@
 #include "entity/entity.h"
 #include "game/defs.h"
+#include "util/io.h"
+#include "util/time.h"
 #include "util/util.h"
 #include "world/world.h"
 
@@ -11,7 +13,7 @@ static const vec2s gravity
 
 void physics_tick(entity_t *self, world_t *world, float dt) {
     // mid-air drag
-    vec2s movement = glms_vec2_normalize(self->body.movement);
+    vec2s movement = glms_vec2_normalize(self->body.direction);
     if (movement.x == 0.f) {
         self->body.vel.x = 0.f;
     } else if (self->flags & F_GRAVITY) {
@@ -22,7 +24,13 @@ void physics_tick(entity_t *self, world_t *world, float dt) {
                * MOVEMENT_SCALAR;
     }
 
-    // player jump
+    // dash
+    if (time_since_ms(self->body.dash_tick) < 250) {
+        self->body.accel.x
+            += self->body.direction.x * self->body.dash_speed * MOVEMENT_SCALAR;
+    }
+
+    // jump
     if (movement.y > 0.f) {
         self->body.vel.y = self->body.jump_speed * MOVEMENT_SCALAR;
         self->body.grounded = false;
@@ -39,4 +47,6 @@ void physics_tick(entity_t *self, world_t *world, float dt) {
         = clamp(self->body.vel.x, -self->body.movement_speed * MOVEMENT_SCALAR,
                 self->body.movement_speed * MOVEMENT_SCALAR);
     self->body.vel.y = max(self->body.vel.y, gravity.y);
+
+    self->body.vel = glms_vec2_add(self->body.accel, self->body.vel);
 }

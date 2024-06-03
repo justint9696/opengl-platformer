@@ -32,6 +32,7 @@ entity_t *player_create(vec2s pos, vec2s dim, world_t *world) {
             .mass = 3.f,
             .movement_speed = 18.f,
             .jump_speed = GRAVITY * 0.8f,
+            .dash_speed = 50.f,
             .collision_callback = collision_callback,
         },
         .flags = F_PLAYER_CONTROLLED | F_KINEMATIC | F_GRAVITY,

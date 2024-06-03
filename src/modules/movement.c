@@ -16,6 +16,7 @@ void movement_tick(entity_t *self, world_t *world, float dt) {
         grid_update(&world->grid, &self, prev_pos, pos);
     }
 
-    // reset movement vector
-    self->body.movement = GLMS_VEC2_ZERO;
+    // reset movement and acceleration vectors
+    self->body.direction = GLMS_VEC2_ZERO;
+    self->body.accel = GLMS_VEC2_ZERO;
 }
