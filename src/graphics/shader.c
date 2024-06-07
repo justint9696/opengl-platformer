@@ -57,3 +57,27 @@ void shader_destroy(shader_t self) {
     glDeleteShader(self.vs);
     glDeleteShader(self.fs);
 }
+
+void shader_use(shader_t self) {
+    glUseProgram(self.handle);
+}
+
+void shader_uniform_mat4f(shader_t self, const char *uniform, mat4s val) {
+    glUniformMatrix4fv(glGetUniformLocation(self.handle, uniform), 1, GL_FALSE,
+                       (const GLfloat *)&val);
+}
+
+void shader_uniform_vec3f(shader_t self, const char *uniform, vec3s val) {
+    glUniform3fv(glGetUniformLocation(self.handle, uniform), 1,
+                 (const GLfloat *)&val);
+}
+
+void shader_uniform_vec4f(shader_t self, const char *uniform, vec4s val) {
+    glUniform4fv(glGetUniformLocation(self.handle, uniform), 1,
+                 (const GLfloat *)&val);
+}
+
+void shader_uniform_3f(shader_t self, const char *uniform, float x, float y,
+                       float z) {
+    glUniform3f(glGetUniformLocation(self.handle, uniform), x, y, z);
+}

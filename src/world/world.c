@@ -2,11 +2,19 @@
 
 #include "data/array.h"
 #include "data/kdtree.h"
+
 #include "entity/entity.h"
 #include "entity/player.h"
+
+#include "graphics/renderer.h"
+#include "graphics/ibo.h"
+#include "graphics/vao.h"
+#include "graphics/vbo.h"
 #include "graphics/window.h"
+
 #include "tile/platform.h"
 #include "tile/tile.h"
+
 #include "util/io.h"
 #include "util/util.h"
 
@@ -33,6 +41,11 @@ static void create_platforms(world_t *self) {
 
 void world_init(world_t *self) {
     memset(self, 0, sizeof(world_t));
+
+    self->vao = vao_create();
+    self->vbo = vbo_create(QUAD_VERTICES, sizeof(QUAD_VERTICES));
+    self->ibo = ibo_create(QUAD_INDICES, sizeof(QUAD_INDICES));
+
     grid_init(&self->grid, (ivec2s) { 60.f, 60.f },
               (ivec2s) { SCREEN_WIDTH, SCREEN_HEIGHT });
     self->entities = array_alloc(sizeof(entity_t), 64);
@@ -63,6 +76,8 @@ void world_update(world_t *self, float dt) {
 }
 
 void world_render(world_t *self) {
+    renderer_use_shader(SHADER_DEFAULT);
+
     size_t len = array_len(self->entities);
     for (size_t i = 0; i < len; i++) {
         entity_t *entity = &self->entities[i];

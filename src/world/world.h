@@ -8,6 +8,7 @@
 #include "tile/tile.h"
 
 #include <cglm/types-struct.h>
+#include <glad/glad.h>
 
 typedef struct world_s {
     grid_t grid;
@@ -24,6 +25,8 @@ typedef struct world_s {
 
     // array of all tiles
     tile_t *tiles;
+
+    GLuint vao, vbo, ibo;
 } world_t;
 
 void world_init(world_t *);
