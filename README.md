@@ -5,7 +5,7 @@ A 2D platformer made from scratch with C and OpenGL.
 #### Linux (Debian) 
 ```
 sudo apt install autoconf automake autotools-dev build-essential cmake \
-         libxkbcommon-dev libwayland-dev pkg-config xorg-dev
+         libfreetype6-dev libxkbcommon-dev libwayland-dev pkg-config xorg-dev
 ```
 
 ### Building

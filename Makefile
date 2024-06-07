@@ -14,12 +14,14 @@ CFLAGS += -Ilib/glad/include
 CFLAGS += -Ilib/stb
 CFLAGS += -Isrc
 CFLAGS += $(shell sdl2-config --cflags)
+CFLAGS += $(shell pkg-config --cflags freetype2)
 CFLAGS += -DDEBUG
 
 LDFLAGS := -lm
 LDFLAGS += -Llib/glad
 LDFLAGS += -lglad
 LDFLAGS += $(shell sdl2-config --libs)
+LDFLAGS += $(shell pkg-config --libs freetype2)
 
 TARGET = $(BIN)game
 

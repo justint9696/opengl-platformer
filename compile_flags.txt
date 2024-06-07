@@ -1,3 +1,4 @@
 -Isrc/
 -Ilib/glad/include/
 -Ilib/stb/
+-I/usr/include/freetype2/
