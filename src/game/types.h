@@ -26,9 +26,9 @@ typedef struct {
     bool grounded;
 
     float mass;
-    float jump_speed;
     float movement_speed;
-    float dash_speed;
+    float jump_force;
+    float dash_force;
 
     time_t dash_tick;
     time_t dash_duration_ms;
