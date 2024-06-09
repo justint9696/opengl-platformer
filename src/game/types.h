@@ -35,7 +35,7 @@ typedef struct {
     time_t grounded_tick;
 
     void (*collision_callback)(struct entity_s *, struct entity_s *);
-} rigidbody_t;
+} rigid_body_t;
 
 typedef struct {
     union {
@@ -47,6 +47,6 @@ typedef struct {
 
     bool solid;
     void (*collision_callback)(struct tile_s *, struct entity_s *);
-} staticbody_t;
+} static_body_t;
 
 #endif

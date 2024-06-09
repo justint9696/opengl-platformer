@@ -2,10 +2,8 @@
 
 #include "game/buttons.h"
 #include "graphics/renderer.h"
-#include "graphics/window.h"
+#include "ui/ui.h"
 #include "util/io.h"
-#include "util/time.h"
-#include "world/world.h"
 
 #include <glad/glad.h>
 #include <string.h>
@@ -51,6 +49,7 @@ static void init(game_t *self) {
     buttons_init();
     time_init(&self->time);
     world_init(&self->world);
+    ui_init();
 }
 
 static void destroy(game_t *self) {
@@ -71,14 +70,15 @@ static void tick(game_t *self) {
 
 static void render(game_t *self) {
     world_render(&self->world);
+    ui_render(&self->world.camera);
 }
 
 void game_run(game_t *self) {
     init(self);
     while (!self->quit) {
         if (time_since(self->time.last_second) > NS_PER_SECOND) {
-            window_title(&self->window, 
-                         "FPS: %d TPS: %d", self->time.fps, self->time.tps);
+            window_title(&self->window, "FPS: %d TPS: %d", self->time.fps,
+                         self->time.tps);
             LOG("%s\n", self->window.title);
         }
 
