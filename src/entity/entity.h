@@ -19,7 +19,7 @@ typedef enum {
 typedef struct entity_s {
     uint32_t id;
     uint32_t flags;
-    rigidbody_t body;
+    rigid_body_t body;
 
 #ifdef DEBUG
     struct {
