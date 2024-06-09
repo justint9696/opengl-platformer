@@ -16,7 +16,6 @@ void vbo_bind(GLuint *self) {
     glBindBuffer(GL_ARRAY_BUFFER, *self);
 }
 
-void vbo_buffer_data(GLuint *self, const void *data, size_t len) {
-    glBindBuffer(GL_ARRAY_BUFFER, *self);
+void vbo_buffer_data(const void *data, size_t len) {
     glBufferData(GL_ARRAY_BUFFER, len, data, GL_DYNAMIC_DRAW);
 }
