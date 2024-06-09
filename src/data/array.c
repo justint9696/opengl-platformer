@@ -57,7 +57,7 @@ void array_remove(void *data, void *item) {
     }
 
     if (idx >= array->len) {
-        WARN( 0, "Attempted to remove an item not contained within the array.\n");
+        WARN(0, "Attempted to remove an item not contained within the array.\n");
         return;
     }
 
