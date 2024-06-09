@@ -114,7 +114,8 @@ void draw_line(vec2s start, vec2s end, uint32_t color) {
     glDrawArrays(GL_LINES, 0, 2);
 }
 
-void draw_text(vec2s pos, float scale, uint32_t color, const char *format, ...) {
+void draw_text(vec2s pos, float scale, uint32_t color, 
+               const char *format, ...) {
     char text[64];
     va_list arg;
 

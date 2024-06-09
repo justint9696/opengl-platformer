@@ -113,8 +113,8 @@ vec2s world_to_screen(const world_t *self, vec2s pos) {
     };
 }
 
-size_t world_get_colliders(
-        world_t *self, entity_t *entity, entity_t *arr[], size_t len) {
+size_t world_get_colliders(world_t *self, entity_t *entity, entity_t *arr[], 
+                           size_t len) {
     cell_t *cell
         = grid_cell_pos(&self->grid, world_to_screen(self, entity->body.pos));
     assert(cell);

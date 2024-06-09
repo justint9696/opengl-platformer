@@ -3,6 +3,7 @@
 
 #include <cglm/types-struct.h>
 #include <glad/glad.h>
+#include <stddef.h>
 
 #define FONTCHAR_MAX 128
 
@@ -21,7 +22,6 @@ typedef struct fontchar_s {
 } fontchar_t;
 
 void font_init(const char *fpath);
-
-extern fontchar_t FONT_TABLE[FONTCHAR_MAX];
+const fontchar_t *font_get_char(size_t idx);
 
 #endif

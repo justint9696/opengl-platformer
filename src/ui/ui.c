@@ -18,22 +18,22 @@ static void render_text(vec2s pos, float scale, vec4s color, const char *text) {
 
     size_t len = strnlen(text, 64);
     for (size_t c = 0; c < len; c++) {
-        size_t idx = (size_t)text[c];
-        fontchar_t *ch = &FONT_TABLE[idx];
+        size_t idx = text[c];
+        const fontchar_t *ch = font_get_char(idx);
 
-        float posx = pos.x + ch->bearing.x * scale,
-              posy = pos.y - (ch->dim.y - ch->bearing.y) * scale;
+        float pos_x = pos.x + ch->bearing.x * scale,
+              pos_y = pos.y - (ch->dim.y - ch->bearing.y) * scale;
 
         ivec2s dim = glms_ivec2_scale(ch->dim, scale);
 
         float vertices[6][4] = {
-            {         posx, posy + dim.y, 0.0f, 0.0f },
-            {         posx,         posy, 0.0f, 1.0f },
-            { posx + dim.x,         posy, 1.0f, 1.0f },
+            {         pos_x, pos_y + dim.y, 0.0f, 0.0f },
+            {         pos_x,         pos_y, 0.0f, 1.0f },
+            { pos_x + dim.x,         pos_y, 1.0f, 1.0f },
 
-            {         posx, posy + dim.y, 0.0f, 0.0f },
-            { posx + dim.x,         posy, 1.0f, 1.0f },
-            { posx + dim.x, posy + dim.y, 1.0f, 0.0f }
+            {         pos_x, pos_y + dim.y, 0.0f, 0.0f },
+            { pos_x + dim.x,         pos_y, 1.0f, 1.0f },
+            { pos_x + dim.x, pos_y + dim.y, 1.0f, 0.0f }
         };
 
         glBindTexture(GL_TEXTURE_2D, ch->id);

@@ -16,13 +16,11 @@ void physics_tick(entity_t *self, world_t *world, float dt) {
     if (movement.x == 0.f) {
         self->body.vel.x = 0.f;
     } else if (self->flags & F_GRAVITY) {
-        vec2s vel = { 0 };
-        vel.x = movement.x * self->body.movement_speed;
-
         // apply drag if entity is not grounded
-        vel.x *= (self->body.grounded) ? 1.f : DRAG_COEFFICIENT;
+        float vel_x = movement.x * self->body.movement_speed;
+        vel_x *= (self->body.grounded) ? 1.f : DRAG_COEFFICIENT;
 
-        self->body.vel = glms_vec2_muladds(vel, MOVEMENT_SCALAR, self->body.vel);
+        self->body.vel.x += (vel_x * MOVEMENT_SCALAR);
     }
 
     // entity dash

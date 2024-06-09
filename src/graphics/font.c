@@ -5,9 +5,10 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#include <assert.h>
 #include <inttypes.h>
 
-fontchar_t FONT_TABLE[FONTCHAR_MAX];
+static fontchar_t FONT_TABLE[FONTCHAR_MAX];
 
 static void build_font_table(FT_Face face) {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -57,4 +58,9 @@ void font_init(const char *fpath) {
     // clear resources
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
+}
+
+const fontchar_t *font_get_char(size_t idx) {
+    assert(idx < 128);
+    return &FONT_TABLE[idx];
 }

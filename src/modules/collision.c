@@ -12,9 +12,9 @@ static void resolve_collision(entity_t *self, world_t *world, box_t *box,
     vec2s prev_pos = world_to_screen(world, self->body.pos);
 
     // set position to entry point of collision along the current axis
-    if (movement->raw[axis] < 0.f) {
+    if (movement->raw[axis] < 0.0001f) {
         self->body.pos.raw[axis] = box->pos.raw[axis] + box->dim.raw[axis];
-    } else if (movement->raw[axis] > 0.f) {
+    } else if (movement->raw[axis] > 0.0001f) {
         self->body.pos.raw[axis]
             = box->pos.raw[axis] - self->body.dim.raw[axis];
     }
@@ -43,7 +43,7 @@ static vec2s try_move(entity_t *self, world_t *world, void *arr[], size_t len,
         bool collision = false;
         entity_t *tmp = arr[i];
         for (short i = 0; i < 2; i++) {
-            if (movement.raw[i] == 0.f)
+            if (fabsf(movement.raw[i]) <= 0.0001f) 
                 continue;
 
             box_t bbb = self->body.box;
@@ -60,7 +60,7 @@ static vec2s try_move(entity_t *self, world_t *world, void *arr[], size_t len,
 
     // check for collision with tiles
     for (short i = 0; i < 2; i++) {
-        if (movement.raw[i] == 0.f)
+        if (fabsf(movement.raw[i]) <= 0.0001f) 
             continue;
 
         box_t bbb = self->body.box;
