@@ -1,6 +1,5 @@
 #include "graphics/font.h"
 
-#include "graphics/shader.h"
 #include "util/io.h"
 
 #include <ft2build.h>
@@ -14,7 +13,9 @@ static void build_font_table(FT_Face face) {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     for (uint8_t c = 0; c < FONTCHAR_MAX; c++) {
-        WARN(!FT_Load_Char(face, c, FT_LOAD_RENDER), "Failed to load Glyph.\n");
+        if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
+            WARN(0, "Failed to load Glyph.\n");
+        }
 
         // generate texture
         GLuint texture;
@@ -46,7 +47,7 @@ void font_init(const char *fpath) {
     ASSERT(!FT_New_Face(ft, fpath, 0, &face), "Failed to load font: %s\n",
            fpath);
 
-    FT_Set_Pixel_Sizes(face, 0, 48);
+    FT_Set_Pixel_Sizes(face, 0, 24);
 
     build_font_table(face);
 

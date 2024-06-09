@@ -43,8 +43,8 @@ void world_init(world_t *self) {
     memset(self, 0, sizeof(world_t));
 
     self->vao = vao_create();
-    self->vbo = vbo_create(QUAD_VERTICES, sizeof(QUAD_VERTICES));
-    self->ibo = ibo_create(QUAD_INDICES, sizeof(QUAD_INDICES));
+    self->vbo = vbo_create(NULL, 0);
+    self->ibo = ibo_create(NULL, 0);
 
     grid_init(&self->grid, (ivec2s) { 60.f, 60.f },
               (ivec2s) { SCREEN_WIDTH, SCREEN_HEIGHT });
@@ -77,6 +77,10 @@ void world_update(world_t *self, float dt) {
 
 void world_render(world_t *self) {
     renderer_use_shader(SHADER_DEFAULT);
+
+    vao_bind(&self->vao);
+    vbo_bind(&self->vbo);
+    ibo_bind(&self->ibo);
 
     size_t len = array_len(self->entities);
     for (size_t i = 0; i < len; i++) {

@@ -1,9 +1,8 @@
 #ifndef _RENDERER_FONT_H_
 #define _RENDERER_FONT_H_
 
-#include "graphics/shader.h"
-
 #include <cglm/types-struct.h>
+#include <glad/glad.h>
 
 #define FONTCHAR_MAX 128
 

@@ -17,6 +17,7 @@ static void init(entity_t *self, world_t *world) {
 static void tick(entity_t *self, world_t *world, float dt) {}
 
 static void render(entity_t *self, world_t *world) {
+    draw_text((vec2s) { 50, 180 }, 1.f, COLOR_WHITE, "%s", "Hello World");
     draw_quad(self->body.pos, self->body.dim, COLOR_BLUE);
 }
 

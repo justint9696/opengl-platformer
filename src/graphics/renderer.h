@@ -8,10 +8,10 @@
 
 typedef enum {
     SHADER_DEFAULT,
-    SHADER_TEXT,
-    SHADER_UI,
+    SHADER_UI_TEXT,
+    SHADER_UI_TEXTURE,
     SHADER_MAX,
-} shadertype_t;
+} shader_type_t;
 
 typedef struct {
     shader_t shaders[SHADER_MAX];
@@ -22,12 +22,9 @@ typedef struct {
 void renderer_init();
 void renderer_destroy();
 
-void renderer_use_shader(shadertype_t);
+shader_t *renderer_use_shader(shader_type_t);
 
 void renderer_prepare_scene(const camera_t *);
 void renderer_present_scene();
-
-extern const float QUAD_VERTICES[12];
-extern const unsigned int QUAD_INDICES[6];
 
 #endif
