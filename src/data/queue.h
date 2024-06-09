@@ -10,12 +10,13 @@ typedef struct {
     void *data;
 } queue_t;
 
-void queue_init(queue_t *, size_t capacity);
+void queue_init(queue_t *, size_t size, size_t capacity);
 void queue_destroy(queue_t *);
 
 void *queue_peak(const queue_t *);
 
 void *queue_pop(queue_t *);
 void queue_push(queue_t *, void *data);
+void queue_clear(queue_t *);
 
 #endif
