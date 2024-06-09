@@ -4,9 +4,9 @@
 #include <glad/glad.h>
 #include <stddef.h>
 
-GLuint ibo_create(const void *data, size_t size);
+GLuint ibo_create(const void *data, size_t len);
 void ibo_destroy(GLuint *);
 void ibo_bind(GLuint *);
-void ibo_buffer_data(GLuint *, const void *data, size_t size);
+void ibo_buffer_data(const void *data, size_t len);
 
 #endif
