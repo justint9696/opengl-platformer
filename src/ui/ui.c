@@ -17,8 +17,9 @@ static void render_text(vec2s pos, float scale, vec4s color, const char *text) {
     vao_bind(&ui.text.vao);
 
     size_t len = strnlen(text, 64);
-    for (char c = 0; c < len; c++) {
-        fontchar_t *ch = &FONT_TABLE[text[c]];
+    for (size_t c = 0; c < len; c++) {
+        size_t idx = (size_t)text[c];
+        fontchar_t *ch = &FONT_TABLE[idx];
 
         float posx = pos.x + ch->bearing.x * scale,
               posy = pos.y - (ch->dim.y - ch->bearing.y) * scale;
@@ -65,12 +66,12 @@ void ui_destroy() {
 }
 
 void ui_render(const camera_t *camera) {
-    ui_texture_t *texture;
-    ui.shader = renderer_use_shader(SHADER_UI_TEXTURE);
-    for (size_t i = 0; i < ui.texture.items.len; i++) {
-        texture = queue_pop(&ui.texture.items);
-        // render texture
-    }
+    /* ui_texture_t *texture; */
+    /* ui.shader = renderer_use_shader(SHADER_UI_TEXTURE); */
+    /* for (size_t i = 0; i < ui.texture.items.len; i++) { */
+    /*     texture = queue_pop(&ui.texture.items); */
+    /*     // render texture */
+    /* } */
 
     vao_bind(&ui.text.vao);
     vbo_bind(&ui.text.vbo);
@@ -99,5 +100,3 @@ void ui_draw_text(vec2s pos, float scale, uint32_t color, const char *text) {
     strncpy(elem.text, text, strnlen(text, 64));
     queue_push(&ui.text.items, &elem);
 }
-
-void ui_draw_quad(vec2s pos, vec2s dim, uint32_t color);

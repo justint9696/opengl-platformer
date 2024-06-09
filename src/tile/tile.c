@@ -5,7 +5,6 @@
 #include "world/world.h"
 
 #include <assert.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 static int sort_x(const void *a, const void *b) {
@@ -43,7 +42,7 @@ void tile_sort(void *arr, size_t len, short axis) {
             qsort(arr, len, sizeof(tile_t *), sort_y);
             break;
         default:
-            ASSERT(0, "Invalid sorting axis %d.\n", axis);
+            log_and_fail("Invalid sorting axis %d.\n");
             break;
     }
 }
@@ -64,6 +63,7 @@ void tile_destroy(tile_t *self, world_t *world) {
     if (self->destroy) {
         self->destroy(self, world);
     }
+
     array_remove(world->tiles, self);
 }
 

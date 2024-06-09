@@ -58,8 +58,8 @@ void renderer_prepare_scene(const camera_t *camera) {
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void renderer_present_scene() {
-}
+// TODO
+void renderer_present_scene() {}
 
 void draw_quad(vec2s pos, vec2s dim, uint32_t color) {
     float vertices[] = {
@@ -82,7 +82,12 @@ void draw_quad(vec2s pos, vec2s dim, uint32_t color) {
 
     ibo_buffer_data(indices, sizeof(indices));
     vbo_buffer_data(vertices, sizeof(vertices));
+
     shader_uniform_mat4f(*renderer.shader, "model", model);
+    shader_uniform_mat4f(*renderer.shader, "projection", 
+            renderer.camera->projection);
+    shader_uniform_mat4f(*renderer.shader, "view", renderer.camera->view);
+
     shader_uniform_vec4f(*renderer.shader, "color", RGBA(color));
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -100,10 +105,11 @@ void draw_line(vec2s start, vec2s end, uint32_t color) {
 
     vbo_buffer_data(vertices, sizeof(vertices));
     shader_uniform_mat4f(*renderer.shader, "model", model);
-    shader_uniform_vec4f(*renderer.shader, "color", RGBA(color));
     shader_uniform_mat4f(*renderer.shader, "projection", 
                          renderer.camera->projection);
     shader_uniform_mat4f(*renderer.shader, "view", renderer.camera->view);
+
+    shader_uniform_vec4f(*renderer.shader, "color", RGBA(color));
 
     glDrawArrays(GL_LINES, 0, 2);
 }
@@ -111,8 +117,10 @@ void draw_line(vec2s start, vec2s end, uint32_t color) {
 void draw_text(vec2s pos, float scale, uint32_t color, const char *format, ...) {
     char text[64];
     va_list arg;
+
     va_start(arg, format);
     vsnprintf(text, 64, format, arg);
     va_end(arg);
+
     ui_draw_text(pos, scale, color, text);
 }

@@ -29,8 +29,8 @@ static void resolve_collision(entity_t *self, world_t *world, box_t *box,
     movement->raw[axis] = 0.f;
 }
 
-static vec2s try_move(
-        entity_t *self, world_t *world, void *arr[], size_t len, float dt) {
+static vec2s try_move(entity_t *self, world_t *world, void *arr[], size_t len, 
+                      float dt) {
 #ifdef DEBUG
     // clear debug lines array
     array_clear(self->debug.lines);

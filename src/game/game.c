@@ -62,9 +62,9 @@ static void update(game_t *self) {
     world_update(&self->world, self->time.delta);
 }
 
-static void tick(game_t *self) {
-    while (time_tick(&self->time)) {
-        world_tick(&self->world, self->time.delta_fixed);
+static void sync(game_t *self) {
+    while (time_sync(&self->time)) {
+        world_sync(&self->world, self->time.delta_fixed);
     }
 }
 
@@ -74,7 +74,9 @@ static void render(game_t *self) {
 }
 
 void game_run(game_t *self) {
+    // initialize application
     init(self);
+
     while (!self->quit) {
         if (time_since(self->time.last_second) > NS_PER_SECOND) {
             window_title(&self->window, "FPS: %d TPS: %d", self->time.fps,
@@ -82,16 +84,21 @@ void game_run(game_t *self) {
             LOG("%s\n", self->window.title);
         }
 
+        // input handling
         poll_events(self);
         monitor_input(self);
+
         renderer_prepare_scene(&self->world.camera);
         {
             update(self);
-            tick(self);
+            sync(self);
             render(self);
         }
         renderer_present_scene();
+
         window_swap_buffers(&self->window);
     }
+
+    // deinit application
     destroy(self);
 }

@@ -19,7 +19,7 @@ void queue_destroy(queue_t *self) {
     free(self->data);
 }
 
-void *queue_peak(const queue_t *self) {
+inline void *queue_peak(const queue_t *self) {
     return (self->data + (self->size * self->index));
 }
 

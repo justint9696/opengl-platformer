@@ -14,7 +14,7 @@ void time_update(struct time_s *self) {
     const time_t now = NOW();
     self->delta_ns = now - self->last_frame;
     self->delta
-        = (self->delta_ns ? (1.f * self->delta_ns / NS_PER_SECOND) : 1.f);
+        = ((self->delta_ns) ? (1.f * self->delta_ns / NS_PER_SECOND) : 1.f);
 
     self->last_frame = now;
 
@@ -31,7 +31,7 @@ void time_update(struct time_s *self) {
     }
 }
 
-bool time_tick(struct time_s *self) {
+bool time_sync(struct time_s *self) {
     const time_t now = NOW();
     if (now - self->last_tick > TICK_DELAY) {
         self->ticks++;

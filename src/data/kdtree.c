@@ -14,8 +14,7 @@ void kdtree_init(kdtree_t *self) {
 }
 
 static void destroy(kdnode_t *root) {
-    if (!root)
-        return;
+    if (!root) return;
 
     destroy(root->left);
     destroy(root->right);
@@ -44,7 +43,7 @@ static void insert(kdnode_t **rootptr, float *pos, void *data, short depth) {
 
     short axis = depth % 2;
     float a = pos[axis], b = root->pos[axis];
-    insert((a <= b ? &root->left : &root->right), pos, data, depth + 1);
+    insert(((a <= b) ? &root->left : &root->right), pos, data, depth + 1);
 }
 
 void kdtree_insert(kdtree_t *self, float *pos, void *data) {
@@ -58,8 +57,7 @@ static inline bool is_leaf(const kdnode_t *root) {
 static void nearest_neighbor(kdnode_t *root, float *pos, float *distance,
                              kdnode_t *node, short depth) {
     // recursive base case
-    if (!root)
-        return;
+    if (!root) return;
 
     // if root node is a leaf and the distance < best distance
     float current = glm_vec2_distance(pos, root->pos);
@@ -73,14 +71,18 @@ static void nearest_neighbor(kdnode_t *root, float *pos, float *distance,
     float a = pos[axis], b = root->pos[axis];
     if (a <= b) {
         nearest_neighbor(root->left, pos, distance, node, depth + 1);
-        // check if there could be a closer node by checking dist to split plane
-        if (fabsf(a - b) < *distance)
+
+        // check if there could be a closer on the right side of split plane
+        if (fabsf(a - b) < *distance) {
             nearest_neighbor(root->right, pos, distance, node, depth + 1);
+        }
     } else {
         nearest_neighbor(root->right, pos, distance, node, depth + 1);
-        // check if there could be a closer node by checking dist to split plane
-        if (fabsf(a - b) < *distance)
+
+        // check if there could be a closer on the left side of split plane
+        if (fabsf(a - b) < *distance) {
             nearest_neighbor(root->left, pos, distance, node, depth + 1);
+        }
     }
 
     if (current < *distance) {
@@ -98,8 +100,7 @@ void *kdtree_nearest(kdtree_t *self, float *pos) {
 
 static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth,
                    int offset, sort_fn_t sort) {
-    if (len < 1)
-        return;
+    if (len < 1) return;
 
     // sort items in array along current axis
     short axis = depth % 2;
@@ -114,16 +115,14 @@ static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth,
     *rootptr = node_init(pos, data);
 
     // ensure array can be sliced
-    if (mid == 0)
-        return;
+    if (mid == 0) return;
 
     // slice array from 0 to mid
     size_t n = mid;
     kdtree(&((*rootptr)->left), arr, n, depth + 1, offset, sort);
 
     // ensure there are items on the right side of mid
-    if (len - mid <= 1)
-        return;
+    if (len - mid <= 1) return;
 
     // slice array from (mid + 1) to len
     n = (len - mid - 1);

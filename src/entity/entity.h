@@ -30,14 +30,14 @@ typedef struct entity_s {
     void (*init)(struct entity_s *, struct world_s *);
     void (*destroy)(struct entity_s *, struct world_s *);
     void (*render)(struct entity_s *, struct world_s *);
-    void (*tick)(struct entity_s *, struct world_s *, float dt);
+    void (*sync)(struct entity_s *, struct world_s *, float dt);
     void (*update)(struct entity_s *, struct world_s *, float dt);
 } entity_t;
 
 entity_t *entity_create(void *data, struct world_s *);
 void entity_destroy(entity_t *, struct world_s *);
 void entity_render(entity_t *, struct world_s *);
-void entity_tick(entity_t *, struct world_s *, float dt);
+void entity_sync(entity_t *, struct world_s *, float dt);
 void entity_update(entity_t *, struct world_s *, float dt);
 
 #endif

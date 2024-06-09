@@ -42,6 +42,7 @@ void entity_destroy(entity_t *self, world_t *world) {
     if (self->destroy) {
         self->destroy(self, world);
     }
+
     array_remove(world->entities, self);
 }
 
@@ -50,9 +51,8 @@ void entity_render(entity_t *self, world_t *world) {
     // render debug lines
     size_t len = array_len(self->debug.lines);
     for (size_t i = 0; i < len; i += 2) {
-        vec2s 
-            from = self->debug.lines[i],
-            to = self->debug.lines[i+1];
+        vec2s from = self->debug.lines[i];
+        vec2s to = self->debug.lines[i+1];
         draw_line(from, to, COLOR_RED);
     }
 #endif
@@ -68,9 +68,9 @@ void entity_update(entity_t *self, world_t *world, float dt) {
     }
 }
 
-void entity_tick(entity_t *self, world_t *world, float dt) {
-    if (self->tick) {
-        self->tick(self, world, dt);
+void entity_sync(entity_t *self, world_t *world, float dt) {
+    if (self->sync) {
+        self->sync(self, world, dt);
     }
 
     // should the entity respond to player input

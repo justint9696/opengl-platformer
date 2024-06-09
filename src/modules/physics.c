@@ -11,25 +11,27 @@ static const vec2s gravity
     = (vec2s) { .x = 0.f, .y = -GRAVITY * MOVEMENT_SCALAR };
 
 void physics_tick(entity_t *self, world_t *world, float dt) {
-    // mid-air drag
     vec2s movement = glms_vec2_normalize(self->body.direction);
+
     if (movement.x == 0.f) {
         self->body.vel.x = 0.f;
     } else if (self->flags & F_GRAVITY) {
-        self->body.vel.x
-            += (movement.x
-                * (self->body.movement_speed
-                   * (self->body.grounded ? 1.f : DRAG_COEFFICIENT)))
-               * MOVEMENT_SCALAR;
+        vec2s vel = { 0 };
+        vel.x = movement.x * self->body.movement_speed;
+
+        // apply drag if entity is not grounded
+        vel.x *= (self->body.grounded) ? 1.f : DRAG_COEFFICIENT;
+
+        self->body.vel = glms_vec2_muladds(vel, MOVEMENT_SCALAR, self->body.vel);
     }
 
-    // dash
+    // entity dash
     if (time_since_ms(self->body.dash_tick) < 250) {
         self->body.accel.x
             += self->body.direction.x * self->body.dash_force * MOVEMENT_SCALAR;
     }
 
-    // jump
+    // entity jump
     if (movement.y > 0.f) {
         self->body.vel.y = self->body.jump_force * MOVEMENT_SCALAR;
         self->body.grounded = false;
@@ -47,5 +49,6 @@ void physics_tick(entity_t *self, world_t *world, float dt) {
                 self->body.movement_speed * MOVEMENT_SCALAR);
     self->body.vel.y = max(self->body.vel.y, gravity.y);
 
+    // apply forces to velocity vector
     self->body.vel = glms_vec2_add(self->body.accel, self->body.vel);
 }

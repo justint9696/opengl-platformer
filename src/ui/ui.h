@@ -46,6 +46,5 @@ void ui_clear();
 
 void ui_draw_text(vec2s pos, float scale, uint32_t color, const char *text);
 void ui_draw_quad(vec2s pos, vec2s dim, uint32_t color);
-void ui_draw_quad_texture();
 
 #endif

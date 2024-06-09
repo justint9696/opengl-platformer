@@ -95,11 +95,11 @@ void world_render(world_t *self) {
     }
 }
 
-void world_tick(world_t *self, float dt) {
+void world_sync(world_t *self, float dt) {
     size_t len = array_len(self->entities);
     for (size_t i = 0; i < len; i++) {
         entity_t *entity = &self->entities[i];
-        entity_tick(entity, self, dt);
+        entity_sync(entity, self, dt);
     }
 }
 
@@ -120,7 +120,7 @@ size_t world_get_colliders(
     assert(cell);
 
     if (!cell->items) {
-        WARN(0, "Current cell has not been initialized.\n");
+        log_warn("Current cell has not been initialized.\n");
         return 0;
     }
 

@@ -13,9 +13,9 @@ CFLAGS += -Wno-missing-braces
 CFLAGS += -Ilib/glad/include
 CFLAGS += -Ilib/stb
 CFLAGS += -Isrc
+CFLAGS += -DDEBUG
 CFLAGS += $(shell sdl2-config --cflags)
 CFLAGS += $(shell pkg-config --cflags freetype2)
-CFLAGS += -DDEBUG
 
 LDFLAGS := -lm
 LDFLAGS += -Llib/glad

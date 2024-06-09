@@ -33,7 +33,7 @@ void world_init(world_t *);
 void world_destroy(world_t *);
 void world_update(world_t *, float dt);
 void world_render(world_t *);
-void world_tick(world_t *, float dt);
+void world_sync(world_t *, float dt);
 
 vec2s world_to_screen(const world_t *, vec2s pos);
 size_t world_get_colliders(world_t *, entity_t *, entity_t *arr[], size_t len);

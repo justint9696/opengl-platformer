@@ -4,11 +4,7 @@
 #include "graphics/drawing.h"
 #include "world/world.h"
 
-#include <stdio.h>
-
-static void collision_callback(tile_t *self, entity_t *entity) {
-    /* printf("platform collision\n"); */
-}
+static void collision_callback(tile_t *self, entity_t *entity) {}
 
 static void render(tile_t *self, world_t *world) {
     draw_quad(self->body.pos, self->body.dim, COLOR_WHITE);

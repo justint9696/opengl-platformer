@@ -4,6 +4,7 @@
 #include "util/io.h"
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
 #include <glad/glad.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -20,23 +21,28 @@ void window_init(window_t *self, const char *title) {
                         SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-    ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0, "Could not initialize SDL: %s\n",
-           SDL_GetError());
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        log_and_fail("Could not initialize SDL: %s\n", SDL_GetError());
+    }
 
     // create window
     self->handle = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
                                     SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH,
                                     SCREEN_HEIGHT, SDL_WINDOW_OPENGL);
 
-    ASSERT(self->handle, "Could not create SDL Window: %s\n", SDL_GetError());
+    if (self->handle == NULL) {
+        log_and_fail("Could not create SDL Window: %s\n", SDL_GetError());
+    }
 
     self->context = SDL_GL_CreateContext(self->handle);
-    ASSERT(gladLoadGLLoader(SDL_GL_GetProcAddress),
-           "Failed to initialize GLAD\n");
+    if (!gladLoadGLLoader(SDL_GL_GetProcAddress)) {
+        log_and_fail("Failed to initialize GLAD\n");
+    }
 
     // disble vsync
-    WARN(SDL_GL_SetSwapInterval(0) == 0, "Could not disable VSync: %s\n",
-         SDL_GetError());
+    if (SDL_GL_SetSwapInterval(0) < 0) {
+        log_warn("Could not disable VSync: %s\n", SDL_GetError());
+    }
 
     renderer_init();
 }
@@ -63,8 +69,10 @@ void window_swap_buffers(window_t *self) {
 
 void window_title(window_t *self, const char *format, ...) {
     va_list args;
+
     va_start(args, format);
     vsnprintf(self->title, 64, format, args);
-    SDL_SetWindowTitle(self->handle, self->title);
     va_end(args);
+
+    SDL_SetWindowTitle(self->handle, self->title);
 }

@@ -14,7 +14,7 @@ static void init(entity_t *self, world_t *world) {
     camera_init(&world->camera, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
-static void tick(entity_t *self, world_t *world, float dt) {}
+static void sync(entity_t *self, world_t *world, float dt) {}
 
 static void render(entity_t *self, world_t *world) {
     draw_text((vec2s) { 50, 180 }, 1.f, COLOR_WHITE, "%s", "Hello World");
@@ -24,7 +24,7 @@ static void render(entity_t *self, world_t *world) {
 entity_t *player_create(vec2s pos, vec2s dim, world_t *world) {
     return entity_create(&(entity_t) {
         .init = init,
-        .tick = tick,
+        .sync = sync,
         .render = render,
         .body = {
             .pos = pos, 

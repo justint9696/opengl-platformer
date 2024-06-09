@@ -17,8 +17,10 @@ void grid_init(grid_t *self, ivec2s cell_size, ivec2s res) {
         .y = ceilf(1.f * res.y / cell_size.y),
     };
     self->size = cell_size;
+
     self->cells = calloc(self->dim.x * self->dim.y, sizeof(cell_t));
     assert(self->cells);
+
     for (int y = 0; y < self->dim.y; y++) {
         for (int x = 0; x < self->dim.x; x++) {
             cell_t *cell = &self->cells[offset(x, y, self->dim.x)];
@@ -44,8 +46,9 @@ void grid_destroy(grid_t *self) {
 
 void grid_add(grid_t *self, void *data, vec2s pos) {
     cell_t *cell = grid_cell_pos(self, pos);
-    if (!cell->items)
+    if (!cell->items) {
         cell->items = array_alloc(sizeof(void *), 16);
+    }
 
     assert(cell->items);
     array_push(&cell->items, data);
@@ -53,8 +56,7 @@ void grid_add(grid_t *self, void *data, vec2s pos) {
 
 void grid_remove(grid_t *self, void *data, vec2s pos) {
     cell_t *cell = grid_cell_pos(self, pos);
-    if (!cell->items)
-        return;
+    if (!cell->items) return;
 
     array_remove(cell->items, data);
 }
@@ -62,8 +64,8 @@ void grid_remove(grid_t *self, void *data, vec2s pos) {
 void grid_update(grid_t *self, void *data, vec2s prev_pos, vec2s pos) {
     cell_t *prev = grid_cell_pos(self, prev_pos);
     cell_t *curr = grid_cell_pos(self, pos);
-    if (prev == curr)
-        return;
+
+    if (prev == curr) return;
 
     grid_remove(self, data, prev_pos);
     grid_add(self, data, pos);

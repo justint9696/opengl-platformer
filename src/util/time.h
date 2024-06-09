@@ -35,7 +35,7 @@ struct time_s {
 void time_init(struct time_s *);
 void time_update(struct time_s *);
 
-bool time_tick(struct time_s *);
+bool time_sync(struct time_s *);
 
 time_t time_since(time_t);
 time_t time_since_ms(time_t);
