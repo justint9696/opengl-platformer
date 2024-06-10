@@ -1,4 +1,5 @@
 #include "graphics/shader.h"
+#include "util/io.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -31,8 +32,7 @@ static GLint shader_compile(const char *fpath, GLenum type) {
     if (!result) {
         char log[512];
         glGetShaderInfoLog(handle, 512, NULL, log);
-        fprintf(stderr, "ERROR: %s\n%s\n", fpath, log);
-        exit(1);
+        log_and_fail("%s\n%s\n", fpath, log);
     }
 
     free(text);

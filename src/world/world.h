@@ -11,11 +11,14 @@
 #include <glad/glad.h>
 
 typedef struct world_s {
+    // uniform grid
     grid_t grid;
+
+    // primary game camera
     camera_t camera;
 
     // reference to player entity
-    entity_t *player;
+    entity_t *p_player;
 
     // kdtree of static world geometry
     kdtree_t kdtree;

@@ -7,6 +7,13 @@
 
 #include <stdbool.h>
 
+typedef enum {
+    GS_DEAD,
+    GS_PAUSED,
+    GS_PLAYING,
+    GS_EDIT,
+} game_state_t;
+
 typedef struct {
     bool quit;
     bool wireframe;

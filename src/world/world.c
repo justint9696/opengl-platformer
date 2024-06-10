@@ -48,11 +48,12 @@ void world_init(world_t *self) {
 
     grid_init(&self->grid, (ivec2s) { 60.f, 60.f },
               (ivec2s) { SCREEN_WIDTH, SCREEN_HEIGHT });
+
     self->entities = array_alloc(sizeof(entity_t), 64);
     self->tiles = array_alloc(sizeof(tile_t), 64);
-    self->player
+
+    self->p_player
         = player_create((vec2s) { 0.f, 0.f }, (vec2s) { 50.f, 50.f }, self);
-    /* enemy_create((vec2s) { 30.f, 80.f }, (vec2s) { 50.f, 50.f }, self); */
 
     create_platforms(self);
     

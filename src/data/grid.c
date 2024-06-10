@@ -33,7 +33,8 @@ void grid_destroy(grid_t *self) {
     for (int y = 0; y < self->dim.y; y++) {
         for (int x = 0; x < self->dim.x; x++) {
             cell_t *cell = &self->cells[offset(x, y, self->dim.x)];
-            if (!cell->items) continue;
+            if (!cell->items) 
+                continue;
 
             array_free(cell->items);
         }
