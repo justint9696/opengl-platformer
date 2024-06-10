@@ -1,0 +1,50 @@
+# Level Editor Design
+## Functions
+- mouse_to_screen(vec2 mouse_pos, const camera_t cam)
+- add_tile(vec2 pos, vec2 size, texture_t texture)
+- remove_tile(vec2 mouse_pos) or (tile_t id)
+- level_export(const void *data, size_t len, const char *fname)
+- level_import(const char *fname)
+- set_texture(tile_t, texture_t)
+
+## Structures
+// primary level data structure
+struct level_t {
+    FILE *fp; // file pointers to current level data (.ldat)
+    void *data; // or heap allocate level data to prevent reading between chunks
+    int offset; // file position for chunking
+}
+
+// representation of an entity within the level data
+struct entity_data_t {
+    vec2 pos, size;
+    int texture_id;
+    int entity_type;
+}
+
+// representation of a tile within the level data
+struct tile_data_t {
+    vec2 pos, size;
+    int texture_id;
+    int tile_type;
+}
+
+## What is level.ldat
+- bytes that represent the number of entities and tiles along with their data
+- 8 bytes entity count (long)
+- sizeof(entity_data_t) * num entities
+- 8 bytes of tile count (long)
+- sizeof(tile_data_t) * num tiles
+
+## What can the level editor do?
+- add, remove, and manipulate tiles & entities
+    - change textures
+    - change the type
+    - change to size and pos
+- export data from current state into .ldat file
+- import data from .ldat file and load into game state
+
+## Complexities
+- the current state of the world has to be parsed to .ldat
+    - a black list is necessary for entities that don't need to be saved
+
