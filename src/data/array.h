@@ -1,8 +1,8 @@
 #ifndef _DATA_ARRAY_H_
 #define _DATA_ARRAY_H_
 
-#include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 
 void *array_alloc(size_t size, size_t capacity);
 void array_free(void *);

@@ -7,7 +7,7 @@
 
 #include <cglm/types-struct.h>
 #include <glad/glad.h>
-#include <inttypes.h>
+#include <stdint.h>
 
 #define UI_MAX 32
 

@@ -2,8 +2,8 @@
 #define _LEVEL_LEVEL_H_
 
 #include <cglm/types-struct.h>
-#include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 
 // corresponding to entities and tiles
 typedef struct {
@@ -17,7 +17,7 @@ typedef struct {
 typedef struct {
     // size in bytes
     size_t size;
-   
+
     // array of level_data_t (entities or tiles)
     level_data_t *data;
 } chunk_t;

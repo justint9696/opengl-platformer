@@ -1,5 +1,6 @@
 #include "data/array.h"
-#include "util/io.h"
+
+#include "util/log.h"
 
 #include <assert.h>
 #include <stdlib.h>

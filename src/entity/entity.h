@@ -3,8 +3,8 @@
 
 #include "game/types.h"
 
-#include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 
 struct world_s;
 
@@ -21,7 +21,7 @@ typedef struct entity_s {
     uint32_t flags;
     rigid_body_t body;
 
-#ifdef DEBUG
+#ifdef _DEBUG
     struct {
         vec2s *lines;
     } debug;

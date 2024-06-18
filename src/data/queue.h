@@ -1,8 +1,8 @@
 #ifndef _DATA_QUEUE_H_
 #define _DATA_QUEUE_H_
 
-#include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 
 typedef struct {
     size_t capacity, size, len;

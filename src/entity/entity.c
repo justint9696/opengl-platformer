@@ -4,15 +4,15 @@
 #include "graphics/drawing.h"
 #include "world/world.h"
 
-#define DECL_MODULE(_name)\
-    extern void _name##_tick(entity_t *, world_t *, float);\
+#define _DECL_MODULE(_name)\
+    extern void _name##_sync(entity_t *, world_t *, float);\
     extern void _name##_update(entity_t *, world_t *, float);
 
-DECL_MODULE(input);
-DECL_MODULE(collision);
-DECL_MODULE(movement);
-DECL_MODULE(physics);
-DECL_MODULE(ai);
+_DECL_MODULE(input);
+_DECL_MODULE(collision);
+_DECL_MODULE(movement);
+_DECL_MODULE(physics);
+_DECL_MODULE(ai);
 
 entity_t *entity_create(void *data, world_t *world) {
     uint32_t id = array_push((void **)&world->entities, data);
@@ -23,7 +23,7 @@ entity_t *entity_create(void *data, world_t *world) {
         self->init(self, world);
     }
 
-#ifdef DEBUG
+#ifdef _DEBUG
     self->debug.lines = array_alloc(sizeof(vec2s), 32);
 #endif
 
@@ -35,7 +35,7 @@ entity_t *entity_create(void *data, world_t *world) {
 }
 
 void entity_destroy(entity_t *self, world_t *world) {
-#ifdef DEBUG
+#ifdef _DEBUG
     array_free(self->debug.lines);
 #endif
 
@@ -47,7 +47,7 @@ void entity_destroy(entity_t *self, world_t *world) {
 }
 
 void entity_render(entity_t *self, world_t *world) {
-#ifdef DEBUG
+#ifdef _DEBUG
     // render debug lines
     size_t len = array_len(self->debug.lines);
     for (size_t i = 0; i < len; i += 2) {
@@ -75,20 +75,20 @@ void entity_sync(entity_t *self, world_t *world, float dt) {
 
     // should the entity respond to player input
     if (self->flags & F_PLAYER_CONTROLLED) {
-        input_tick(self, world, dt);
+        input_sync(self, world, dt);
     }
 
     // is entity controlled by an ai
     if (self->flags & F_AI_CONTROLLED) {
-        ai_tick(self, world, dt);
+        ai_sync(self, world, dt);
     }
 
     // should the entity move and respond to physics
     if (self->flags & F_KINEMATIC) {
-        physics_tick(self, world, dt);
+        physics_sync(self, world, dt);
 
-        if (self->body.solid) { collision_tick(self, world, dt); }
+        if (self->body.solid) { collision_sync(self, world, dt); }
 
-        movement_tick(self, world, dt);
+        movement_sync(self, world, dt);
     }
 }

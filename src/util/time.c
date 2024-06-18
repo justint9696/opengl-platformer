@@ -32,8 +32,7 @@ void time_update(struct time_s *self) {
 }
 
 bool time_sync(struct time_s *self) {
-    const time_t now = NOW();
-    if (now - self->last_tick > TICK_DELAY) {
+    if (time_since(self->last_tick) > TICK_DELAY) {
         self->ticks++;
         self->last_tick += TICK_DELAY;
         return true;

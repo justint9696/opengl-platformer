@@ -1,12 +1,12 @@
 #include "graphics/font.h"
 
-#include "util/io.h"
+#include "util/log.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
 #include <assert.h>
-#include <inttypes.h>
+#include <stdint.h>
 
 static fontchar_t FONT_TABLE[FONTCHAR_MAX];
 

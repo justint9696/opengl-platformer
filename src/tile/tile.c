@@ -1,7 +1,7 @@
 #include "tile/tile.h"
 
 #include "data/array.h"
-#include "util/io.h"
+#include "util/log.h"
 #include "world/world.h"
 
 #include <assert.h>
@@ -42,7 +42,7 @@ void tile_sort(void *arr, size_t len, short axis) {
             qsort(arr, len, sizeof(tile_t *), sort_y);
             break;
         default:
-            log_and_fail("Invalid sorting axis %d.\n");
+            log_and_fail("Invalid sorting axis %d.\n", axis);
             break;
     }
 }

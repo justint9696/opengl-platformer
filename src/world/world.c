@@ -15,10 +15,11 @@
 #include "tile/platform.h"
 #include "tile/tile.h"
 
-#include "util/io.h"
+#include "util/log.h"
 #include "util/util.h"
 
 #include <cglm/struct.h>
+#include <cglm/struct/mat4.h>
 #include <math.h>
 #include <string.h>
 
@@ -110,8 +111,22 @@ vec2s world_to_screen(const world_t *self, vec2s pos) {
         glms_mat4_mulv(self->camera.view, (vec4s) { pos.x, pos.y, 0.f, 1.f }));
     return (vec2s) {
         .x = roundf(((clip.x + 1) / 2.f) * SCREEN_WIDTH),
-        .y = roundf(((clip.y + 1) / 2.f) * SCREEN_HEIGHT),
+        .y = roundf(((1 - clip.y) / 2.f) * SCREEN_HEIGHT),
     };
+}
+
+vec2s screen_to_world(const world_t *self, ivec2s pos) {
+    vec2s clip = (vec2s) { 
+        .x = (2.f * pos.x / SCREEN_WIDTH - 1),
+        .y = (-2.f * pos.y / SCREEN_HEIGHT + 1),
+    };
+
+    mat4s view = glms_mat4_inv(
+        glms_mat4_mul(self->camera.projection, self->camera.view));
+
+    vec4s world = glms_mat4_mulv(view, (vec4s) { clip.x, clip.y, 0.f, 1.f });
+
+    return (vec2s) { world.x, world.y };
 }
 
 size_t world_get_colliders(world_t *self, entity_t *entity, entity_t *arr[], 

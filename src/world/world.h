@@ -39,6 +39,10 @@ void world_render(world_t *);
 void world_sync(world_t *, float dt);
 
 vec2s world_to_screen(const world_t *, vec2s pos);
+vec2s screen_to_world(const world_t *, ivec2s pos);
+
+void *world_raycast(const world_t *, vec2s pos);
+
 size_t world_get_colliders(world_t *, entity_t *, entity_t *arr[], size_t len);
 
 #endif

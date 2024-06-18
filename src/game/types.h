@@ -11,6 +11,12 @@ struct entity_s;
 struct tile_s;
 
 typedef struct {
+    vec2s pos;
+    vec2s dim;
+    void (*callback)(void *, void *);
+} hit_t;
+
+typedef struct {
     union {
         box_t box;
         struct {
@@ -20,7 +26,7 @@ typedef struct {
 
     vec2s vel;
     vec2s accel;
-    vec2s direction;
+    vec2s vdir;
 
     bool solid;
     bool grounded;

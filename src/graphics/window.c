@@ -1,7 +1,7 @@
 #include "graphics/window.h"
 
 #include "graphics/renderer.h"
-#include "util/io.h"
+#include "util/log.h"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>

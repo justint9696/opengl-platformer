@@ -3,7 +3,7 @@
 
 #include "game/types.h"
 
-#include <inttypes.h>
+#include <stdint.h>
 
 struct world_s;
 

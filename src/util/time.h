@@ -1,8 +1,8 @@
 #ifndef _UTIL_TIME_H_
 #define _UTIL_TIME_H_
 
-#include <inttypes.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <time.h>
 
 #define NS_PER_SECOND 1000000000
