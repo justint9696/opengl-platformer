@@ -7,9 +7,14 @@
 
 struct world_s;
 
+typedef enum {
+    TT_PLATFORM,
+} tiletype_e;
+
 typedef struct tile_s {
     uint32_t id;
-    static_body_t body;
+    tiletype_e type;
+    staticbody_t body;
 
     void (*init)(struct tile_s *, struct world_s *);
     void (*destroy)(struct tile_s *, struct world_s *);
@@ -22,4 +27,4 @@ tile_t *tile_create(void *data, struct world_s *);
 void tile_destroy(tile_t *, struct world_s *);
 void tile_render(tile_t *, struct world_s *);
 
-#endif
+#endif // _TILE_TILE_H_

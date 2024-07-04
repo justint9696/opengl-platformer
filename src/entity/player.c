@@ -35,6 +35,7 @@ entity_t *player_create(vec2s pos, vec2s dim, world_t *world) {
             .dash_force = 50.f,
             .collision_callback = collision_callback,
         },
+        .type = ET_PLAYER,
         .flags = F_PLAYER_CONTROLLED | F_KINEMATIC | F_GRAVITY,
     }, world);
 }

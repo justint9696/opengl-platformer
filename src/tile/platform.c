@@ -18,5 +18,6 @@ tile_t *platform_create(vec2s pos, vec2s dim, world_t *world) {
             .dim = dim,
             .collision_callback = collision_callback,
         },
+        .type = TT_PLATFORM,
     }, world);
 }

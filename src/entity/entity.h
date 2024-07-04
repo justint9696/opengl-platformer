@@ -14,18 +14,24 @@ typedef enum {
     F_AI_CONTROLLED     = 1 << 1,
     F_KINEMATIC         = 1 << 2,
     F_GRAVITY           = 1 << 3,
-} flag_t;
+} flag_e;
+
+typedef enum {
+    ET_PLAYER,
+    ET_ENEMY,
+} entitytype_e;
 
 typedef struct entity_s {
     uint32_t id;
     uint32_t flags;
-    rigid_body_t body;
+    entitytype_e type;
+    rigidbody_t body;
 
 #ifdef _DEBUG
     struct {
         vec2s *lines;
     } debug;
-#endif
+#endif // _DEBUG
 
     void (*init)(struct entity_s *, struct world_s *);
     void (*destroy)(struct entity_s *, struct world_s *);
@@ -40,4 +46,4 @@ void entity_render(entity_t *, struct world_s *);
 void entity_sync(entity_t *, struct world_s *, float dt);
 void entity_update(entity_t *, struct world_s *, float dt);
 
-#endif
+#endif // _ENTITY_ENTITY_H_

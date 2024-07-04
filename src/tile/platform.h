@@ -9,4 +9,4 @@ struct world_s;
 
 tile_t *platform_create(vec2s pos, vec2s dim, struct world_s *);
 
-#endif
+#endif // _TILE_PLATFORM_H_

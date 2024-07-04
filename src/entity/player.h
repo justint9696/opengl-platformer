@@ -9,4 +9,4 @@ struct world_s;
 
 entity_t *player_create(vec2s pos, vec2s dim, struct world_s *);
 
-#endif
+#endif // _ENTITY_PLAYER_H_
