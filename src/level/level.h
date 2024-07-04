@@ -1,35 +1,43 @@
 #ifndef _LEVEL_LEVEL_H_
 #define _LEVEL_LEVEL_H_
 
+#include "world/world.h"
+
 #include <cglm/types-struct.h>
-#include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
+
+/*
+ * level.dat file format
+ * vec2s        origin
+ * size_t       nent;    
+ * leveldata_t  entities[nent];
+ * size_t       ntile;
+ * leveldata_t  tiles[ntile];
+ */
 
 // corresponding to entities and tiles
 typedef struct {
     int type;
-    int texture;
-    uint32_t color;
-    vec2s pos;
-    vec2s dim;
-} level_data_t;
+    union {
+        box_t box;
+        struct {
+            vec2s pos, dim;
+        };
+    };
+} ldata_t;
 
 typedef struct {
-    // size in bytes
-    size_t size;
+    // position offset of the current level file
+    int offset;
 
-    // array of level_data_t (entities or tiles)
-    level_data_t *data;
-} chunk_t;
-
-typedef struct {
-    // array of chunks
-    chunk_t *chunks;
+    // level file pointer
+    FILE *fp;
 } level_t;
 
-void level_init(level_t *, const char *fname);
-void level_destroy(level_t *);
+void level_import(level_t *, world_t *, const char *fname);
+void level_export(const level_t *, const world_t *, const char *fname);
 
-void level_swap_chunks(level_t *, uint32_t idx);
+void level_swap_chunks(level_t *, world_t *, uint32_t idx);
 
-#endif
+#endif // _LEVEL_LEVEL_H_
