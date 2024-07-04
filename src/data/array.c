@@ -8,54 +8,65 @@
 
 typedef struct {
     size_t capacity, size, len;
-    void *data;
+    void *userdata;
 } array_t;
 
-#define array_header(_a) ((array_t *)(((void *)(_a)) - offsetof(array_t, data)))
+#define array_header(_a)\
+    ((array_t *)(((void *)(_a)) - offsetof(array_t, userdata)))
 
-void *array_alloc(size_t size, size_t capacity) {
-    array_t *array = calloc(1, sizeof(array_t) + (size * capacity));
+void *array_init(void *data, size_t size, size_t capacity) {
+    assert(data);
+
+    array_t *array = (array_t *)data;
+    /* memset(array, 0, sizeof(array_t) * (size * capacity)); */
 
     array->capacity = capacity;
     array->size = size;
 
-    return (void *)&array->data;
+    return &array->userdata;
+}
+
+void *array_alloc(size_t size, size_t capacity) {
+    array_t *array = calloc(1, sizeof(array_t) + (size * capacity));
+    assert(array);
+
+    array->capacity = capacity;
+    array->size = size;
+
+    return &array->userdata;
 }
 
 void array_free(void *data) {
+    assert(data);
     array_t *array = array_header(data);
-    assert(array);
     free(array);
 }
 
 void array_resize(void **dataptr, size_t capacity) {
+    assert(*dataptr);
+
     array_t *array = array_header(*dataptr);
-    assert(array && capacity >= array->len);
+    assert(capacity >= array->len);
 
     array->capacity = capacity;
     array = realloc(array, array->size * capacity);
 
-    *dataptr = (void *)&array->data;
+    *dataptr = &array->userdata;
 }
 
-uint32_t array_push(void **dataptr, void *item) {
-    array_t *array = array_header(*dataptr);
-    assert(array);
+uint32_t array_push(void *data, void *item) {
+    assert(data);
+    array_t *array = array_header(data);
 
-    if (array->len >= array->capacity) {
-        array_resize(dataptr, array->capacity * 2);
-        log_warn("Array was automatically resized to %ld\n", array->capacity);
-    }
-
-    void *ptr = array_get(*dataptr, array->len);
+    void *ptr = array_get(data, array->len);
     memcpy(ptr, item, array->size);
 
     return array->len++;
 }
 
 void array_remove(void *data, void *item) {
+    assert(data);
     array_t *array = array_header(data);
-    assert(array);
 
     void *dst;
     size_t idx;
@@ -81,28 +92,30 @@ void array_remove(void *data, void *item) {
 }
 
 void array_clear(void *data) {
+    assert(data);
     array_t *array = array_header(data);
-    assert(array);
     memset(data, 0, array->size * array->capacity);
     array->len = 0;
 }
 
 void *array_get(void *data, uint32_t index) {
+    assert(data);
+
     array_t *array = array_header(data);
-    assert(array);
     return (void *)(data + (array->size * index));
 }
 
 size_t array_len(void *data) {
+    assert(data);
+
     array_t *array = array_header(data);
-    assert(array);
     return array->len;
 }
 
 void *array_slice(void *data, uint32_t start, uint32_t end) {
-    array_t *array = array_header(data);
-    assert(array);
+    assert(data);
 
+    array_t *array = array_header(data);
     void *slice = array_alloc(array->size, array->capacity);
     memcpy(slice, array_get(array, start), (end - start) * array->size);
 

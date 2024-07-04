@@ -48,7 +48,7 @@ void tile_sort(void *arr, size_t len, short axis) {
 }
 
 tile_t *tile_create(void *data, world_t *world) {
-    uint32_t id = array_push((void **)&world->tiles, data);
+    uint32_t id = array_push(world->tiles, data);
     tile_t *self = array_get(world->tiles, id);
 
     self->id = id;

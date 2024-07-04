@@ -51,7 +51,7 @@ void grid_add(grid_t *self, void *data, vec2s pos) {
     }
 
     assert(cell->items);
-    array_push(&cell->items, data);
+    array_push(cell->items, data);
 }
 
 void grid_remove(grid_t *self, void *data, vec2s pos) {

@@ -72,8 +72,8 @@ static vec2s try_move(entity_t *self, world_t *world, void *arr[], size_t len,
 
 #ifdef _DEBUG
         vec2s center = box_center(&self->body.box);
-        array_push((void **)&self->debug.lines, &center);
-        array_push((void **)&self->debug.lines, &tmp->body.pos);
+        array_push(self->debug.lines, &center);
+        array_push(self->debug.lines, &tmp->body.pos);
 #endif
 
         if (aabb_collision_2d(&bbb, &tmp->body.box)) {

@@ -15,7 +15,7 @@ _DECL_MODULE(physics);
 _DECL_MODULE(ai);
 
 entity_t *entity_create(void *data, world_t *world) {
-    uint32_t id = array_push((void **)&world->entities, data);
+    uint32_t id = array_push(world->entities, data);
     entity_t *self = array_get(world->entities, id);
 
     self->id = id;
@@ -25,7 +25,7 @@ entity_t *entity_create(void *data, world_t *world) {
 
 #ifdef _DEBUG
     self->debug.lines = array_alloc(sizeof(vec2s), 32);
-#endif
+#endif // _DEBUG
 
     if (self->body.solid) {
         grid_add(&world->grid, &self, world_to_screen(world, self->body.pos));
@@ -37,7 +37,7 @@ entity_t *entity_create(void *data, world_t *world) {
 void entity_destroy(entity_t *self, world_t *world) {
 #ifdef _DEBUG
     array_free(self->debug.lines);
-#endif
+#endif // _DEBUG
 
     if (self->destroy) {
         self->destroy(self, world);
@@ -55,7 +55,7 @@ void entity_render(entity_t *self, world_t *world) {
         vec2s to = self->debug.lines[i+1];
         draw_line(from, to, COLOR_RED);
     }
-#endif
+#endif // _DEBUG
 
     if (self->render) {
         self->render(self, world);
