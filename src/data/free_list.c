@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 
 #define list_header(_d)\
     ((fnode_t *)(((void *)(_d)) - offsetof(fnode_t, userdata)))
@@ -13,7 +14,9 @@
 void flist_init(flist_t *self, size_t size, size_t capacity) {
     memset(self, 0, sizeof(flist_t));
 
-    self->data = calloc(1, sizeof(fnode_t) + (size * capacity));
+    self->data
+        = mmap(NULL, sizeof(fnode_t) + (size * capacity),
+               PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
     assert(self->data);
 
     self->size = size;
@@ -25,7 +28,7 @@ void flist_init(flist_t *self, size_t size, size_t capacity) {
 
 void flist_destroy(flist_t *self) {
     assert(self->data);
-    free(self->data);
+    munmap(self->data, sizeof(fnode_t) + (self->size * self->capacity));
 }
 
 void *flist_request(flist_t *self, size_t count) {
@@ -39,7 +42,7 @@ void *flist_request(flist_t *self, size_t count) {
             // calculate the memory remaining from the requested segment
             size_t bytes = ((tmp->capacity - count) * self->size);
 
-            // check if there is enough memory for another next header
+            // check if there is enough memory for another header
             if (bytes <= offsetof(fnode_t, userdata)) {
                 log_warn("No memory available after request.\n");
                 llist_remove(self, prev, tmp);
