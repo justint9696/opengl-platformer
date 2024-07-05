@@ -9,11 +9,14 @@
 
 /*
  * level.dat file format
- * vec2s        origin
- * size_t       nent;    
- * leveldata_t  entities[nent];
- * size_t       ntile;
- * leveldata_t  tiles[ntile];
+ * vec2s            origin;
+ * ivec2s           dchunk; // (width, height)
+ * size_t           nchunk;
+ *
+ * for (i = 0; i < nchunk; i++) {
+ *     size_t       nent;    
+ *     ldata_t      entities[nent];
+ * }
  */
 
 // corresponding to entities and tiles

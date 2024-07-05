@@ -2,7 +2,7 @@
 
 #include "data/array.h"
 #include "entity/entity.h"
-#include "tile/tile.h"
+#include "entity/table.h"
 #include "util/log.h"
 #include "world/chunk.h"
 
@@ -27,28 +27,20 @@ void level_import(level_t *self, world_t *world, const char *fname) {
     struct { 
         size_t n;
         ldata_t arr[CHUNK_MAX];
-    } entities, tiles;
+    } entities;
 
     fread(&entities.n, sizeof(size_t), 1, fp);
     fread(&entities.arr, sizeof(ldata_t), entities.n, fp);
 
-    fread(&tiles.n, sizeof(size_t), 1, fp);
-    fread(&tiles.arr, sizeof(ldata_t), tiles.n, fp);
+    // player should always be at index 0
+    ldata_t *data = &entities.arr[0];
+    create_fn_t create = table_lookup(data->type);
+    world->player = create(data->pos, data->dim, world);
 
-    for (size_t i = 0; i < entities.n; i++) {
-        ldata_t *data = &entities.arr[i];
-        log_debug("arr[%ld] = { %d, (%.2f, %.2f), (%.2f, %.2f)\n",
-                  i, data->type, 
-                  data->pos.x, data->pos.y,
-                  data->dim.x, data->dim.y);
-    }
-
-    for (size_t i = 0; i < tiles.n; i++) {
-        ldata_t *data = &tiles.arr[i];
-        log_debug("arr[%ld] = { %d, (%.2f, %.2f), (%.2f, %.2f)\n",
-                  i, data->type, 
-                  data->pos.x, data->pos.y,
-                  data->dim.x, data->dim.y);
+    for (size_t i = 1; i < entities.n; i++) {
+        data = &entities.arr[i];
+        create = table_lookup(data->type);
+        create(data->pos, data->dim, world);
     }
 
     fclose(fp);
@@ -74,21 +66,6 @@ void level_export(const level_t *self, const world_t *world,
         ldata_t data = {
             .type = entity->type,
             .box = entity->body.box,
-        };
-
-        fwrite(&data, sizeof(ldata_t), 1, fp);
-    }
-
-    len = array_len(world->tiles);
-    fwrite(&len, sizeof(size_t), 1, fp);
-
-    for (size_t i = 0; i < len; i++) {
-        tile_t *tile = &world->tiles[i];
-        assert(tile);
-
-        ldata_t data = {
-            .type = tile->type,
-            .box = tile->body.box,
         };
 
         fwrite(&data, sizeof(ldata_t), 1, fp);

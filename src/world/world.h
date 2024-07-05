@@ -5,7 +5,8 @@
 #include "data/kdtree.h"
 #include "entity/entity.h"
 #include "game/camera.h"
-#include "tile/tile.h"
+#include "game/types.h"
+#include "world/chunk.h"
 
 #include <cglm/types-struct.h>
 #include <glad/glad.h>
@@ -18,7 +19,7 @@ typedef struct world_s {
     camera_t camera;
 
     // reference to player entity
-    entity_t *p_player;
+    entity_t *player;
 
     // kdtree of static world geometry
     kdtree_t kdtree;
@@ -26,9 +27,10 @@ typedef struct world_s {
     // array of all entities
     entity_t *entities;
 
-    // array of all tiles
-    tile_t *tiles;
+    // current chunks loaded in memory
+    chunk_t chunk;
 
+    // vertex buffer objects
     GLuint vao, vbo, ibo;
 } world_t;
 
@@ -43,6 +45,7 @@ vec2s screen_to_world(const world_t *, ivec2s pos);
 
 void *world_raycast(const world_t *, vec2s pos);
 
-size_t world_get_colliders(world_t *, entity_t *, entity_t *arr[], size_t len);
+size_t world_get_colliders(world_t *, entity_t *, collider_t *arr,
+                           size_t len);
 
-#endif
+#endif // _WORLD_WORLD_H_
