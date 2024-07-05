@@ -15,16 +15,16 @@ typedef enum {
     GS_PAUSED,
     GS_PLAYING,
     GS_EDIT,
-} game_state_t;
+} gamestate_e;
 
 typedef struct {
     bool wireframe;
-    game_state_t prev_state, state;
+    gamestate_e prev_state, state;
     window_t window;
     struct time_s time;
     world_t world;
     level_t level;
-    level_editor_t editor;
+    leveleditor_t editor;
 } game_t;
 
 void game_run(game_t *);

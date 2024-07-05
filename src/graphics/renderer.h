@@ -11,7 +11,7 @@ typedef enum {
     SHADER_UI_TEXT,
     SHADER_UI_TEXTURE,
     SHADER_MAX,
-} shader_type_t;
+} shader_e;
 
 typedef struct {
     shader_t shaders[SHADER_MAX];
@@ -22,9 +22,9 @@ typedef struct {
 void renderer_init();
 void renderer_destroy();
 
-shader_t *renderer_use_shader(shader_type_t);
+shader_t *renderer_use_shader(shader_e);
 
 void renderer_prepare_scene(const camera_t *);
 void renderer_present_scene();
 
-#endif
+#endif // _GRAPHICS_RENDERER_H_

@@ -131,7 +131,7 @@ static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth,
 
 void kdtree_from(kdtree_t *self, void *arr, size_t len, int offset,
                  sort_fn_t sort) {
-    // initialize kdtee
+    // initialize kdtree
     kdtree_init(self);
 
     // create a stack allocated array of pointers to items in arr
