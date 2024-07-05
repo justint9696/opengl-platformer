@@ -9,14 +9,24 @@
 #include <stdint.h>
 #include <time.h>
 
+enum {
+    BUTTON_UP     = 1 << 0,
+    BUTTON_DOWN   = 1 << 1,
+    BUTTON_LEFT   = 1 << 2,
+    BUTTON_RIGHT  = 1 << 3,
+    BUTTON_SPACE  = 1 << 4,
+    BUTTON_LSHIFT = 1 << 5,
+    BUTTON_RSHIFT = 1 << 6,
+};
+
 typedef enum {
     BS_RELEASED,
     BS_PRESSED,
     BS_HELD,
-} button_state_t;
+} button_e;
 
 typedef struct {
-    button_state_t state;
+    button_e state;
     time_t pressed_tick;
     time_t released_tick;
 } button_t;
@@ -43,4 +53,4 @@ bool mouse_released(uint32_t);
 
 ivec2s mouse_get_position();
 
-#endif
+#endif // _GAME_INPUT_H_
