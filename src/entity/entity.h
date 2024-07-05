@@ -3,9 +3,6 @@
 
 #include "game/types.h"
 
-#include <stddef.h>
-#include <stdint.h>
-
 struct world_s;
 
 typedef enum {
@@ -19,13 +16,16 @@ typedef enum {
 typedef enum {
     ET_PLAYER,
     ET_ENEMY,
-} entitytype_e;
+    ET_PLATFORM,
+    ET_MAX,
+} entity_e;
 
 typedef struct entity_s {
-    uint32_t id;
-    uint32_t flags;
-    entitytype_e type;
-    rigidbody_t body;
+    int id;
+    int flags;
+    int buttons;
+    entity_e type;
+    body_t body;
 
 #ifdef _DEBUG
     struct {

@@ -29,8 +29,8 @@ static void resolve_collision(entity_t *self, world_t *world, box_t *box,
     movement->raw[axis] = 0.f;
 }
 
-static vec2s try_move(entity_t *self, world_t *world, void *arr[], size_t len,
-                      float dt) {
+static vec2s try_move(entity_t *self, world_t *world, collider_t *arr,
+                      size_t len, float dt) {
 #ifdef _DEBUG
     // clear debug lines array
     array_clear(self->debug.lines);
@@ -40,46 +40,24 @@ static vec2s try_move(entity_t *self, world_t *world, void *arr[], size_t len,
 
     // check for collision with entities
     for (size_t i = 0; i < len; i++) {
-        entity_t *tmp = arr[i];
+        collider_t *tmp = &arr[i];
         for (short i = 0; i < 2; i++) {
             if (fabsf(movement.raw[i]) <= 0.000001f)
                 continue;
 
-            box_t bbb = self->body.box;
-            bbb_create(&bbb, movement, i, dt);
-            if (aabb_collision_2d(&bbb, &tmp->body.box)) {
-                resolve_collision(self, world, &tmp->body.box, &movement, i);
-                if (tmp->body.collision_callback) {
-                    tmp->body.collision_callback(tmp, self);
-                }
-            }
-        }
-    }
-
-    // check for collision with tiles
-    for (short i = 0; i < 2; i++) {
-        if (fabsf(movement.raw[i]) <= 0.000001f)
-            continue;
-
-        box_t bbb = self->body.box;
-        bbb_create(&bbb, movement, i, dt);
-
-        vec2s pos = bbb.pos;
-        pos.raw[i] += (movement.raw[i] > 0.f) ? bbb.dim.raw[i] : 0.f;
-
-        tile_t *tmp = kdtree_nearest(&world->kdtree, pos.raw);
-        assert(tmp);
-
 #ifdef _DEBUG
-        vec2s center = box_center(&self->body.box);
-        array_push(self->debug.lines, &center);
-        array_push(self->debug.lines, &tmp->body.pos);
+            vec2s center = box_center(&self->body.box);
+            array_push(self->debug.lines, &center);
+            array_push(self->debug.lines, &tmp->box.pos);
 #endif
 
-        if (aabb_collision_2d(&bbb, &tmp->body.box)) {
-            resolve_collision(self, world, &tmp->body.box, &movement, i);
-            if (tmp->body.collision_callback) {
-                tmp->body.collision_callback(tmp, self);
+            box_t bbb = self->body.box;
+            bbb_create(&bbb, movement, i, dt);
+            if (aabb_collision_2d(&bbb, &tmp->box)) {
+                resolve_collision(self, world, &tmp->box, &movement, i);
+                if (tmp->callback) {
+                    tmp->callback(tmp->data, self);
+                }
             }
         }
     }
@@ -89,11 +67,11 @@ static vec2s try_move(entity_t *self, world_t *world, void *arr[], size_t len,
 
 void collision_sync(entity_t *self, world_t *world, float dt) {
     // get possible colliders from uniform grid
-    entity_t *arr[64];
+    collider_t arr[64];
     size_t n = world_get_colliders(world, self, arr, 64);
 
     // attempt to move entity
-    vec2s movement = try_move(self, world, (void **)arr, n, dt);
+    vec2s movement = try_move(self, world, arr, n, dt);
 
     // entity is grounded if downward velocity was stopped
     self->body.grounded = self->body.vel.y < 0 && movement.y == 0;

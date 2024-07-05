@@ -11,10 +11,10 @@ struct entity_s;
 struct tile_s;
 
 typedef struct {
-    vec2s pos;
-    vec2s dim;
+    box_t box;
+    void *data;
     void (*callback)(void *, void *);
-} hit_t;
+} collider_t;
 
 typedef struct {
     union {
@@ -25,34 +25,20 @@ typedef struct {
     };
 
     vec2s vel;
-    vec2s accel;
-    vec2s vdir;
+    vec2s force;
 
     bool solid;
     bool grounded;
 
     float mass;
-    float movement_speed;
+    float speed;
     float jump_force;
     float dash_force;
 
     time_t dash_tick;
-    time_t dash_duration_ms;
-    time_t grounded_tick;
+    time_t jump_tick;
 
-    void (*collision_callback)(struct entity_s *, struct entity_s *);
-} rigid_body_t;
+    void *collision_callback;
+} body_t;
 
-typedef struct {
-    union {
-        box_t box;
-        struct {
-            vec2s pos, dim;
-        };
-    };
-
-    bool solid;
-    void (*collision_callback)(struct tile_s *, struct entity_s *);
-} static_body_t;
-
-#endif
+#endif // _ENTITY_TYPES_H_

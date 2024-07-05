@@ -16,7 +16,6 @@ void movement_sync(entity_t *self, world_t *world, float dt) {
         grid_update(&world->grid, &self, prev_pos, pos);
     }
 
-    // reset movement and acceleration vectors
-    self->body.vdir = GLMS_VEC2_ZERO;
-    self->body.accel = GLMS_VEC2_ZERO;
+    // reset force vector
+    self->body.force = GLMS_VEC2_ZERO;
 }

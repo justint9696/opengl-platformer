@@ -30,7 +30,7 @@ entity_t *player_create(vec2s pos, vec2s dim, world_t *world) {
             .dim = dim,
             .solid = true,
             .mass = 3.f,
-            .movement_speed = 18.f,
+            .speed = 18.f,
             .jump_force = GRAVITY * 0.8f,
             .dash_force = 50.f,
             .collision_callback = collision_callback,
