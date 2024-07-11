@@ -11,7 +11,7 @@
 static void collision_callback(entity_t *self, entity_t *entity) {}
 
 static void init(entity_t *self, world_t *world) {
-    camera_init(&world->camera, SCREEN_WIDTH, SCREEN_HEIGHT);
+    camera_init(&world->camera, self->body.pos, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 static void sync(entity_t *self, world_t *world, float dt) {}
@@ -23,8 +23,8 @@ static void render(entity_t *self, world_t *world) {
 entity_t *player_create(vec2s pos, vec2s dim, world_t *world) {
     return entity_create(&(entity_t) {
         .init = init,
-        .sync = sync,
         .render = render,
+        .sync = sync,
         .body = {
             .pos = pos, 
             .dim = dim,
@@ -36,6 +36,9 @@ entity_t *player_create(vec2s pos, vec2s dim, world_t *world) {
             .collision_callback = collision_callback,
         },
         .type = ET_PLAYER,
-        .flags = F_PLAYER_CONTROLLED | F_KINEMATIC | F_GRAVITY,
+        .flags = F_PLAYER_CONTROLLED 
+                 | F_KINEMATIC 
+                 | F_GRAVITY
+                 | F_CAMERA_FOLLOW,
     }, world);
 }

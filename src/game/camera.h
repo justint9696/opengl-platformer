@@ -8,7 +8,7 @@ typedef struct {
     mat4s projection, view;
 } camera_t;
 
-void camera_init(camera_t *, int width, int height);
+void camera_init(camera_t *, vec2s pos, int width, int height);
 void camera_update_view(camera_t *);
 
-#endif
+#endif // _GAME_CAMERA_H_
