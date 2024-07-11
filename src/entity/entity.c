@@ -13,6 +13,7 @@ _DECL_MODULE(collision);
 _DECL_MODULE(movement);
 _DECL_MODULE(physics);
 _DECL_MODULE(ai);
+_DECL_MODULE(camera_follow);
 
 entity_t *entity_create(void *data, world_t *world) {
     uint32_t id = array_push(world->entities, data);
@@ -90,5 +91,10 @@ void entity_sync(entity_t *self, world_t *world, float dt) {
         if (self->body.solid) { collision_sync(self, world, dt); }
 
         movement_sync(self, world, dt);
+    }
+
+    // should the camera follow the player's movement
+    if (self->flags & F_CAMERA_FOLLOW) {
+        camera_follow_sync(self, world, dt);
     }
 }

@@ -11,6 +11,7 @@ typedef enum {
     F_AI_CONTROLLED     = 1 << 1,
     F_KINEMATIC         = 1 << 2,
     F_GRAVITY           = 1 << 3,
+    F_CAMERA_FOLLOW     = 1 << 4,
 } flag_e;
 
 typedef enum {
