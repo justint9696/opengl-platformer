@@ -2,7 +2,6 @@
 
 #include "util/time.h"
 
-#include <stdint.h>
 #include <stdio.h>
 
 static input_t input;

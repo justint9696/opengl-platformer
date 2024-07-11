@@ -14,7 +14,7 @@ typedef struct {
     entity_t *entities;
 } page_t;
 
-typedef struct chunk_s {
+typedef struct {
     // center point of the level
     vec2s origin;
 

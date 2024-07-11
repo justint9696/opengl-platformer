@@ -2,10 +2,7 @@
 
 #include "game/input.h"
 #include "graphics/renderer.h"
-#include "level/editor.h"
-#include "level/level.h"
 #include "ui/ui.h"
-#include "world/world.h"
 
 #include <cglm/struct.h>
 #include <glad/glad.h>
@@ -96,7 +93,7 @@ void game_run(game_t *self) {
     init(self);
 
     level_import(&self->level, &self->world, "data/demo.dat");
-    level_export(&self->level, &self->world, "data/demo.dat");
+    /* level_export(&self->level, &self->world, "data/demo.dat"); */
 
     while (self->state != GS_QUIT) {
         poll_events(self);
