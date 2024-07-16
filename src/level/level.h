@@ -9,9 +9,9 @@
 
 /*
  * level.dat file format
- * vec2s            origin;
+ * int              origin;
  * ivec2s           dchunk; // (width, height)
- * size_t           nchunk;
+ * ldata_t          player;
  *
  * for (i = 0; i < nchunk; i++) {
  *     size_t       nent;    
@@ -38,8 +38,8 @@ typedef struct {
     FILE *fp;
 } level_t;
 
-void level_import(level_t *, world_t *, const char *fname);
-void level_export(const level_t *, const world_t *, const char *fname);
+void level_import(level_t *, world_t *, const char *fpath);
+void level_export(const level_t *, const world_t *, const char *fpath);
 
 void level_swap_chunks(level_t *, world_t *, uint32_t idx);
 

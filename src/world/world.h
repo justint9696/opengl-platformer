@@ -25,7 +25,7 @@ typedef struct world_s {
     kdtree_t kdtree;
 
     // array of all entities
-    entity_t *entities;
+    /* entity_t *entities; */
 
     // current chunks loaded in memory
     chunk_t chunk;
@@ -45,7 +45,6 @@ vec2s screen_to_world(const world_t *, ivec2s pos);
 
 void *world_raycast(const world_t *, vec2s pos);
 
-size_t world_get_colliders(world_t *, entity_t *, collider_t *arr,
-                           size_t len);
+size_t world_get_colliders(world_t *, entity_t *, collider_t *arr, size_t len);
 
 #endif // _WORLD_WORLD_H_

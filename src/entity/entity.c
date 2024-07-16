@@ -16,10 +16,14 @@ _DECL_MODULE(ai);
 _DECL_MODULE(camera_follow);
 
 entity_t *entity_create(void *data, world_t *world) {
-    uint32_t id = array_push(world->entities, data);
-    entity_t *self = array_get(world->entities, id);
+    page_t *page = chunk_page(&world->chunk, ((entity_t *)data)->body.pos);
+
+    uint32_t id = array_push(page->entities, data);
+    entity_t *self = array_get(page->entities, id);
 
     self->id = id;
+    self->body.page = page;
+
     if (self->init) {
         self->init(self, world);
     }
@@ -44,7 +48,8 @@ void entity_destroy(entity_t *self, world_t *world) {
         self->destroy(self, world);
     }
 
-    array_remove(world->entities, self);
+    page_t *page = chunk_page(&world->chunk, self->body.pos);
+    array_remove(page->entities, self);
 }
 
 void entity_render(entity_t *self, world_t *world) {

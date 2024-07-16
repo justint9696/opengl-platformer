@@ -1,7 +1,6 @@
 #include "world/world.h"
 
 #include "data/array.h"
-#include "data/kdtree.h"
 
 #include "graphics/ibo.h"
 #include "graphics/renderer.h"
@@ -27,21 +26,21 @@ void world_init(world_t *self) {
 
     grid_init(&self->grid, (ivec2s) { 60.f, 60.f },
               (ivec2s) { SCREEN_WIDTH, SCREEN_HEIGHT });
-
-    self->entities = array_alloc(sizeof(entity_t), 64);
 }
 
 void world_destroy(world_t *self) {
     grid_destroy(&self->grid);
-    array_free(self->entities);
     chunk_destroy(&self->chunk);
 }
 
 void world_update(world_t *self, float dt) {
-    size_t len = array_len(self->entities);
-    for (size_t i = 0; i < len; i++) {
-        entity_t *entity = &self->entities[i];
-        entity_update(entity, self, dt);
+    for (int i = 0; i < 9; i++) {
+        page_t *page = &self->chunk.pages[i];
+        size_t len = array_len(page->entities);
+        for (size_t j = 0; j < len; j++) {
+            entity_t *entity = &page->entities[j];
+            entity_update(entity, self, dt);
+        }
     }
 }
 
@@ -52,18 +51,26 @@ void world_render(world_t *self) {
     vbo_bind(&self->vbo);
     ibo_bind(&self->ibo);
 
-    size_t len = array_len(self->entities);
-    for (size_t i = 0; i < len; i++) {
-        entity_t *entity = &self->entities[i];
-        entity_render(entity, self);
+    for (int i = 0; i < 9; i++) {
+        page_t *page = &self->chunk.pages[i];
+        size_t len = array_len(page->entities);
+        for (size_t j = 0; j < len; j++) {
+            entity_t *entity = &page->entities[j];
+            entity_render(entity, self);
+        }
     }
+
+    chunk_render(&self->chunk);
 }
 
 void world_sync(world_t *self, float dt) {
-    size_t len = array_len(self->entities);
-    for (size_t i = 0; i < len; i++) {
-        entity_t *entity = &self->entities[i];
-        entity_sync(entity, self, dt);
+    for (int i = 0; i < 9; i++) {
+        page_t *page = &self->chunk.pages[i];
+        size_t len = array_len(page->entities);
+        for (size_t j = 0; j < len; j++) {
+            entity_t *entity = &page->entities[j];
+            entity_sync(entity, self, dt);
+        }
     }
 }
 

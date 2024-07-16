@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <time.h>
 
+struct page_s;
 struct entity_s;
 struct tile_s;
 
@@ -23,6 +24,8 @@ typedef struct {
             vec2s pos, dim;
         };
     };
+
+    struct page_s *page;
 
     vec2s vel;
     vec2s force;
