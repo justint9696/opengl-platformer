@@ -58,6 +58,7 @@ uint32_t array_push(void *data, void *item) {
     assert(data);
     array_t *array = array_header(data);
 
+    assert(array->len < array->capacity);
     void *ptr = array_get(data, array->len);
     memcpy(ptr, item, array->size);
 
@@ -77,7 +78,7 @@ void array_remove(void *data, void *item) {
     }
 
     if (idx >= array->len) {
-        log_warn(
+        log_warn( 
             "Attempted to remove an item not contained within the array.\n");
         return;
     }

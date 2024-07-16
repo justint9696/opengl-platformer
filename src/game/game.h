@@ -15,11 +15,11 @@ typedef enum {
     GS_PAUSED,
     GS_PLAYING,
     GS_EDIT,
-} gamestate_e;
+} game_state_e;
 
 typedef struct {
     bool wireframe;
-    gamestate_e prev_state, state;
+    game_state_e prev_state, state;
     window_t window;
     struct time_s time;
     world_t world;

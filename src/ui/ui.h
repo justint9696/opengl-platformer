@@ -15,14 +15,14 @@ typedef struct {
     vec2s pos;
     vec2s dim;
     uint32_t color;
-} uitexture_t;
+} ui_texture_t;
 
 typedef struct {
     char text[64];
     vec2s pos;
     float scale;
     uint32_t color;
-} uitext_t;
+} ui_text_t;
 
 typedef struct {
     struct {

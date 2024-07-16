@@ -92,7 +92,7 @@ void game_run(game_t *self) {
     // initialize game
     init(self);
 
-    level_import(&self->level, &self->world, "data/demo.dat");
+    level_import(&self->level, &self->world, "data/level.dat");
     /* level_export(&self->level, &self->world, "data/demo.dat"); */
 
     while (self->state != GS_QUIT) {
@@ -109,6 +109,6 @@ void game_run(game_t *self) {
         window_swap_buffers(&self->window);
     }
 
-    // deinit game
+    // destroy game
     destroy(self);
 }

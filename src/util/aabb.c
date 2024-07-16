@@ -14,7 +14,7 @@ void bbb_create(box_t *self, vec2s vel, short axis, float dt) {
                               : self->pos.raw[axis] + vel.raw[axis];
 }
 
-bool aabb_collision_2d(const box_t *a, const box_t *b) {
+inline bool aabb_collision_2d(const box_t *a, const box_t *b) {
     return ((a->pos.x < b->pos.x + b->dim.x) 
             && (a->pos.x + a->dim.x > b->pos.x)
             && (a->pos.y < b->pos.y + b->dim.y)

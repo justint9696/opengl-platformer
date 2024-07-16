@@ -39,6 +39,8 @@ void physics_sync(entity_t *self, world_t *world, float dt) {
         xvel *= (self->body.grounded) ? 1.f : drag.x;
 
         self->body.vel.x += (xvel * MOVEMENT_SCALAR);
+    } else {
+        self->body.vel.x += (movement.x * self->body.speed);
     }
 
     // entity dash

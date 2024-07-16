@@ -56,8 +56,8 @@ void ui_init() {
     ui.text.vbo = vbo_create(NULL, sizeof(float) * 6 * 4);
     vao_attrib(0, 4, GL_FLOAT, 4 * sizeof(float), 0);
 
-    queue_init(&ui.text.items, sizeof(uitext_t), UI_MAX);
-    queue_init(&ui.texture.items, sizeof(uitexture_t), UI_MAX);
+    queue_init(&ui.text.items, sizeof(ui_text_t), UI_MAX);
+    queue_init(&ui.texture.items, sizeof(ui_texture_t), UI_MAX);
 }
 
 void ui_destroy() {
@@ -76,7 +76,7 @@ void ui_render(const camera_t *camera) {
     vao_bind(&ui.text.vao);
     vbo_bind(&ui.text.vbo);
 
-    uitext_t *text;
+    ui_text_t *text;
     ui.shader = renderer_use_shader(SHADER_UI_TEXT);
     shader_uniform_mat4f(*ui.shader, "projection", camera->projection);
 
@@ -92,7 +92,7 @@ void ui_clear() {
 }
 
 void ui_draw_text(vec2s pos, float scale, uint32_t color, const char *text) {
-    uitext_t elem = (uitext_t) {
+    ui_text_t elem = (ui_text_t) {
         .pos = pos,
         .scale = scale,
         .color = color,

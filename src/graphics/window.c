@@ -30,13 +30,13 @@ void window_init(window_t *self, const char *title) {
                                     SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH,
                                     SCREEN_HEIGHT, SDL_WINDOW_OPENGL);
 
-    if (self->handle == NULL) {
+    if (!self->handle) {
         log_and_fail("Could not create SDL Window: %s\n", SDL_GetError());
     }
 
     self->context = SDL_GL_CreateContext(self->handle);
     if (!gladLoadGLLoader(SDL_GL_GetProcAddress)) {
-        log_and_fail("Failed to initialize GLAD\n");
+        log_and_fail("Failed to initialize GLAD: %s\n", SDL_GetError());
     }
 
     // disble vsync
