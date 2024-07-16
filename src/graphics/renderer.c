@@ -119,6 +119,19 @@ void draw_line(vec2s start, vec2s end, uint32_t color) {
     glDrawArrays(GL_LINES, 0, 2);
 }
 
+void draw_quad_line(vec2s pos, vec2s size, uint32_t color) {
+    vec2s lines[] = {
+        { pos.x, pos.y },
+        { pos.x, pos.y + size.y },
+        { pos.x + size.x, pos.y + size.y },
+        { pos.x + size.x, pos.y },
+    };
+
+    for (size_t i = 0; i < 4; i++) {
+        draw_line(lines[i], lines[(i+1) % 4], color);
+    }
+}
+
 void draw_text(vec2s pos, float scale, uint32_t color, 
                const char *format, ...) {
     va_list arg;
