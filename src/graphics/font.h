@@ -1,5 +1,5 @@
-#ifndef _RENDERER_FONT_H_
-#define _RENDERER_FONT_H_
+#ifndef _GRAPHICS_FONT_H_
+#define _GRAPHICS_FONT_H_
 
 #include <cglm/types-struct.h>
 #include <glad/glad.h>
@@ -14,14 +14,16 @@ typedef struct fontchar_s {
     // size of texture
     ivec2s dim;
 
-    // offset from base to left/top of texture
+    // offset from the base to the left/top of texture
     ivec2s bearing;
 
-    // offset to next texture
+    // offset of next texture
     GLuint advance;
 } fontchar_t;
 
 void font_init(const char *fpath);
+
+// returns a fontchar from the ASCII value (or `idx`) of a character
 const fontchar_t *font_get_char(size_t idx);
 
-#endif
+#endif // _GRAPHICS_FONT_H_

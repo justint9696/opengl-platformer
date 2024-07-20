@@ -1,5 +1,5 @@
 #include "entity/entity.h"
-#include "game/constants.h"
+#include "game/defines.h"
 #include "game/input.h"
 #include "util/time.h"
 #include "util/util.h"

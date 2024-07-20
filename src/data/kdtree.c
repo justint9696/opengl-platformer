@@ -14,7 +14,8 @@ void kdtree_init(kdtree_t *self) {
 }
 
 static void destroy(kdnode_t *root) {
-    if (!root) return;
+    if (!root)
+        return;
 
     destroy(root->left);
     destroy(root->right);
@@ -29,8 +30,10 @@ void kdtree_destroy(kdtree_t *self) {
 static kdnode_t *node_init(float *pos, void *data) {
     kdnode_t *self = calloc(1, sizeof(kdnode_t));
     assert(self);
+
     self->pos = pos;
     self->data = data;
+
     return self;
 }
 
@@ -57,7 +60,8 @@ static inline bool is_leaf(const kdnode_t *root) {
 static void nearest_neighbor(kdnode_t *root, float *pos, float *distance,
                              kdnode_t *node, short depth) {
     // recursive base case
-    if (!root) return;
+    if (!root)
+        return;
 
     // if root node is a leaf and the distance < best distance
     float current = glm_vec2_distance(pos, root->pos);
@@ -100,7 +104,8 @@ void *kdtree_nearest(kdtree_t *self, float *pos) {
 
 static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth,
                    int offset, sort_fn_t sort) {
-    if (len < 1) return;
+    if (len < 1)
+        return;
 
     // sort items in array along current axis
     short axis = depth % 2;
@@ -115,14 +120,16 @@ static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth,
     *rootptr = node_init(pos, data);
 
     // ensure array can be sliced
-    if (mid == 0) return;
+    if (mid == 0)
+        return;
 
     // slice array from 0 to mid
     size_t n = mid;
     kdtree(&((*rootptr)->left), arr, n, depth + 1, offset, sort);
 
     // ensure there are items on the right side of mid
-    if (len - mid <= 1) return;
+    if (len - mid <= 1)
+        return;
 
     // slice array from (mid + 1) to len
     n = (len - mid - 1);

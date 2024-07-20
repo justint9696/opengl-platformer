@@ -5,6 +5,7 @@
 
 #include <stddef.h>
 
+// for the internal headers of unused blocks within a free list
 typedef struct fnode_s {
     size_t capacity;
     LNODE(struct fnode_s);

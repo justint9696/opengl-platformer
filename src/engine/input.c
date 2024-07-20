@@ -1,6 +1,6 @@
-#include "entity/entity.h"
-#include "game/constants.h"
 #include "game/input.h"
+#include "entity/entity.h"
+#include "game/defines.h"
 #include "util/time.h"
 #include "world/world.h"
 

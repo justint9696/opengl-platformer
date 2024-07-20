@@ -25,4 +25,4 @@ void grid_update(grid_t *, void *data, vec2s prev_pos, vec2s pos);
 cell_t *grid_cell_pos(grid_t *, vec2s pos);
 cell_t *grid_cell_index(grid_t *, ivec2s index);
 
-#endif
+#endif // _DATA_GRID_H_

@@ -17,4 +17,4 @@ void shader_uniform_vec3f(shader_t, const char *uniform, vec3s val);
 void shader_uniform_vec4f(shader_t, const char *uniform, vec4s val);
 void shader_uniform_3f(shader_t, const char *uniform, float x, float y, float z);
 
-#endif
+#endif // _GRAPHICS_SHADER_H_

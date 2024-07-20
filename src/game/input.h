@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <time.h>
 
+// entity button bits
 enum {
     BUTTON_UP     = 1 << 0,
     BUTTON_DOWN   = 1 << 1,

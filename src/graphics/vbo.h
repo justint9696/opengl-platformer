@@ -9,4 +9,4 @@ void vbo_destroy(GLuint *);
 void vbo_bind(GLuint *);
 void vbo_buffer_data(const void *data, size_t len);
 
-#endif
+#endif // _GRAPHICS_VAO_H_

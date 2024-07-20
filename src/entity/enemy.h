@@ -9,4 +9,4 @@ struct world_s;
 
 entity_t *enemy_create(vec2s pos, vec2s dim, struct world_s *);
 
-#endif
+#endif // _ENTITY_ENEMY_H_

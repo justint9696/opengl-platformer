@@ -9,4 +9,4 @@ void ibo_destroy(GLuint *);
 void ibo_bind(GLuint *);
 void ibo_buffer_data(const void *data, size_t len);
 
-#endif
+#endif // _GRAPHICS_IBO_H_

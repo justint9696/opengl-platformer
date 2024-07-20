@@ -7,7 +7,8 @@ GLuint vao_create();
 void vao_destroy(GLuint *);
 void vao_bind(GLuint *);
 
+// sets the vertex attributes of `data`
 void vao_attrib(GLint index, GLint size, GLenum type, GLsizei stride,
                 const void *data);
 
-#endif
+#endif // _GRAPHICS_VAO_H_

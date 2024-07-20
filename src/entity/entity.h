@@ -3,6 +3,8 @@
 
 #include "game/types.h"
 
+#include <stdint.h>
+
 struct world_s;
 
 typedef enum {
@@ -22,9 +24,9 @@ typedef enum {
 } entity_e;
 
 typedef struct entity_s {
-    int id;
-    int flags;
-    int buttons;
+    int32_t id;
+    int32_t flags;
+    int32_t buttons;
     entity_e type;
     body_t body;
 

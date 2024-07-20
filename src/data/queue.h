@@ -19,4 +19,4 @@ void *queue_pop(queue_t *);
 void queue_push(queue_t *, void *data);
 void queue_clear(queue_t *);
 
-#endif
+#endif // _DATA_QUEUE_H_

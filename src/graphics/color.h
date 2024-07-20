@@ -19,4 +19,4 @@
         ((c >>  0) & 0xFF) / 255.f,\
     })
 
-#endif
+#endif // _GRAPHICS_COLOR_H_
