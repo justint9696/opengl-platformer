@@ -18,11 +18,11 @@ typedef struct world_s {
     // primary game camera
     camera_t camera;
 
-    // reference to player entity
-    entity_t *player;
+    // reference to the player entity
+    entity_t(*player);
 
     // kdtree of static world geometry
-    kdtree_t kdtree;
+    /* kdtree_t kdtree; */
 
     // array of all entities
     /* entity_t *entities; */

@@ -16,7 +16,8 @@ _DECL_MODULE(ai);
 _DECL_MODULE(camera_follow);
 
 entity_t *entity_create(void *data, world_t *world) {
-    page_t *page = chunk_page(&world->chunk, ((entity_t *)data)->body.pos);
+    page_t *page 
+        = chunk_page_from_pos(&world->chunk, ((entity_t *)data)->body.pos);
 
     uint32_t id = array_push(page->entities, data);
     entity_t *self = array_get(page->entities, id);
@@ -48,7 +49,7 @@ void entity_destroy(entity_t *self, world_t *world) {
         self->destroy(self, world);
     }
 
-    page_t *page = chunk_page(&world->chunk, self->body.pos);
+    page_t *page = chunk_page_from_pos(&world->chunk, self->body.pos);
     array_remove(page->entities, self);
 }
 
@@ -98,7 +99,7 @@ void entity_sync(entity_t *self, world_t *world, float dt) {
         movement_sync(self, world, dt);
     }
 
-    // should the camera follow the player's movement
+    // should the camera follow the entity's movement
     if (self->flags & F_CAMERA_FOLLOW) {
         camera_follow_sync(self, world, dt);
     }

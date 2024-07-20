@@ -2,6 +2,7 @@
 
 #include "game/input.h"
 #include "graphics/renderer.h"
+#include "level/level.h"
 #include "ui/ui.h"
 
 #include <cglm/struct.h>
@@ -59,18 +60,17 @@ static void init(game_t *self) {
     time_init(&self->time);
     world_init(&self->world);
     ui_init();
-    level_editor_init(&self->editor);
 }
 
 static void destroy(game_t *self) {
     window_destroy(&self->window);
     world_destroy(&self->world);
+    level_shutdown();
 }
 
 static void update(game_t *self) {
     time_update(&self->time);
     world_update(&self->world, self->time.delta);
-    level_editor_update(&self->editor, &self->world);
 }
 
 static void sync(game_t *self) {
@@ -78,7 +78,7 @@ static void sync(game_t *self) {
         buttons_update();
         monitor_input(self);
 
-        // synchonize game
+        // synchonize game world
         world_sync(&self->world, self->time.delta_fixed);
     }
 }
@@ -89,11 +89,11 @@ static void render(game_t *self) {
 }
 
 void game_run(game_t *self) {
-    // initialize game
+    // initialize application
     init(self);
 
-    level_import(&self->level, &self->world, "data/level.dat");
-    /* level_export(&self->level, &self->world, "data/demo.dat"); */
+    level_import(&self->world, "data/level.dat");
+    /* level_export(&self->world, "data/demo.dat"); */
 
     while (self->state != GS_QUIT) {
         poll_events(self);
@@ -109,6 +109,6 @@ void game_run(game_t *self) {
         window_swap_buffers(&self->window);
     }
 
-    // destroy game
+    // destroy application
     destroy(self);
 }

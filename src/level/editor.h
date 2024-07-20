@@ -6,9 +6,9 @@
 typedef struct {
     int current_tile;
     int curent_entity;
-} leveleditor_t;
+} editor_t;
 
-void level_editor_init(leveleditor_t *);
-void level_editor_update(leveleditor_t *, world_t *);
+void editor_init(editor_t *);
+void editor_update(editor_t *, world_t *);
 
-#endif
+#endif // _LEVEL_EDITOR_H_

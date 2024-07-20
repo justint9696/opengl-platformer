@@ -3,7 +3,6 @@
 
 #include "graphics/window.h"
 #include "level/editor.h"
-#include "level/level.h"
 #include "util/time.h"
 #include "world/world.h"
 
@@ -23,10 +22,9 @@ typedef struct {
     window_t window;
     struct time_s time;
     world_t world;
-    level_t level;
-    leveleditor_t editor;
+    editor_t editor;
 } game_t;
 
 void game_run(game_t *);
 
-#endif
+#endif // _GAME_GAME_H_
