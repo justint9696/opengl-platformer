@@ -1,21 +1,8 @@
 #include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include <cglm/struct.h>
-
-void _log_message(FILE *stream, const char *title, const char *file, int line,
-                  const char *format, ...) {
-    va_list args;
-    va_start(args, format);
-
-    char text[1024];
-    vsnprintf(text, 1024, format, args);
-    fprintf(stream, "%s: %s:%d: %s", title, file, line, text);
-
-    va_end(args);
-}
 
 #define XASSERT(_e, _msg, ...) do {\
     if (!(_e)) {\
@@ -25,15 +12,7 @@ void _log_message(FILE *stream, const char *title, const char *file, int line,
     }\
 } while (0);
 
-#define log_and_fail(...) do {\
-    _log_message(stderr, "ERROR", __FILE__, __LINE__, __VA_ARGS__);\
-    exit(1);\
-} while (0);
-
-#define log_debug(...)\
-    _log_message(stderr, "DEBUG", __FILE__, __LINE__, __VA_ARGS__);
-
-#define CHUNK_SIZE 256
+#define CHUNK_SIZE 384
 #define CHUNK_MAX  64
 
 typedef struct {
@@ -74,7 +53,7 @@ static void level_init() {
     memset(&state.level, 0, sizeof(state.level));
 
     chunk_t *chunk = &state.level.chunk;
-    chunk->origin = 8;
+    chunk->origin = 7;
     chunk->dim = (ivec2s) { 5, 3 };
 }
 
@@ -153,11 +132,11 @@ static int level_export(const char *fpath) {
 
     data_t data = (data_t) {
         .type = 2,
-        .pos = { -CHUNK_SIZE, 25.f },
+        .pos = { -CHUNK_SIZE * 2.f, 25.f },
         .dim = { 50.f, 50.f },
     };
 
-    size_t n = 5;
+    size_t n = floorf(CHUNK_SIZE / 50.f);
     for (int i = 0; i < 5; i++) {
         fwrite(&n, sizeof(size_t), 1, fp);
         for (size_t j = 0; j < n; j++) {
@@ -186,13 +165,13 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    log_debug("file \"%s\" exported successfully!\n", fname);
+    printf("file \"%s\" exported successfully!\n", fname);
 
     if ((ret = level_import(fname)) == F_ERROR) {
         perror(fname);
         return 1;
     }
 
-    log_debug("file \"%s\" imported successfully!\n", fname);
+    printf("file \"%s\" imported successfully!\n", fname);
     return 0;
 }
