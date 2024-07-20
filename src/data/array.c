@@ -14,10 +14,10 @@ typedef struct {
 #define array_header(_a)\
     ((array_t *)(((void *)(_a)) - offsetof(array_t, userdata)))
 
-void *array_init(void *data, size_t size, size_t capacity) {
-    assert(data);
+void *array_init(void *ptr, size_t size, size_t capacity) {
+    assert(ptr);
 
-    array_t *array = (array_t *)data;
+    array_t *array = (array_t *)ptr;
     /* memset(array, 0, sizeof(array_t) * (size * capacity)); */
 
     array->capacity = capacity;
@@ -124,4 +124,15 @@ void *array_slice(void *data, uint32_t start, uint32_t end) {
     array->len = (end - start);
 
     return slice;
+}
+
+void array_copy(void *dst, void *src) {
+    assert(dst);
+    array_t *a = array_header(dst);
+
+    assert(src);
+    array_t *b = array_header(src);
+
+    assert(a->capacity >= b->capacity);
+    memcpy(&a->userdata, &b->userdata, b->size * b->len);
 }

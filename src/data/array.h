@@ -17,6 +17,8 @@ void array_remove(void *, void *item);
 
 void *array_get(void *, uint32_t index);
 size_t array_len(void *);
+
 void *array_slice(void *, uint32_t start, uint32_t end);
+void array_copy(void *dst, void *src);
 
 #endif // _DATA_ARRAY_H_
