@@ -6,7 +6,7 @@
 void camera_init(camera_t *self, vec2s pos, int width, int height) {
     float w = width * 0.5f, h = height * 0.5f;
     self->projection = glms_ortho(-w, w, -h, h, -1.f, 1.f);
-    self->pos = (vec3s) { pos.x, pos.y, 0.f };
+    self->pos = glms_vec3_negate((vec3s) { pos.x, pos.y, 0.f });
     camera_update_view(self);
 }
 
