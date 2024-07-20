@@ -42,9 +42,8 @@ void chunk_render(chunk_t *self) {
     }
 }
 
-page_t *chunk_page(chunk_t *self, vec2s pos) {
-    const int CHUNK_WIDTH = 3;
+page_t *chunk_page_from_pos(chunk_t *self, vec2s pos) {
     vec2s coord = glms_vec2_divs(glms_vec2_sub(pos, self->pos), CHUNK_SIZE);
-    int index = ((floorf(coord.y) * CHUNK_WIDTH) + floorf(coord.x));
+    int32_t index = ((floorf(coord.y) * CHUNK_WIDTH) + floorf(coord.x));
     return &self->pages[index];
 }
