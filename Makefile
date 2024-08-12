@@ -20,8 +20,11 @@ CPPFLAGS += -I/usr/include/libpng16
 CPPFLAGS += -D_DEBUG
 CPPFLAGS += -D_EDITOR
 
-CFLAGS := -g -O2
-CFLAGS += -Wall -Wextra
+CFLAGS := -std=c11
+CFLAGS += -g
+CFLAGS += -O2
+CFLAGS += -Wall
+CFLAGS += -Wextra
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-missing-braces
 CFLAGS += $(CPPFLAGS)
@@ -37,7 +40,7 @@ LDFLAGS += -Llib/SDL2/build/build/.libs
 LDFLAGS += -Llib/cglm/build
 LDFLAGS += -Wl,--start-group $(LDLIBS) -Wl,--end-group
 
-TARGET = $(BIN)/build
+TARGET = $(BIN)/game
 
 .PHONY: all clean
 
