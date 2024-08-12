@@ -1,84 +1,64 @@
 #include "data/grid.h"
 
-#include "data/array.h"
-
 #include <assert.h>
 #include <math.h>
-#include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 
 #define offset(_x, _y, _w) ((_x) + ((_y) * (_w)))
 
-// 640x480 produces a 13x10 grid with cells of size 50
-void grid_init(grid_t *self, ivec2s cell_size, ivec2s screen_size) {
+void grid_init(grid_t *self, int size, int width, int height) {
     memset(self, 0, sizeof(grid_t));
+    assert(((width / size) < BUCKET_MAX) && ((height / size) < BUCKET_MAX));
+    self->size = size;
     self->dim = (ivec2s) {
-        .x = ceilf(1.f * screen_size.x / cell_size.x),
-        .y = ceilf(1.f * screen_size.y / cell_size.y),
+        .x = ceilf(1.f * width / size),
+        .y = ceilf(1.f * height / size),
     };
-    self->size = cell_size;
-
-    self->cells = calloc(self->dim.x * self->dim.y, sizeof(cell_t));
-    assert(self->cells);
-
     for (int y = 0; y < self->dim.y; y++) {
         for (int x = 0; x < self->dim.x; x++) {
-            cell_t *cell = &self->cells[offset(x, y, self->dim.x)];
+            cell_t *cell = &self->bucket[offset(x, y, self->dim.x)];
             cell->pos = (ivec2s) { x, y };
         }
     }
 }
 
-void grid_destroy(grid_t *self) {
-    for (int y = 0; y < self->dim.y; y++) {
-        for (int x = 0; x < self->dim.x; x++) {
-            cell_t *cell = &self->cells[offset(x, y, self->dim.x)];
-            if (!cell->items)
-                continue;
+void grid_destroy(grid_t *self) {}
 
-            array_free(cell->items);
+void grid_insert(grid_t *self, vec2s pos, void *data) {
+    cell_t *cell = grid_cell_from_pos(self, pos);
+    cell_insert(cell, data);
+}
+
+void grid_remove(grid_t *self, vec2s pos, void *data) {
+    cell_t *cell = grid_cell_from_pos(self, pos);
+    cell_remove(cell, data);
+}
+
+cell_t *grid_cell_from_pos(grid_t *self, vec2s pos) {
+    assert(pos.x > 0 && pos.y > 0);
+    uint32_t x = floorf(pos.x / self->size);
+    uint32_t y = floorf(pos.y / self->size);
+    return &self->bucket[offset(x, y, self->dim.x)];
+}
+
+cell_t *grid_cell_from_index(grid_t *self, ivec2s index) {
+    return &self->bucket[offset(index.x, index.y, self->dim.x)];
+}
+
+void cell_insert(cell_t *cell, void *data) {
+    assert(cell->len < CELL_MAX);
+    cell->arr[cell->len++] = data;
+}
+
+void cell_remove(cell_t *cell, void *data) {
+    size_t len = cell->len;
+
+    for (size_t i = 0; i < len; i++) {
+        if (cell->arr[i] == data) {
+            memcpy(&cell->arr[i], &cell->arr[i + 1],
+                   sizeof(void *) * --cell->len);
+            break;
         }
     }
-
-    assert(self->cells);
-    free(self->cells);
-}
-
-void grid_add(grid_t *self, void *data, vec2s pos) {
-    cell_t *cell = grid_cell_pos(self, pos);
-    if (!cell->items) {
-        cell->items = array_alloc(sizeof(void *), 16);
-    }
-
-    assert(cell->items);
-    array_push(cell->items, data);
-}
-
-void grid_remove(grid_t *self, void *data, vec2s pos) {
-    cell_t *cell = grid_cell_pos(self, pos);
-    if (!cell->items)
-        return;
-
-    array_remove(cell->items, data);
-}
-
-void grid_update(grid_t *self, void *data, vec2s prev_pos, vec2s pos) {
-    cell_t *prev = grid_cell_pos(self, prev_pos);
-    cell_t *curr = grid_cell_pos(self, pos);
-
-    if (prev == curr)
-        return;
-
-    grid_remove(self, data, prev_pos);
-    grid_add(self, data, pos);
-}
-
-cell_t *grid_cell_pos(grid_t *self, vec2s pos) {
-    int x = floorf(pos.x / self->size.x);
-    int y = floorf(pos.y / self->size.y);
-    return &self->cells[offset(x, y, self->dim.x)];
-}
-
-cell_t *grid_cell_index(grid_t *self, ivec2s index) {
-    return &self->cells[offset(index.x, index.y, self->dim.x)];
 }

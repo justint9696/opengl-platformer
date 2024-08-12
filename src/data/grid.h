@@ -2,27 +2,47 @@
 #define _DATA_GRID_H_
 
 #include <cglm/types-struct.h>
+#include <stddef.h>
 
-typedef struct {
+#define BUCKET_MAX 128
+#define CELL_MAX   32
+
+typedef struct cell_s {
     ivec2s pos;
-    void *items;
+    size_t len;
+    void *arr[CELL_MAX];
 } cell_t;
 
 typedef struct {
+    int size;
     ivec2s dim;
-    ivec2s size;
-    cell_t *cells;
+    cell_t bucket[BUCKET_MAX];
 } grid_t;
 
-void grid_init(grid_t *, ivec2s cell_size, ivec2s res);
+/* Initializes a grid with the provided parameters. */
+void grid_init(grid_t *, int size, int width, int height);
+
+/* Releases the memory allocated for a grid. */
 void grid_destroy(grid_t *);
 
-void grid_add(grid_t *, void *data, vec2s pos);
-void grid_remove(grid_t *, void *data, vec2s pos);
+/* Inserts an item into the grid cell that corresponds to the provided position.
+ */
+void grid_insert(grid_t *, vec2s pos, void *data);
 
-void grid_update(grid_t *, void *data, vec2s prev_pos, vec2s pos);
+/* Removes an item from the grid cell that corresponds to the provided position.
+ */
+void grid_remove(grid_t *, vec2s pos, void *data);
 
-cell_t *grid_cell_pos(grid_t *, vec2s pos);
-cell_t *grid_cell_index(grid_t *, ivec2s index);
+/* Returns the cell that corresponds to the provided position. */
+cell_t *grid_cell_from_pos(grid_t *, vec2s pos);
 
-#endif // _DATA_GRID_H_
+/* Returns the cell at the (x, y) coordinates of the provided index. */
+cell_t *grid_cell_from_index(grid_t *, ivec2s index);
+
+/* Inserts an item into the provided cell. */
+void cell_insert(cell_t *, void *data);
+
+/* Removes an item from the provided cell. */
+void cell_remove(cell_t *, void *data);
+
+#endif // ifndef _DATA_GRID_H_
