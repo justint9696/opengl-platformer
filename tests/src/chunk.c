@@ -53,8 +53,8 @@ static void level_init() {
     memset(&state.level, 0, sizeof(state.level));
 
     chunk_t *chunk = &state.level.chunk;
-    chunk->origin = 7;
-    chunk->dim = (ivec2s) { 5, 3 };
+    chunk->origin = 11;
+    chunk->dim = (ivec2s) { 7, 3 };
 }
 
 static int level_import(const char *fpath) {
@@ -116,9 +116,13 @@ static int level_export(const char *fpath) {
 
     fseek(fp, 0, SEEK_SET);
 
+    // chunk origin
     fwrite(&state.level.chunk.origin, sizeof(int), 1, fp);
+
+    // chunk dimensions
     fwrite(&state.level.chunk.dim, sizeof(ivec2s), 1, fp);
 
+    // chunk player
     data_t player = {
         .type = 0,
         .pos = (vec2s) { 128.f, 128.f },
@@ -126,26 +130,48 @@ static int level_export(const char *fpath) {
     };
     fwrite(&player, sizeof(data_t), 1, fp);
 
+    // first 5 pages have 0 entities
     size_t count = 0;
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < state.level.chunk.dim.x; i++)
         fwrite(&count, sizeof(size_t), 1, fp);
+
+
+    float target = -CHUNK_SIZE * 4.f;
 
     data_t data = (data_t) {
         .type = 2,
-        .pos = { -CHUNK_SIZE * 2.f, 25.f },
+        .pos = { target, 25.f },
         .dim = { 50.f, 50.f },
     };
 
-    size_t n = floorf(CHUNK_SIZE / 50.f);
-    for (int i = 0; i < 5; i++) {
-        fwrite(&n, sizeof(size_t), 1, fp);
-        for (size_t j = 0; j < n; j++) {
-            fwrite(&data, sizeof(data_t), 1, fp);
+    size_t n;
+    data_t arr[24];
+
+    for (int i = 0; i < state.level.chunk.dim.x; i++) {
+        n = 0;
+        memset(arr, 0, sizeof(data_t) * 24);
+
+        target += CHUNK_SIZE;
+        while (data.pos.x <= target && n < 24) {
+            memcpy(&arr[n++], &data, sizeof(data_t));
             data.pos.x += 50.f;
         }
+
+        fwrite(&n, sizeof(size_t), 1, fp);
+        fwrite(&arr, sizeof(data_t), n, fp);
     }
 
-    for (int i = 0; i < 5; i++)
+    /* size_t n = floorf(CHUNK_SIZE / 50.f); */
+    /* for (int i = 0; i < 5; i++) { */
+    /*     fwrite(&n, sizeof(size_t), 1, fp); */
+    /*     for (size_t j = 0; j < n; j++) { */
+    /*         fwrite(&data, sizeof(data_t), 1, fp); */
+    /*         data.pos.x += 50.f; */
+    /*     } */
+    /* } */
+
+    // last 5 pages have 0 entities
+    for (int i = 0; i < state.level.chunk.dim.x; i++)
         fwrite(&count, sizeof(size_t), 1, fp);
 
     ret = F_SUCCESS;

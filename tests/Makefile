@@ -4,14 +4,14 @@ BIN = bin
 SRC = src
 
 SRCS = $(shell find $(SRC) -name "*.c")
-OBJS = $(patsubst $(SRC)%, $(BIN)%, $(SRCS:.c=))
+OBJS = $(patsubst $(SRC)%, $(BIN)%, $(SRCS:.c=.o))
 DEPS = $(patsubst $(SRC)%, $(BIN)%, $(SRCS:.c=.d))
 
-CFLAGS := -std=c2x
-CFLAGS += -g -O2
+CFLAGS := -std=c11
+CFLAGS += -g
+CFLAGS += -O2
 CFLAGS += -Wall
 CFLAGS += -Wextra
-CFLAGS += -Wpedantic
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-missing-braces
 
@@ -21,7 +21,7 @@ LDFLAGS := -Wl,--start-group $(LDLIBS) -Wl,--end-group
 
 all: $(OBJS)
 
-$(BIN)/%: $(SRC)/%.c
+$(BIN)/%.o: $(SRC)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -o $@ $^ -MMD -MP $(CFLAGS) $(LDFLAGS)
 
