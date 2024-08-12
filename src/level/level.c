@@ -2,73 +2,60 @@
 
 #include "data/array.h"
 #include "entity/table.h"
-#include "util/log.h"
-#include "util/util.h"
+#include "util/assert.h"
 
 #include <assert.h>
 #include <cglm/struct.h>
 #include <errno.h>
+#include <math.h>
+#include <stdio.h>
 #include <string.h>
 
-/*
- * level.dat file format
- * int              origin;
- * ivec2s           dchunk; // (width, height)
- * ldata_t          player;
- *
- * for (i = 0; i < nchunk; i++) {
- *     size_t       nent;
- *     ldata_t      entities[nent];
- * }
- */
+static level_t level;
 
-// corresponding to entities and tiles
-typedef struct {
-    int type;
-    union {
-        box_t box;
-        struct {
-            vec2s pos, dim;
-        };
-    };
-} ldata_t;
-
-static struct {
-    // array of position offsets of pages within level data
-    int *offsets;
-
-    // level file pointer
-    FILE *fp;
-} level;
-
-static void calculate_page_aabb(page_t *page, world_t *world, int index) {
-    page->box.pos = glms_vec2_add(
+/* Creates the page bounds based on the chunk position and page index. */
+static void page_calculate_aabb(page_t *page, world_t *world) {
+    page->pos = glms_vec2_add(
         (vec2s) {
-            .x = (index % CHUNK_WIDTH) * CHUNK_SIZE,
-            .y = floorf(1.f * index / CHUNK_WIDTH) * CHUNK_SIZE,
+            .x = (page->index % CHUNK_WIDTH) * CHUNK_SIZE,
+            .y = (2 - floorf((float)page->index / CHUNK_WIDTH)) * CHUNK_SIZE,
         },
         world->chunk.pos);
-    page->box.dim = glms_vec2_fill(CHUNK_SIZE);
+    page->dim = glms_vec2_fill(CHUNK_SIZE);
 }
 
-static void load_pages(world_t *world, ldata_t *arr, size_t len, int index) {
-    page_t *page = &world->chunk.pages[index];
-    calculate_page_aabb(page, world, index);
-
-    /* log_debug("loading %ld entities into page %d\n", len, index); */
-
+/* Loads level data into the provided page. */
+static void page_load_data(page_t *page, world_t *world, ldata_t arr[],
+                           size_t len) {
+    size_t n = 0;
     for (size_t i = 0; i < len; i++) {
         ldata_t *data = &arr[i];
-        create_fn_t f = table_lookup(data->type);
-        f(data->pos, data->dim, world);
+
+        page_t *tmp = chunk_page_from_pos(&world->chunk, data->pos);
+        if (tmp->index != page->index) {
+            n++;
+        }
+
+        create_fn_t fn = table_lookup(data->type);
+        fn(data->pos, data->dim, world);
     }
+    if (n) {
+        log_fatal("%ld entities were loaded into the wrong page\n", n);
+    }
+}
+
+void level_shutdown() {
+    if (level.fp)
+        return;
+
+    fclose(level.fp);
+    array_free(level.offsets);
 }
 
 void level_import(world_t *world, const char *fpath) {
     level.fp = fopen(fpath, "rb");
-    if (!level.fp) {
-        log_and_fail("Could not open file %s: %s\n", fpath, strerror(errno));
-    }
+    XASSERT(level.fp, "Could not open file `%s`: %s.\n", fpath,
+            strerror(errno));
 
     fseek(level.fp, 0, SEEK_SET);
     fread(&world->chunk.index, sizeof(int), 1, level.fp);
@@ -80,8 +67,8 @@ void level_import(world_t *world, const char *fpath) {
     ldata_t data;
     fread(&data, sizeof(ldata_t), 1, level.fp);
 
-    create_fn_t f = table_lookup(data.type);
-    world->player = f(data.pos, data.dim, world);
+    create_fn_t fn = table_lookup(data.type);
+    world->player = fn(data.pos, data.dim, world);
 
     struct {
         size_t n;
@@ -89,134 +76,144 @@ void level_import(world_t *world, const char *fpath) {
     } entities;
 
     int32_t size = (world->chunk.dim.x * world->chunk.dim.y);
-    level.offsets = array_alloc(sizeof(int), size);
+    level.offsets = array_alloc(sizeof(int32_t), size);
 
-    int index = 0;
-    int32_t target = max(0, world->chunk.index - world->chunk.dim.x - 1);
+    // current page index
+    uint32_t index = 0;
+
+    // top left page of starting chunk
+    int32_t target = glm_max(0, world->chunk.index - world->chunk.dim.x - 1);
+
     for (int32_t i = 0; i < size; i++) {
+        // offset within level file
+        uint32_t offset = ftell(level.fp);
+        array_push(level.offsets, &offset);
+
         fread(&entities.n, sizeof(size_t), 1, level.fp);
         fread(&entities.arr, sizeof(ldata_t), entities.n, level.fp);
 
-        size_t offset = ftell(level.fp);
-        array_push(level.offsets, &offset);
-
-        // have all chunks been loaded or should the page be loaded
+        // have all the pages been loaded or is the page not part of the chunk
         if ((index >= 9) || ((target - i) > 0))
             continue;
 
         // have all 3 pages been loaded
-        if ((i - target) == 2)
+        if ((i - target) >= 2)
             target = world->chunk.dim.x + target;
 
-        load_pages(world, entities.arr, entities.n, index++);
+        // load pages into memory
+        page_t *page = &world->chunk.pages[index++];
+        page_calculate_aabb(page, world);
+        page_load_data(page, world, entities.arr, entities.n);
     }
 }
 
-void level_export(const world_t *world, const char *fpath) {
-    /* FILE *fp = fopen(fpath, "wb+"); */
-    /* if (!fp) { */
-    /*     log_and_fail("Could not open file %s\n", fpath); */
-    /* } */
-
-    /* fwrite(&world->chunk.origin, sizeof(vec2s), 1, fp); */
-
-    /* size_t len; */
-    /* len = array_len(world->entities); */
-    /* fwrite(&len, sizeof(size_t), 1, fp); */
-
-    /* for (size_t i = 0; i < len; i++) { */
-    /*     entity_t *entity = &world->entities[i]; */
-    /*     assert(entity); */
-
-    /*     ldata_t data = { */
-    /*         .type = entity->type, */
-    /*         .box = entity->body.box, */
-    /*     }; */
-
-    /*     fwrite(&data, sizeof(ldata_t), 1, fp); */
-    /* } */
-
-    /* fclose(fp); */
-    /* log_debug("Successfully exported level data to file \"%s\".\n", fpath);
-     */
-}
-
-void level_shutdown() {
-    array_free(level.offsets);
-
-    assert(level.fp);
-    fclose(level.fp);
-}
-
-static void shift_pages(world_t *world, int indices[], int it) {
+/* Shifts all the pages within the index array around the provided iterator. */
+static void pages_shift(world_t *world, uint32_t indices[], int it) {
+    // iterate through all the indices
     for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 2; j++) {
-            int32_t index = (indices[i] + (it * j));
-            page_t *page = &world->chunk.pages[index];
+        uint32_t index = indices[i];
+        page_t *page = &world->chunk.pages[index];
 
-            log_debug("copy page %d into %d\n", index,
-                      indices[i] + (it * (j + 1)));
+        // remove entities from the world
+        size_t len = array_len(page->entities);
+        for (size_t n = 0; n < len; n++) {
+            entity_t *entity = &page->entities[n];
+            entity_destroy(entity, world);
+        }
 
-            index = ((indices[i] + (it * (j + 1))));
-            array_copy(page->entities, world->chunk.pages[index].entities);
-            
-            calculate_page_aabb(page, world, page->index);
+        // mark page block as free
+        chunk_release_page(&world->chunk, page);
+
+        // shift the pages around the iterator
+        for (int j = 1; j < 3; j++) {
+            index = (indices[i] + (it * j));
+            page_t *tmp = &world->chunk.pages[index];
+
+            page->entities = tmp->entities;
+            memcpy(&page->box, &tmp->box, sizeof(box_t));
+
+            page = tmp;
         }
     }
 }
 
-static void replace_pages(world_t *world, int indices[], int it) {
+/* Replaces all the pages within the index array around the provided iterator.
+ */
+static void pages_replace(world_t *world, uint32_t indices[], int it) {
     struct {
         size_t n;
         ldata_t arr[CHUNK_MAX];
     } entities;
 
+    // iterate through all the indices
     for (int i = 0; i < 3; i++) {
         page_t *page = &world->chunk.pages[indices[i]];
-        array_clear(page->entities);
 
-        vec2s pos
-            = glms_vec2_negate(glms_vec2_div(page->box.pos, world->chunk.pos));
-        int32_t index
-            = (world->chunk.index + (world->chunk.dim.x * pos.y) + pos.x) + it;
+        // request block of memory
+        page->entities = chunk_request_page(&world->chunk, page);
+        page_calculate_aabb(page, world);
 
-        log_debug("requesting index %d for page %d\n", index, indices[i]);
+        // calculate the offset from the center chunk
+        vec2s coord = glms_vec2_subs(
+            glms_vec2_divs(glms_vec2_sub(page->pos, world->chunk.pos),
+                           CHUNK_SIZE),
+            1.f);
 
-        int32_t offset = *(int32_t *)array_get(level.offsets, index);
+        // calculate the offset of the center chunk with respects to the chunk
+        // dimensions
+        vec2s idx = (vec2s) {
+            .x = world->chunk.index % world->chunk.dim.x,
+            .y = floorf(1.f * world->chunk.index / world->chunk.dim.x),
+        };
+
+        idx = glms_vec2_add(idx, coord);
+
+        // this allows (-1, -1) to be the top left page
+        // instead of the bottom left page.
+        idx.y = world->chunk.dim.y - idx.y - 1;
+
+        int32_t index = ((floorf(idx.y) * world->chunk.dim.x) + floorf(idx.x));
+
+        if (index < 0)
+            continue;
+
+        log_debug("Requesting index %u for page %u\n", index, page->index);
+        uint32_t offset = *(uint32_t *)array_get(level.offsets, index);
         fseek(level.fp, offset, SEEK_SET);
 
         fread(&entities.n, sizeof(size_t), 1, level.fp);
         fread(&entities.arr, sizeof(ldata_t), entities.n, level.fp);
 
-        load_pages(world, entities.arr, entities.n, indices[i]);
-    }
+        log_debug("Loading %lu entities into page %u\n", entities.n,
+                  page->index);
 
-    world->chunk.index += it;
-    log_debug("moved to chunk: %d\n", world->chunk.index);
+        page_load_data(page, world, entities.arr, entities.n);
+    }
 }
 
-void level_swap_chunks(world_t *world, int index) {
+void level_swap_pages(world_t *world, page_t *page) {
     assert(level.fp);
 
     enum {
-        TOP_LEFT = -4,
-        TOP_MIDDLE = -3,
-        TOP_RIGHT = -2,
-        LEFT = -1,
-        CENTER = 0,
-        RIGHT = 1,
-        BOTTOM_LEFT = 2,
-        BOTTOM_MIDDLE = 3,
-        BOTTOM_RIGHT = 4,
+        TOP_LEFT,
+        TOP_MIDDLE,
+        TOP_RIGHT,
+        LEFT,
+        CENTER,
+        RIGHT,
+        BOTTOM_LEFT,
+        BOTTOM_MIDDLE,
+        BOTTOM_RIGHT,
     };
 
-    // move the pages into correct indices within chunk->pages[]
-    // load the new pages from the level data file based on indicies and offsets
+    // calculate the direction the pages are moving
+    uint32_t index = page->index;
+
     switch (index) {
         case TOP_LEFT:
         case TOP_MIDDLE:
         case TOP_RIGHT:
-            /* shift_pages_down(world, index); */
+            // shift pages down
             break;
     }
 
@@ -224,7 +221,7 @@ void level_swap_chunks(world_t *world, int index) {
         case BOTTOM_LEFT:
         case BOTTOM_MIDDLE:
         case BOTTOM_RIGHT:
-            /* shift_pages_up(world, index); */
+            // shift pages up
             break;
     }
 
@@ -232,10 +229,14 @@ void level_swap_chunks(world_t *world, int index) {
         case TOP_LEFT:
         case BOTTOM_LEFT:
         case LEFT:
-            log_debug("shifting pages right\n");
-            shift_pages(world, (int[]) { 2, 5, 8 }, -1);
-            replace_pages(world, (int[]) { 0, 3, 6 }, -1);
+            // shift pages right
+            log_debug("Shifting pages right\n");
+            pages_shift(world, (uint32_t[]) { 2, 5, 8 }, -1);
+
             world->chunk.pos.x -= CHUNK_SIZE;
+            world->chunk.index -= 1;
+
+            pages_replace(world, (uint32_t[]) { 0, 3, 6 }, -1);
             break;
     }
 
@@ -243,10 +244,16 @@ void level_swap_chunks(world_t *world, int index) {
         case TOP_RIGHT:
         case BOTTOM_RIGHT:
         case RIGHT:
-            log_debug("shifting pages left\n");
-            shift_pages(world, (int[]) { 0, 3, 6 }, 1);
-            replace_pages(world, (int[]) { 2, 5, 8 }, 1);
+            // shift pages left
+            log_debug("Shifting pages left\n");
+            pages_shift(world, (uint32_t[]) { 0, 3, 6 }, 1);
+
             world->chunk.pos.x += CHUNK_SIZE;
+            world->chunk.index += 1;
+
+            pages_replace(world, (uint32_t[]) { 2, 5, 8 }, 1);
             break;
     }
+
+    log_debug("Player moved to page %u\n", world->chunk.index);
 }

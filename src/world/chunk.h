@@ -14,7 +14,12 @@ typedef struct page_s {
     int32_t index;
 
     // bounds of the current page
-    box_t box;
+    union {
+        box_t box;
+        struct {
+            vec2s pos, dim;
+        };
+    };
 
     // array of entities within the current page
     entity_t *entities;
@@ -40,4 +45,7 @@ void chunk_render(chunk_t *);
 
 page_t *chunk_page_from_pos(chunk_t *, vec2s pos);
 
-#endif // _WORLD_CHUNK_H_
+void *chunk_request_page(chunk_t *, page_t *);
+void chunk_release_page(chunk_t *, page_t *);
+
+#endif // ifndef _WORLD_CHUNK_H_
