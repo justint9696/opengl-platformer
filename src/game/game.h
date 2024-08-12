@@ -25,6 +25,7 @@ typedef struct {
     editor_t editor;
 } game_t;
 
+/* Initializes the game and starts the game loop. */
 void game_run(game_t *);
 
-#endif // _GAME_GAME_H_
+#endif // ifndef _GAME_GAME_H_

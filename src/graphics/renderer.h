@@ -19,12 +19,19 @@ typedef struct {
     const camera_t *camera;
 } renderer_t;
 
+/* Initializes the internal renderer. */
 void renderer_init();
+
+/* Destroys the internal renderer. */
 void renderer_destroy();
 
+/* Binds the provided shader index if it has not already been bound. */
 shader_t *renderer_use_shader(shader_e);
 
+/* Prepares the renderer scene based on the provided camera. */
 void renderer_prepare_scene(const camera_t *);
+
+/* Presents the renderer scene. */
 void renderer_present_scene();
 
-#endif // _GRAPHICS_RENDERER_H_
+#endif // ifndef _GRAPHICS_RENDERER_H_

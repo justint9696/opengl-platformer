@@ -1,25 +1,26 @@
 #include "entity/entity.h"
 
 #include "data/array.h"
-#include "graphics/drawing.h"
+#include "util/assert.h"
 #include "world/world.h"
 
-#define _DECL_MODULE(_name)\
+#define DECL_MODULE(_name)\
     extern void _name##_sync(entity_t *, world_t *, float);\
     extern void _name##_update(entity_t *, world_t *, float);
 
-_DECL_MODULE(input);
-_DECL_MODULE(collision);
-_DECL_MODULE(movement);
-_DECL_MODULE(physics);
-_DECL_MODULE(ai);
-_DECL_MODULE(camera_follow);
+DECL_MODULE(input);
+DECL_MODULE(collision);
+DECL_MODULE(movement);
+DECL_MODULE(physics);
+DECL_MODULE(ai);
+DECL_MODULE(camera_follow);
 
 entity_t *entity_create(void *data, world_t *world) {
-    page_t *page 
-        = chunk_page_from_pos(&world->chunk, ((entity_t *)data)->body.pos);
+    vec2s pos = ((entity_t *)data)->body.pos;
+    page_t *page = chunk_page_from_pos(&world->chunk, pos);
+    int32_t id = array_push(page->entities, data);
+    XASSERT(id != -1, "Could not create entity within page %u\n", page->index);
 
-    uint32_t id = array_push(page->entities, data);
     entity_t *self = array_get(page->entities, id);
 
     self->id = id;
@@ -29,24 +30,22 @@ entity_t *entity_create(void *data, world_t *world) {
         self->init(self, world);
     }
 
-#ifdef _DEBUG
-    self->debug.lines = array_alloc(sizeof(vec2s), 32);
-#endif // _DEBUG
-
-    if (self->body.solid) {
-        grid_add(&world->grid, &self, world_to_screen(world, self->body.pos));
+    if (self->body.solid && world_is_on_screen(world, self->body.pos)) {
+        self->body.cell = grid_cell_from_pos(
+            &world->grid, world_to_screen(world, self->body.pos));
+        cell_insert(self->body.cell, self);
     }
 
     return self;
 }
 
 void entity_destroy(entity_t *self, world_t *world) {
-#ifdef _DEBUG
-    array_free(self->debug.lines);
-#endif // _DEBUG
-
     if (self->destroy) {
         self->destroy(self, world);
+    }
+
+    if (self->body.solid && self->body.cell) {
+        cell_remove(self->body.cell, self);
     }
 
     page_t *page = chunk_page_from_pos(&world->chunk, self->body.pos);
@@ -54,16 +53,6 @@ void entity_destroy(entity_t *self, world_t *world) {
 }
 
 void entity_render(entity_t *self, world_t *world) {
-#ifdef _DEBUG
-    // render debug lines
-    size_t len = array_len(self->debug.lines);
-    for (size_t i = 0; i < len; i += 2) {
-        vec2s from = self->debug.lines[i];
-        vec2s to = self->debug.lines[i+1];
-        draw_line(from, to, COLOR_RED);
-    }
-#endif // _DEBUG
-
     if (self->render) {
         self->render(self, world);
     }
@@ -94,7 +83,9 @@ void entity_sync(entity_t *self, world_t *world, float dt) {
     if (self->flags & F_KINEMATIC) {
         physics_sync(self, world, dt);
 
-        if (self->body.solid) { collision_sync(self, world, dt); }
+        if (self->body.solid) {
+            collision_sync(self, world, dt);
+        }
 
         movement_sync(self, world, dt);
     }
@@ -103,4 +94,27 @@ void entity_sync(entity_t *self, world_t *world, float dt) {
     if (self->flags & F_CAMERA_FOLLOW) {
         camera_follow_sync(self, world, dt);
     }
+
+    if (!self->body.solid)
+        return;
+
+    if (!world_is_on_screen(world, self->body.pos)) {
+        if (self->body.cell) {
+            cell_remove(self->body.cell, self);
+        }
+        self->body.cell = NULL;
+        return;
+    }
+
+    cell_t *cell = grid_cell_from_pos(&world->grid,
+                                      world_to_screen(world, self->body.pos));
+    if (cell == self->body.cell)
+        return;
+
+    if (self->body.cell) {
+        cell_remove(self->body.cell, self);
+    }
+
+    cell_insert(cell, self);
+    self->body.cell = cell;
 }

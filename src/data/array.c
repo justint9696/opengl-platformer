@@ -1,24 +1,14 @@
 #include "data/array.h"
 
-#include "util/log.h"
-
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-
-typedef struct {
-    size_t capacity, size, len;
-    void *userdata;
-} array_t;
-
-#define array_header(_a)\
-    ((array_t *)(((void *)(_a)) - offsetof(array_t, userdata)))
 
 void *array_init(void *ptr, size_t size, size_t capacity) {
     assert(ptr);
 
     array_t *array = (array_t *)ptr;
-    /* memset(array, 0, sizeof(array_t) * (size * capacity)); */
+    memset(array, 0, size * capacity);
 
     array->capacity = capacity;
     array->size = size;
@@ -54,18 +44,20 @@ void array_resize(void **dataptr, size_t capacity) {
     *dataptr = &array->userdata;
 }
 
-uint32_t array_push(void *data, void *item) {
+int array_push(void *data, const void *item) {
     assert(data);
     array_t *array = array_header(data);
 
-    assert(array->len < array->capacity);
+    if (array->len > array->capacity)
+        return -1;
+
     void *ptr = array_get(data, array->len);
     memcpy(ptr, item, array->size);
 
     return array->len++;
 }
 
-void array_remove(void *data, void *item) {
+int array_remove(void *data, const void *item) {
     assert(data);
     array_t *array = array_header(data);
 
@@ -77,11 +69,8 @@ void array_remove(void *data, void *item) {
             break;
     }
 
-    if (idx >= array->len) {
-        log_warn( 
-            "Attempted to remove an item not contained within the array.\n");
-        return;
-    }
+    if (idx >= array->len)
+        return -1;
 
     // check if the item is at the last index of the array
     if (idx < array->len - 1) {
@@ -90,6 +79,8 @@ void array_remove(void *data, void *item) {
     }
 
     array->len--;
+
+    return 0;
 }
 
 void array_clear(void *data) {
@@ -103,6 +94,9 @@ void *array_get(void *data, uint32_t index) {
     assert(data);
 
     array_t *array = array_header(data);
+    if (index > array->len)
+        return NULL;
+
     return (void *)(data + (array->size * index));
 }
 

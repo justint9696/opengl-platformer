@@ -32,7 +32,7 @@ static GLint shader_compile(const char *fpath, GLenum type) {
     if (!result) {
         char log[512];
         glGetShaderInfoLog(handle, 512, NULL, log);
-        log_and_fail("%s\n%s\n", fpath, log);
+        log_fatal("%s\n%s\n", fpath, log);
     }
 
     free(text);

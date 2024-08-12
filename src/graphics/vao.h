@@ -3,12 +3,20 @@
 
 #include <glad/glad.h>
 
+/* Creates an vertex array. */
 GLuint vao_create();
+
+/* Releases an vertex array. */
 void vao_destroy(GLuint *);
+
+/* Binds a vertex array. */
 void vao_bind(GLuint *);
 
-// sets the vertex attributes of `data`
+/* Unbinds an vertex array. */
+void vao_unbind();
+
+/* Sets the vertex attributes for `data`. */
 void vao_attrib(GLint index, GLint size, GLenum type, GLsizei stride,
                 const void *data);
 
-#endif // _GRAPHICS_VAO_H_
+#endif // ifndef _GRAPHICS_VAO_H_

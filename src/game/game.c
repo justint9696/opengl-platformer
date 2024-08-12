@@ -1,6 +1,7 @@
 #include "game/game.h"
 
 #include "game/input.h"
+#include "graphics/drawing.h"
 #include "graphics/renderer.h"
 #include "level/level.h"
 #include "ui/ui.h"
@@ -63,9 +64,10 @@ static void init(game_t *self) {
 }
 
 static void destroy(game_t *self) {
-    window_destroy(&self->window);
-    world_destroy(&self->world);
+    ui_destroy();
     level_shutdown();
+    world_destroy(&self->world);
+    window_destroy(&self->window);
 }
 
 static void update(game_t *self) {
@@ -96,13 +98,22 @@ void game_run(game_t *self) {
     /* level_export(&self->world, "data/demo.dat"); */
 
     while (self->state != GS_QUIT) {
+        time_t start = NOW();
         poll_events(self);
 
         renderer_prepare_scene(&self->world.camera);
         {
+
             update(self);
             sync(self);
             render(self);
+
+            draw_text((vec2s) { -315, 160 }, 1.f, COLOR_WHITE, 
+                      "FPS: %u", self->time.fps);
+            draw_text((vec2s) { -315, 140 }, 1.f, COLOR_WHITE, 
+                      "TPS: %u", self->time.tps);
+            draw_text((vec2s) { -315, 120 }, 1.f, COLOR_WHITE, 
+                      "Frame: %lums", (NOW() - start) / NS_PER_MS);
         }
         renderer_present_scene();
 

@@ -8,9 +8,6 @@
 
 static void resolve_collision(entity_t *self, world_t *world, box_t *box,
                               vec2s *movement, short axis) {
-    // store current position
-    vec2s prev_pos = world_to_screen(world, self->body.pos);
-
     // set position to entry point of collision along the current axis
     if (movement->raw[axis] < 0.000001f) {
         self->body.pos.raw[axis] = box->pos.raw[axis] + box->dim.raw[axis];
@@ -19,23 +16,12 @@ static void resolve_collision(entity_t *self, world_t *world, box_t *box,
             = box->pos.raw[axis] - self->body.dim.raw[axis];
     }
 
-    // update position within uniform grid
-    vec2s pos = world_to_screen(world, self->body.pos);
-    if (self->body.solid) {
-        grid_update(&world->grid, &self, prev_pos, pos);
-    }
-
     // stop further movement along collision axis
     movement->raw[axis] = 0.f;
 }
 
-static vec2s try_move(entity_t *self, world_t *world, collider_t *arr,
+static vec2s try_move(entity_t *self, world_t *world, collider_t arr[],
                       size_t len, float dt) {
-#ifdef _DEBUG
-    // clear debug lines array
-    array_clear(self->debug.lines);
-#endif
-
     vec2s movement = glms_vec2_make(self->body.vel.raw);
 
     // check for collision with entities
@@ -44,12 +30,6 @@ static vec2s try_move(entity_t *self, world_t *world, collider_t *arr,
         for (short i = 0; i < 2; i++) {
             if (fabsf(movement.raw[i]) <= 0.000001f)
                 continue;
-
-#ifdef _DEBUG
-            vec2s center = box_center(&self->body.box);
-            array_push(self->debug.lines, &center);
-            array_push(self->debug.lines, &tmp->box.pos);
-#endif
 
             box_t bbb = self->body.box;
             bbb_create(&bbb, movement, i, dt);

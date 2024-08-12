@@ -11,7 +11,7 @@ void camera_follow_sync(entity_t *self, world_t *world, float dt) {
         dt);
 
     if (!aabb_collision_2d(&self->body.box, &self->body.page->box)) {
-        const page_t *page = chunk_page_from_pos(&world->chunk, self->body.pos);
-        level_swap_chunks(world, (page->index - self->body.page->index));
+        page_t *page = chunk_page_from_pos(&world->chunk, self->body.pos);
+        level_swap_pages(world, page);
     }
 }

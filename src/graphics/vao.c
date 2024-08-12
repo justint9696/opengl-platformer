@@ -14,6 +14,10 @@ inline void vao_bind(GLuint *self) {
     glBindVertexArray(*self);
 }
 
+inline void vao_unbind() {
+    glBindVertexArray(0);
+}
+
 inline void vao_attrib(GLint index, GLint size, GLenum type, GLsizei stride,
                 const void *data) {
     glVertexAttribPointer(index, size, type, GL_FALSE, stride, data);

@@ -11,4 +11,4 @@ typedef struct {
 void editor_init(editor_t *);
 void editor_update(editor_t *, world_t *);
 
-#endif // _LEVEL_EDITOR_H_
+#endif // ifndef _LEVEL_EDITOR_H_

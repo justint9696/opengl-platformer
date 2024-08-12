@@ -8,10 +8,10 @@ typedef struct {
     mat4s projection, view;
 } camera_t;
 
-// initializes a camera with a frustrum of (`width` x `height`)
+/* Initializes a camera with a frustrum of size (`width` x `height`). */
 void camera_init(camera_t *, vec2s pos, int width, int height);
 
-// updates the camera's view matrix
+/* Updates the camera's view matrix. */
 void camera_update_view(camera_t *);
 
-#endif // _GAME_CAMERA_H_
+#endif // ifndef _GAME_CAMERA_H_

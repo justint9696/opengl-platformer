@@ -38,9 +38,13 @@ void renderer_init() {
 }
 
 void renderer_destroy() {
+    // destroy loaded shaders
     for (size_t i = 0; i < SHADER_MAX; i++) {
         shader_destroy(renderer.shaders[i]);
     }
+
+    // destroy font textures
+    font_destroy();
 }
 
 shader_t *renderer_use_shader(shader_e index) {

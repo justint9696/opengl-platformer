@@ -16,6 +16,10 @@ inline void ibo_bind(GLuint *self) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *self);
 }
 
+inline void ibo_unbind() {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
 inline void ibo_buffer_data(const void *data, size_t len) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, len, data, GL_DYNAMIC_DRAW);
 }

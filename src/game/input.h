@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <time.h>
 
-// entity button bits
+/* Entity button bits */
 enum {
     BUTTON_UP     = 1 << 0,
     BUTTON_DOWN   = 1 << 1,
@@ -41,17 +41,31 @@ typedef struct {
     } mouse;
 } input_t;
 
+/* Initializes the internal button state. */
 void buttons_init();
+
+/* Updates the internal button state. */
 void buttons_update();
 
+/* Returns true if the button state is pressed. */
 bool button_pressed(SDL_Scancode);
+
+/* Returns true if the button state is held after a certain time. */
 bool button_held(SDL_Scancode, time_t delay_ms);
+
+/* Returns true if the button state is released. */
 bool button_released(SDL_Scancode);
 
+/* Returns true if the button state is pressed. */
 bool mouse_pressed(uint32_t);
+
+/* Returns true if the button state is held after a certain time. */
 bool mouse_held(uint32_t, time_t delay_ms);
+
+/* Returns true if the button state is released. */
 bool mouse_released(uint32_t);
 
+/* Returns the screen position of the mouse. */
 ivec2s mouse_get_position();
 
-#endif // _GAME_INPUT_H_
+#endif // ifndef _GAME_INPUT_H_

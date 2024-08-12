@@ -30,12 +30,6 @@ typedef struct entity_s {
     entity_e type;
     body_t body;
 
-#ifdef _DEBUG
-    struct {
-        vec2s *lines;
-    } debug;
-#endif // _DEBUG
-
     void (*init)(struct entity_s *, struct world_s *);
     void (*destroy)(struct entity_s *, struct world_s *);
     void (*render)(struct entity_s *, struct world_s *);
@@ -43,10 +37,19 @@ typedef struct entity_s {
     void (*update)(struct entity_s *, struct world_s *, float dt);
 } entity_t;
 
+/* Creates an entity and adds it to the world. */
 entity_t *entity_create(void *data, struct world_s *);
+
+/* Destroys an entity and removes it from the world. */
 void entity_destroy(entity_t *, struct world_s *);
+
+/* Renders an entity on the screen if their render param is defined. */
 void entity_render(entity_t *, struct world_s *);
+
+/* Synchronizes an entity with the tick rate if their sync param is defined. */
 void entity_sync(entity_t *, struct world_s *, float dt);
+
+/* Updates an entity if their update param is defined. */
 void entity_update(entity_t *, struct world_s *, float dt);
 
-#endif // _ENTITY_ENTITY_H_
+#endif // ifndef _ENTITY_ENTITY_H_

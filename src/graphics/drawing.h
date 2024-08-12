@@ -6,10 +6,17 @@
 #include <cglm/types-struct.h>
 #include <stdint.h>
 
+/* Renders a quad at the provided world position. */
 extern void draw_quad(vec2s pos, vec2s dim, uint32_t color);
+
+/* Renders a line from the start to the end world positions. */
 extern void draw_line(vec2s start, vec2s end, uint32_t color);
+
+/* Renders an unfilled quad at the provided world position. */
 extern void draw_quad_line(vec2s pos, vec2s dim, uint32_t color);
+
+/* Renders text at the provided screen coordinates. */
 extern void draw_text(vec2s pos, float scale, uint32_t color,
                       const char *format, ...);
 
-#endif // _GRAPHICS_DRAWING_H_
+#endif // ifndef _GRAPHICS_DRAWING_H_

@@ -2,7 +2,6 @@
 #include "game/defines.h"
 #include "game/input.h"
 #include "util/time.h"
-#include "util/util.h"
 #include "world/world.h"
 
 #include <assert.h>
@@ -62,9 +61,9 @@ void physics_sync(entity_t *self, world_t *world, float dt) {
 
     // clamp velocity at terminal values
     self->body.vel.x
-        = clamp(self->body.vel.x, -self->body.speed * MOVEMENT_SCALAR,
+        = glm_clamp(self->body.vel.x, -self->body.speed * MOVEMENT_SCALAR,
                 self->body.speed * MOVEMENT_SCALAR);
-    self->body.vel.y = max(self->body.vel.y, gravity.y);
+    self->body.vel.y = glm_max(self->body.vel.y, gravity.y);
 
     // apply forces to velocity vector
     self->body.vel = glms_vec2_add(self->body.force, self->body.vel);

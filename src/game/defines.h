@@ -6,4 +6,4 @@
 #define DRAG_COEFFICIENT 0.125f
 #define DASH_COOLDOWN    2500
 
-#endif // _GAME_DEFINES_H_
+#endif // ifndef _GAME_DEFINES_H_

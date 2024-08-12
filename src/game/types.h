@@ -7,9 +7,9 @@
 #include <stdbool.h>
 #include <time.h>
 
-struct page_s;
 struct entity_s;
-struct tile_s;
+struct cell_s;
+struct page_s;
 
 typedef struct {
     box_t box;
@@ -26,6 +26,7 @@ typedef struct {
     };
 
     struct page_s *page;
+    struct cell_s *cell;
 
     vec2s vel;
     vec2s force;
@@ -44,4 +45,4 @@ typedef struct {
     void *collision_callback;
 } body_t;
 
-#endif // _ENTITY_TYPES_H_
+#endif // ifndef _GAME_TYPES_H_

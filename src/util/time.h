@@ -40,4 +40,4 @@ bool time_sync(struct time_s *);
 time_t time_since(time_t);
 time_t time_since_ms(time_t);
 
-#endif
+#endif // ifndef _UTIL_TIME_H_

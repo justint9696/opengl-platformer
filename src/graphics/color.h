@@ -12,6 +12,7 @@
 #define COLOR_ORANGE 0xFFA500FF
 #define COLOR_YELLOW 0xFFFF00FF
 
+/* Converts a color represented as an integer (RGBA) into a 4d float vector. */
 #define RGBA(c) ((vec4s) {\
         ((c >> 24) & 0xFF) / 255.f,\
         ((c >> 16) & 0xFF) / 255.f,\
@@ -19,4 +20,4 @@
         ((c >>  0) & 0xFF) / 255.f,\
     })
 
-#endif // _GRAPHICS_COLOR_H_
+#endif // ifndef _GRAPHICS_COLOR_H_

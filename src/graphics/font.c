@@ -1,6 +1,6 @@
 #include "graphics/font.h"
 
-#include "util/log.h"
+#include "util/assert.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -15,7 +15,7 @@ static void build_font_table(FT_Face face) {
 
     for (uint8_t c = 0; c < FONTCHAR_MAX; c++) {
         if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
-            log_warn("Failed to load Glyph.\n");
+            log_warn("Failed to load Glyph `%c`.\n", c);
         }
 
         // generate texture
@@ -42,22 +42,27 @@ static void build_font_table(FT_Face face) {
 
 void font_init(const char *fpath) {
     FT_Library ft;
-    if (FT_Init_FreeType(&ft)) {
-        log_and_fail("Could not initialize FreeType Library\n");
-    }
+    XASSERT(FT_Init_FreeType(&ft) == 0,
+            "Could not initialize FreeType Library\n");
 
     FT_Face face;
-    if (FT_New_Face(ft, fpath, 0, &face)) {
-        log_and_fail("Failed to load font: %s\n", fpath);
-    }
+    XASSERT(FT_New_Face(ft, fpath, 0, &face) == 0, "Failed to load font: %s\n",
+            fpath);
 
-    FT_Set_Pixel_Sizes(face, 0, 24);
+    FT_Set_Pixel_Sizes(face, 0, 18);
 
     build_font_table(face);
 
     // clear resources
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
+}
+
+void font_destroy() {
+    for (size_t i = 0; i < FONTCHAR_MAX; i++) {
+        fontchar_t *fontchar = &FONT_TABLE[i];
+        glDeleteTextures(1, &fontchar->id);
+    }
 }
 
 const fontchar_t *font_get_char(size_t idx) {

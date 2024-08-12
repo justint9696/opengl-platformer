@@ -16,7 +16,7 @@ static void render_text(vec2s pos, float scale, vec4s color, const char *text) {
     glActiveTexture(GL_TEXTURE0);
     vao_bind(&ui.text.vao);
 
-    size_t len = strnlen(text, 64);
+    size_t len = strlen(text);
     for (size_t c = 0; c < len; c++) {
         size_t idx = text[c];
         const fontchar_t *ch = font_get_char(idx);
@@ -45,6 +45,8 @@ static void render_text(vec2s pos, float scale, vec4s color, const char *text) {
 
         pos.x += (ch->advance >> 6) * scale;
     }
+
+    vao_unbind();
 }
 
 void ui_init() {
@@ -58,6 +60,9 @@ void ui_init() {
 
     queue_init(&ui.text.items, sizeof(ui_text_t), UI_MAX);
     queue_init(&ui.texture.items, sizeof(ui_texture_t), UI_MAX);
+
+    vao_unbind();
+    vbo_unbind();
 }
 
 void ui_destroy() {
@@ -73,17 +78,22 @@ void ui_render(const camera_t *camera) {
     /*     // render texture */
     /* } */
 
+    ui_text_t *text;
+    ui.shader = renderer_use_shader(SHADER_UI_TEXT);
+
     vao_bind(&ui.text.vao);
     vbo_bind(&ui.text.vbo);
 
-    ui_text_t *text;
-    ui.shader = renderer_use_shader(SHADER_UI_TEXT);
     shader_uniform_mat4f(*ui.shader, "projection", camera->projection);
 
-    for (size_t i = 0; i < ui.text.items.len; i++) {
+    size_t len = ui.text.items.len;
+    for (size_t i = 0; i < len; i++) {
         text = queue_pop(&ui.text.items);
         render_text(text->pos, text->scale, RGBA(text->color), text->text);
     }
+
+    vao_unbind();
+    vbo_unbind();
 }
 
 void ui_clear() {
@@ -97,6 +107,7 @@ void ui_draw_text(vec2s pos, float scale, uint32_t color, const char *text) {
         .scale = scale,
         .color = color,
     };
-    strncpy(elem.text, text, strnlen(text, 64));
+    assert(strlen(text) < 64);
+    strcpy(elem.text, text);
     queue_push(&ui.text.items, &elem);
 }
