@@ -8,6 +8,8 @@
 #include "graphics/vbo.h"
 #include "graphics/window.h"
 
+#include "player.h"
+
 #include <cglm/struct.h>
 #include <string.h>
 
@@ -35,6 +37,8 @@ void world_destroy(world_t *self) {
 }
 
 void world_update(world_t *self, float dt) {
+    player_update(self->player, self, dt);
+
     for (int i = 0; i < 9; i++) {
         page_t *page = &self->chunk.pages[i];
         size_t len = array_len(page->entities);
@@ -51,6 +55,8 @@ void world_render(world_t *self) {
     vao_bind(&self->vao);
     vbo_bind(&self->vbo);
     ibo_bind(&self->ibo);
+
+    player_render(self->player, self);
 
     for (int i = 0; i < 9; i++) {
         page_t *page = &self->chunk.pages[i];
@@ -69,6 +75,8 @@ void world_render(world_t *self) {
 }
 
 void world_sync(world_t *self, float dt) {
+    player_sync(self->player, self, dt);
+
     for (int i = 0; i < 9; i++) {
         page_t *page = &self->chunk.pages[i];
         size_t len = array_len(page->entities);

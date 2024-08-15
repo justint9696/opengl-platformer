@@ -3,6 +3,7 @@
 #include "data/array.h"
 #include "entity/table.h"
 #include "util/assert.h"
+#include "player.h"
 
 #include <assert.h>
 #include <cglm/struct.h>
@@ -44,12 +45,15 @@ static void page_load_data(page_t *page, world_t *world, ldata_t arr[],
     }
 }
 
-void level_shutdown() {
+void level_shutdown(world_t *world) {
     if (level.fp)
         return;
 
     fclose(level.fp);
     array_free(level.offsets);
+
+    assert(world->player);
+    player_destroy(world->player);
 }
 
 void level_import(world_t *world, const char *fpath) {
@@ -67,8 +71,7 @@ void level_import(world_t *world, const char *fpath) {
     ldata_t data;
     fread(&data, sizeof(ldata_t), 1, level.fp);
 
-    create_fn_t fn = table_lookup(data.type);
-    world->player = fn(data.pos, data.dim, world);
+    world->player = player_init(data.pos, data.dim, world);
 
     struct {
         size_t n;
@@ -101,13 +104,14 @@ void level_import(world_t *world, const char *fpath) {
             target = world->chunk.dim.x + target;
 
         // load pages into memory
+        log_debug("Loading index %d into memory\n", i);
         page_t *page = &world->chunk.pages[index++];
         page_calculate_aabb(page, world);
         page_load_data(page, world, entities.arr, entities.n);
     }
 }
 
-/* Shifts all the pages within the index array around the provided iterator. */
+/* Shifts the provided page indicies around the iterator. */
 static void pages_shift(world_t *world, uint32_t indices[], int it) {
     // iterate through all the indices
     for (int i = 0; i < 3; i++) {
@@ -116,6 +120,7 @@ static void pages_shift(world_t *world, uint32_t indices[], int it) {
 
         // remove entities from the world
         size_t len = array_len(page->entities);
+        log_debug("Releasing %ld entities from page %d\n", len, page->index);
         for (size_t n = 0; n < len; n++) {
             entity_t *entity = &page->entities[n];
             entity_destroy(entity, world);
@@ -126,7 +131,9 @@ static void pages_shift(world_t *world, uint32_t indices[], int it) {
 
         // shift the pages around the iterator
         for (int j = 1; j < 3; j++) {
-            index = (indices[i] + (it * j));
+            indices[i] += it;
+            index = indices[i];
+
             page_t *tmp = &world->chunk.pages[index];
 
             page->entities = tmp->entities;
@@ -137,8 +144,7 @@ static void pages_shift(world_t *world, uint32_t indices[], int it) {
     }
 }
 
-/* Replaces all the pages within the index array around the provided iterator.
- */
+/* Replaces the provided page indicies around the iterator. */
 static void pages_replace(world_t *world, uint32_t indices[], int it) {
     struct {
         size_t n;
@@ -171,11 +177,13 @@ static void pages_replace(world_t *world, uint32_t indices[], int it) {
         // this allows (-1, -1) to be the top left page
         // instead of the bottom left page.
         idx.y = world->chunk.dim.y - idx.y - 1;
+        /* log_debug("%.2f, %.2f\n", idx.x, idx.y); */
+
+        if ((idx.x < 0 || idx.x >= world->chunk.dim.x)
+            || (idx.y < 0 || idx.y > world->chunk.dim.y))
+            continue;
 
         int32_t index = ((floorf(idx.y) * world->chunk.dim.x) + floorf(idx.x));
-
-        if (index < 0)
-            continue;
 
         log_debug("Requesting index %u for page %u\n", index, page->index);
         uint32_t offset = *(uint32_t *)array_get(level.offsets, index);
@@ -189,6 +197,16 @@ static void pages_replace(world_t *world, uint32_t indices[], int it) {
 
         page_load_data(page, world, entities.arr, entities.n);
     }
+}
+
+/* Swaps the provided page indicies horizontally around the iterator. */
+static void pages_swap_horz(world_t *world, uint32_t indices[], int it) {
+    pages_shift(world, indices, it);
+
+    world->chunk.index += it;
+    world->chunk.pos.x += (it * CHUNK_SIZE);
+
+    pages_replace(world, indices, it);
 }
 
 void level_swap_pages(world_t *world, page_t *page) {
@@ -229,14 +247,10 @@ void level_swap_pages(world_t *world, page_t *page) {
         case TOP_LEFT:
         case BOTTOM_LEFT:
         case LEFT:
-            // shift pages right
             log_debug("Shifting pages right\n");
-            pages_shift(world, (uint32_t[]) { 2, 5, 8 }, -1);
 
-            world->chunk.pos.x -= CHUNK_SIZE;
-            world->chunk.index -= 1;
-
-            pages_replace(world, (uint32_t[]) { 0, 3, 6 }, -1);
+            uint32_t indices[] = { 2, 5, 8 };
+            pages_swap_horz(world, indices, -1);
             break;
     }
 
@@ -244,14 +258,10 @@ void level_swap_pages(world_t *world, page_t *page) {
         case TOP_RIGHT:
         case BOTTOM_RIGHT:
         case RIGHT:
-            // shift pages left
             log_debug("Shifting pages left\n");
-            pages_shift(world, (uint32_t[]) { 0, 3, 6 }, 1);
 
-            world->chunk.pos.x += CHUNK_SIZE;
-            world->chunk.index += 1;
-
-            pages_replace(world, (uint32_t[]) { 2, 5, 8 }, 1);
+            uint32_t indices[] = { 0, 3, 6 };
+            pages_swap_horz(world, indices, 1);
             break;
     }
 

@@ -65,7 +65,7 @@ static void init(game_t *self) {
 
 static void destroy(game_t *self) {
     ui_destroy();
-    level_shutdown();
+    level_shutdown(&self->world);
     world_destroy(&self->world);
     window_destroy(&self->window);
 }

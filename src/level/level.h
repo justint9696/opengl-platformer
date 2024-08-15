@@ -43,7 +43,7 @@ void level_import(world_t *, const char *fpath);
 void level_export(world_t *, const char *fpath);
 
 /* Releases the data associated with the level. */
-void level_shutdown();
+void level_shutdown(world_t *);
 
 /* Changes the primary page and swaps others accordingly. */
 void level_swap_pages(world_t *, page_t *);

@@ -6,7 +6,6 @@
 
 #include <assert.h>
 #include <cglm/struct.h>
-#include <math.h>
 #include <string.h>
 
 static flist_t entities;
@@ -14,7 +13,7 @@ static flist_t entities;
 void chunk_init(chunk_t *self) {
     memset(self, 0, sizeof(chunk_t));
 
-    size_t capacity = ceilf(CHUNK_MAX * 9.5f);
+    size_t capacity = (CHUNK_MAX * sizeof(array_t) * 9);
     flist_init(&entities, sizeof(entity_t), capacity);
 
     for (short i = 0; i < 9; i++) {
