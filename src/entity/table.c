@@ -5,12 +5,11 @@
 #define _DECL_TABLE(_name)\
     extern void *_name##_create(vec2s, vec2s, world_t *);
 
-_DECL_TABLE(player);
 _DECL_TABLE(enemy);
 _DECL_TABLE(platform);
 
 const create_fn_t CREATE_TABLE[ET_MAX] = {
-    player_create,
+    NULL,
     enemy_create,
     platform_create,
 };
