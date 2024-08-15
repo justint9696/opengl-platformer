@@ -22,9 +22,6 @@ typedef struct {
 /* Initializes a grid with the provided parameters. */
 void grid_init(grid_t *, int size, int width, int height);
 
-/* Releases the memory allocated for a grid. */
-void grid_destroy(grid_t *);
-
 /* Inserts an item into the grid cell that corresponds to the provided position.
  */
 void grid_insert(grid_t *, vec2s pos, void *data);

@@ -23,8 +23,6 @@ void grid_init(grid_t *self, int size, int width, int height) {
     }
 }
 
-void grid_destroy(grid_t *self) {}
-
 void grid_insert(grid_t *self, vec2s pos, void *data) {
     cell_t *cell = grid_cell_from_pos(self, pos);
     cell_insert(cell, data);

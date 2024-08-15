@@ -28,11 +28,10 @@ void world_init(world_t *self) {
     self->ibo = ibo_create(NULL, 0);
 
     chunk_init(&self->chunk);
-    grid_init(&self->grid, 55, SCREEN_WIDTH, SCREEN_HEIGHT);
+    grid_init(&self->grid, 60, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 void world_destroy(world_t *self) {
-    grid_destroy(&self->grid);
     chunk_destroy(&self->chunk);
 }
 
@@ -119,16 +118,17 @@ bool world_is_on_screen(const world_t *self, vec2s pos) {
             && (screen_pos.y >= 0 && screen_pos.y < SCREEN_HEIGHT));
 }
 
-size_t world_get_colliders(world_t *self, entity_t *entity, collider_t *arr,
+size_t world_get_colliders(world_t *self, entity_t *entity, collider_t arr[],
                            size_t len) {
-    cell_t *cell
-        = grid_cell_from_pos(&self->grid, world_to_screen(self, entity->body.pos));
+    cell_t *cell = grid_cell_from_pos(&self->grid,
+                                      world_to_screen(self, entity->body.pos));
     assert(cell);
 
     size_t n = 0;
     ivec2s pos = cell->pos, dim = self->grid.dim;
     for (int y = glm_max(pos.y - 1, 0); y <= glm_min(pos.y + 1, dim.y); y++) {
-        for (int x = glm_max(pos.x - 1, 0); x <= glm_min(pos.x + 1, dim.x); x++) {
+        for (int x = glm_max(pos.x - 1, 0); x <= glm_min(pos.x + 1, dim.x);
+             x++) {
             cell_t *tmp = grid_cell_from_index(&self->grid, (ivec2s) { x, y });
             for (size_t i = 0; i < tmp->len; i++) {
                 entity_t *e = tmp->arr[i];

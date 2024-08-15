@@ -32,12 +32,20 @@ struct time_s {
     uint32_t fps, tps;
 };
 
+/* Initializes the time structure. */
 void time_init(struct time_s *);
+
+/* Updates the time structure. */
 void time_update(struct time_s *);
 
+/* Returns true if the time since the last tick is greater than the tick delay.
+ */
 bool time_sync(struct time_s *);
 
+/* Returns the time passed since the provided tick in nanoseconds. */
 time_t time_since(time_t);
+
+/* Returns the time passed since the provided tick in milliseconds. */
 time_t time_since_ms(time_t);
 
 #endif // ifndef _UTIL_TIME_H_

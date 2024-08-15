@@ -39,13 +39,22 @@ typedef struct {
     page_t pages[9];
 } chunk_t;
 
+/* Initializes the world chunk. */
 void chunk_init(chunk_t *);
+
+/* Releases the memory allocated for the world chunk. */
 void chunk_destroy(chunk_t *);
+
+/* Renders the bounds of the world chunk. */
 void chunk_render(chunk_t *);
 
+/* Returns the page asscoiated with the given position. */
 page_t *chunk_page_from_pos(chunk_t *, vec2s pos);
 
+/* Returns a free block of memory that is initialized as an array. */
 void *chunk_request_page(chunk_t *, page_t *);
+
+/* Releases an occupied block of memory and marks it as free. */
 void chunk_release_page(chunk_t *, page_t *);
 
 #endif // ifndef _WORLD_CHUNK_H_
