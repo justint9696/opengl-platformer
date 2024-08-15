@@ -32,7 +32,7 @@ void physics_sync(entity_t *self, world_t *world, float dt) {
 
     if (movement.x == 0.f) {
         self->body.vel.x = 0.f;
-    } else if (self->flags & F_GRAVITY) {
+    } else if (self->flags & EF_GRAVITY) {
         // apply drag if entity is not grounded
         float xvel = movement.x * self->body.speed;
         xvel *= (self->body.grounded) ? 1.f : drag.x;
@@ -54,7 +54,7 @@ void physics_sync(entity_t *self, world_t *world, float dt) {
     }
 
     // apply gravity
-    if (self->flags & F_GRAVITY) {
+    if (self->flags & EF_GRAVITY) {
         self->body.vel = glms_vec2_muladds(
             glms_vec2_scale(gravity, self->body.mass), dt, self->body.vel);
     }

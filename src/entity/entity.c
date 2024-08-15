@@ -1,30 +1,38 @@
 #include "entity/entity.h"
 
 #include "data/array.h"
-#include "util/assert.h"
 #include "world/world.h"
+#include "util/log.h"
 
-#define DECL_MODULE(_name)\
+#define _DECL_MODULE(_name)\
     extern void _name##_sync(entity_t *, world_t *, float);\
     extern void _name##_update(entity_t *, world_t *, float);
 
-DECL_MODULE(input);
-DECL_MODULE(collision);
-DECL_MODULE(movement);
-DECL_MODULE(physics);
-DECL_MODULE(ai);
-DECL_MODULE(camera_follow);
+_DECL_MODULE(input);
+_DECL_MODULE(collision);
+_DECL_MODULE(movement);
+_DECL_MODULE(physics);
+_DECL_MODULE(ai);
+_DECL_MODULE(camera_follow);
 
 entity_t *entity_create(void *data, world_t *world) {
     vec2s pos = ((entity_t *)data)->body.pos;
     page_t *page = chunk_page_from_pos(&world->chunk, pos);
     int32_t id = array_push(page->entities, data);
-    XASSERT(id != -1, "Could not create entity within page %u\n", page->index);
+    if ((id = array_push(page->entities, data)) == -1) {
+        log_fatal("Could not create entity within page %u\n", page->index);
+    }
 
-    entity_t *self = array_get(page->entities, id);
-
+    entity_t *self = &page->entities[id];
     self->id = id;
-    self->body.page = page;
+
+    entity_init(self, world);
+
+    return self;
+}
+
+void entity_init(entity_t *self, world_t *world) {
+    self->body.page = chunk_page_from_pos(&world->chunk, self->body.pos);
 
     if (self->init) {
         self->init(self, world);
@@ -35,8 +43,6 @@ entity_t *entity_create(void *data, world_t *world) {
             &world->grid, world_to_screen(world, self->body.pos));
         cell_insert(self->body.cell, self);
     }
-
-    return self;
 }
 
 void entity_destroy(entity_t *self, world_t *world) {
@@ -69,18 +75,19 @@ void entity_sync(entity_t *self, world_t *world, float dt) {
         self->sync(self, world, dt);
     }
 
-    // should the entity respond to player input
-    if (self->flags & F_PLAYER_CONTROLLED) {
+    if (self->flags & EF_PLAYER_CONTROLLED) {
         input_sync(self, world, dt);
     }
 
-    // is entity controlled by an ai
-    if (self->flags & F_AI_CONTROLLED) {
+    if (self->flags & EF_AI_CONTROLLED) {
         ai_sync(self, world, dt);
     }
 
-    // should the entity move and respond to physics
-    if (self->flags & F_KINEMATIC) {
+    if (self->flags & EF_CAMERA_FOLLOW) {
+        camera_follow_sync(self, world, dt);
+    }
+
+    if (self->flags & EF_KINEMATIC) {
         physics_sync(self, world, dt);
 
         if (self->body.solid) {
@@ -88,11 +95,6 @@ void entity_sync(entity_t *self, world_t *world, float dt) {
         }
 
         movement_sync(self, world, dt);
-    }
-
-    // should the camera follow the entity's movement
-    if (self->flags & F_CAMERA_FOLLOW) {
-        camera_follow_sync(self, world, dt);
     }
 
     if (!self->body.solid)

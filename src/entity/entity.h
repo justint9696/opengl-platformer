@@ -8,12 +8,22 @@
 struct world_s;
 
 typedef enum {
-    F_NONE              = 0,
-    F_PLAYER_CONTROLLED = 1 << 0,
-    F_AI_CONTROLLED     = 1 << 1,
-    F_KINEMATIC         = 1 << 2,
-    F_GRAVITY           = 1 << 3,
-    F_CAMERA_FOLLOW     = 1 << 4,
+    // should the entity respond to player input
+    EF_PLAYER_CONTROLLED = 1 << 0, 
+
+    // should the entity controlled by an ai
+    EF_AI_CONTROLLED     = 1 << 1, 
+
+    // should the entity be expected to move
+    EF_KINEMATIC         = 1 << 2, 
+
+    // should the entity respond to gravity
+    EF_GRAVITY           = 1 << 3, 
+                                  
+    // should the camera follow the entity's movement
+    EF_CAMERA_FOLLOW     = 1 << 4,
+
+    EF_NONE              = 0,
 } flag_e;
 
 typedef enum {
@@ -39,6 +49,9 @@ typedef struct entity_s {
 
 /* Creates an entity and adds it to the world. */
 entity_t *entity_create(void *data, struct world_s *);
+
+/* Initializes an entity based on their flags and init param. */
+void entity_init(entity_t *, struct world_s *);
 
 /* Destroys an entity and removes it from the world. */
 void entity_destroy(entity_t *, struct world_s *);

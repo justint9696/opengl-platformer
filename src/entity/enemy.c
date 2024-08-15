@@ -19,6 +19,6 @@ entity_t *enemy_create(vec2s pos, vec2s dim, world_t *world) {
             .solid = true,
             .speed = 5.25f,
         },
-        .flags = F_AI_CONTROLLED | F_KINEMATIC,
+        .flags = EF_AI_CONTROLLED | EF_KINEMATIC,
     }, world);
 }
