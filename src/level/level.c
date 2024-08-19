@@ -38,6 +38,8 @@ static void page_load_data(page_t *page, world_t *world, ldata_t arr[],
         }
 
         create_fn_t fn = table_lookup(data->type);
+        assert(fn);
+
         fn(data->pos, data->dim, world);
     }
     if (n) {
@@ -57,19 +59,22 @@ void level_shutdown(world_t *world) {
 }
 
 void level_import(world_t *world, const char *fpath) {
-    level.fp = fopen(fpath, "rb");
-    XASSERT(level.fp, "Could not open file `%s`: %s.\n", fpath,
-            strerror(errno));
+    FILE *fp = fopen(fpath, "rb");
+    XASSERT(fp, "Could not open file `%s`: %s.\n", fpath, strerror(errno));
 
-    fseek(level.fp, 0, SEEK_SET);
-    fread(&world->chunk.index, sizeof(int), 1, level.fp);
-    fread(&world->chunk.dim, sizeof(ivec2s), 1, level.fp);
+    level.fp = tmpfile();
+    XASSERT(level.fp, "Failed to create temp file: `%s`\n", strerror(errno));
+
+    fseek(fp, 0, SEEK_SET);
+    fread(&world->chunk.index, sizeof(int), 1, fp);
+    fread(&world->chunk.dim, sizeof(ivec2s), 1, fp);
 
     // FIXME: calculate the actual position based on the chunk index
     world->chunk.pos = glms_vec2_fill(-CHUNK_SIZE);
 
     ldata_t data;
-    fread(&data, sizeof(ldata_t), 1, level.fp);
+    fread(&data, sizeof(ldata_t), 1, fp);
+    fwrite(&data, sizeof(ldata_t), 1, level.fp);
 
     world->player = player_init(data.pos, data.dim, world);
 
@@ -92,8 +97,13 @@ void level_import(world_t *world, const char *fpath) {
         uint32_t offset = ftell(level.fp);
         array_push(level.offsets, &offset);
 
-        fread(&entities.n, sizeof(size_t), 1, level.fp);
-        fread(&entities.arr, sizeof(ldata_t), entities.n, level.fp);
+        // read data from level file
+        fread(&entities.n, sizeof(size_t), 1, fp);
+        fread(&entities.arr, sizeof(ldata_t), entities.n, fp);
+
+        // write data to temporary file with padding
+        fwrite(&entities.n, sizeof(size_t), 1, level.fp);
+        fwrite(&entities.arr, sizeof(ldata_t), CHUNK_MAX, level.fp);
 
         // have all the pages been loaded or is the page not part of the chunk
         if ((index >= 9) || ((target - i) > 0))
@@ -103,12 +113,53 @@ void level_import(world_t *world, const char *fpath) {
         if ((i - target) >= 2)
             target = world->chunk.dim.x + target;
 
+        /* log_debug("Loading index %d into memory\n", i); */
+
         // load pages into memory
-        log_debug("Loading index %d into memory\n", i);
         page_t *page = &world->chunk.pages[index++];
         page_calculate_aabb(page, world);
         page_load_data(page, world, entities.arr, entities.n);
     }
+
+    fclose(fp);
+}
+
+void level_export(world_t *world, const char *fpath) {
+    assert(level.fp);
+
+    FILE *fp = fopen(fpath, "wb+");
+    XASSERT(fp, "Could not open file `%s`: %s\n.", fpath, strerror(errno));
+
+    fseek(fp, 0, SEEK_SET);
+    fwrite(&world->chunk.index, sizeof(int), 1, fp);
+    fwrite(&world->chunk.dim, sizeof(ivec2s), 1, fp);
+
+    fwrite(&(ldata_t) {
+        .type = world->player->type,
+        .box = world->player->body.box,
+    }, sizeof(ldata_t), 1, fp);
+
+    struct {
+        size_t n;
+        ldata_t arr[CHUNK_MAX];
+    } entities;
+
+    size_t len = array_len(level.offsets);
+    for (size_t i = 0; i < len; i++) {
+        // set file pointer to offset within file
+        int offset = level.offsets[i];
+        fseek(level.fp, offset, SEEK_SET);
+
+        // read data at temp file offset
+        fread(&entities.n, sizeof(size_t), 1, level.fp);
+        fread(&entities.arr, sizeof(ldata_t), entities.n, level.fp);
+
+        // write data to export file without padding
+        fwrite(&entities.n, sizeof(size_t), 1, fp);
+        fwrite(&entities.arr, sizeof(ldata_t), entities.n, fp);
+    }
+
+    fclose(fp);
 }
 
 /* Shifts the provided page indicies around the iterator. */
@@ -120,7 +171,7 @@ static void pages_shift(world_t *world, uint32_t indices[], int it) {
 
         // remove entities from the world
         size_t len = array_len(page->entities);
-        log_debug("Releasing %ld entities from page %d\n", len, page->index);
+        /* log_debug("Releasing %ld entities from page %d\n", len, page->index); */
         for (size_t n = 0; n < len; n++) {
             entity_t *entity = &page->entities[n];
             entity_destroy(entity, world);
@@ -185,15 +236,15 @@ static void pages_replace(world_t *world, uint32_t indices[], int it) {
 
         int32_t index = ((floorf(idx.y) * world->chunk.dim.x) + floorf(idx.x));
 
-        log_debug("Requesting index %u for page %u\n", index, page->index);
+        /* log_debug("Requesting index %u for page %u\n", index, page->index); */
         uint32_t offset = *(uint32_t *)array_get(level.offsets, index);
         fseek(level.fp, offset, SEEK_SET);
 
         fread(&entities.n, sizeof(size_t), 1, level.fp);
         fread(&entities.arr, sizeof(ldata_t), entities.n, level.fp);
 
-        log_debug("Loading %lu entities into page %u\n", entities.n,
-                  page->index);
+        /* log_debug("Loading %lu entities into page %u\n", entities.n, */
+        /*           page->index); */
 
         page_load_data(page, world, entities.arr, entities.n);
     }
@@ -247,8 +298,6 @@ void level_swap_pages(world_t *world, page_t *page) {
         case TOP_LEFT:
         case BOTTOM_LEFT:
         case LEFT:
-            log_debug("Shifting pages right\n");
-
             uint32_t indices[] = { 2, 5, 8 };
             pages_swap_horz(world, indices, -1);
             break;
@@ -258,12 +307,10 @@ void level_swap_pages(world_t *world, page_t *page) {
         case TOP_RIGHT:
         case BOTTOM_RIGHT:
         case RIGHT:
-            log_debug("Shifting pages left\n");
-
             uint32_t indices[] = { 0, 3, 6 };
             pages_swap_horz(world, indices, 1);
             break;
     }
 
-    log_debug("Player moved to page %u\n", world->chunk.index);
+    /* log_debug("Player moved to page %u\n", world->chunk.index); */
 }

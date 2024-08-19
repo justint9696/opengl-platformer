@@ -36,7 +36,7 @@ typedef struct {
     FILE *fp;
 } level_t;
 
-/* Loads data from file into the world */
+/* Loads data from a level file into the world */
 void level_import(world_t *, const char *fpath);
 
 /* Exports data from the world into a file */
