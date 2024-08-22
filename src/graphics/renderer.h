@@ -3,6 +3,7 @@
 
 #include "game/camera.h"
 #include "graphics/shader.h"
+#include "graphics/texture.h"
 
 #include <glad/glad.h>
 
@@ -16,6 +17,7 @@ typedef enum {
 typedef struct {
     shader_t shaders[SHADER_MAX];
     shader_t *shader;
+    texture_t texture;
     const camera_t *camera;
 } renderer_t;
 

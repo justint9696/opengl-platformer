@@ -94,28 +94,32 @@ vec2s world_to_screen(const world_t *self, vec2s pos) {
                        (vec4s) { wpos.x, wpos.y, wpos.z, 1.f }));
     return (vec2s) {
         .x = (((clip.x + 1) / 2.f) * SCREEN_WIDTH),
-        .y = (((1 - clip.y) / 2.f) * SCREEN_HEIGHT),
+        .y = (((clip.y + 1) / 2.f) * SCREEN_HEIGHT),
     };
 }
 
 vec2s screen_to_world(const world_t *self, ivec2s pos) {
-    vec2s clip = (vec2s) {
+    vec4s clip = (vec4s) {
         .x = (2.f * pos.x / SCREEN_WIDTH - 1),
         .y = (-2.f * pos.y / SCREEN_HEIGHT + 1),
+        .z = 0.f, .w = 1.f,
     };
 
     mat4s view = glms_mat4_inv(
         glms_mat4_mul(self->camera.projection, self->camera.view));
 
-    vec4s world = glms_mat4_mulv(view, (vec4s) { clip.x, clip.y, 0.f, 1.f });
+    vec4s camera = ((vec4s) {
+        self->camera.pos.x, self->camera.pos.y, self->camera.pos.z, 1.f });
+
+    vec4s world = glms_vec4_sub(glms_mat4_mulv(view, clip), camera);
 
     return (vec2s) { world.x, world.y };
 }
 
 bool world_is_on_screen(const world_t *self, vec2s pos) {
     vec2s screen_pos = world_to_screen(self, pos);
-    return ((screen_pos.x >= 0 && screen_pos.x < SCREEN_WIDTH)
-            && (screen_pos.y >= 0 && screen_pos.y < SCREEN_HEIGHT));
+    return ((screen_pos.x > 0 && screen_pos.x < SCREEN_WIDTH)
+            && (screen_pos.y > 0 && screen_pos.y < SCREEN_HEIGHT));
 }
 
 size_t world_get_colliders(world_t *self, entity_t *entity, collider_t arr[],

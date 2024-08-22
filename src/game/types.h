@@ -12,7 +12,12 @@ struct cell_s;
 struct page_s;
 
 typedef struct {
-    box_t box;
+    union {
+        box_t box;
+        struct {
+            vec2s pos, dim;
+        };
+    };
     void *data;
     void (*callback)(void *, void *);
 } collider_t;

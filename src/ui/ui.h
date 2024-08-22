@@ -11,6 +11,9 @@
 
 #define UI_MAX 32
 
+#define UI_DEBUG_HORZ -315
+#define UI_DEBUG_VERT  220
+
 typedef struct {
     vec2s pos;
     vec2s dim;
@@ -26,6 +29,7 @@ typedef struct {
 
 typedef struct {
     struct {
+        size_t n;
         queue_t items;
         GLuint vao, vbo;
     } text;
@@ -44,7 +48,10 @@ void ui_destroy();
 void ui_render(const camera_t *);
 void ui_clear();
 
+void ui_draw_debug(const char *text);
 void ui_draw_text(vec2s pos, float scale, uint32_t color, const char *text);
+void ui_draw_quad(vec2s pos, vec2s dim, uint32_t color);
+
 void ui_draw_quad(vec2s pos, vec2s dim, uint32_t color);
 
 #endif // ifndef _UI_UI_H_

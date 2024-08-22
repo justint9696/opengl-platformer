@@ -7,7 +7,7 @@
 #include <stdbool.h>
 
 static void resolve_collision(entity_t *self, world_t *world, box_t *box,
-                              vec2s *movement, short axis) {
+                              vec2s *movement, int axis) {
     // set position to entry point of collision along the current axis
     if (movement->raw[axis] < 0.000001f) {
         self->body.pos.raw[axis] = box->pos.raw[axis] + box->dim.raw[axis];
@@ -27,7 +27,7 @@ static vec2s try_move(entity_t *self, world_t *world, collider_t arr[],
     // check for collision with entities
     for (size_t i = 0; i < len; i++) {
         collider_t *tmp = &arr[i];
-        for (short i = 0; i < 2; i++) {
+        for (int i = 0; i < 2; i++) {
             if (fabsf(movement.raw[i]) <= 0.000001f)
                 continue;
 

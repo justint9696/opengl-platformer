@@ -5,6 +5,7 @@
 #include "graphics/renderer.h"
 #include "graphics/vao.h"
 #include "graphics/vbo.h"
+#include "graphics/ibo.h"
 
 #include <cglm/struct.h>
 #include <string.h>
@@ -14,7 +15,6 @@ static ui_t ui;
 static void render_text(vec2s pos, float scale, vec4s color, const char *text) {
     shader_uniform_3f(*ui.shader, "color", color.r, color.g, color.b);
     glActiveTexture(GL_TEXTURE0);
-    vao_bind(&ui.text.vao);
 
     size_t len = strlen(text);
     for (size_t c = 0; c < len; c++) {
@@ -45,8 +45,29 @@ static void render_text(vec2s pos, float scale, vec4s color, const char *text) {
 
         pos.x += (ch->advance >> 6) * scale;
     }
+}
 
-    vao_unbind();
+static void render_texture(vec2s pos, vec2s dim, uint32_t color) {
+    float vertices[] = {
+        pos.x, pos.y, 0.f,
+        pos.x, pos.y + dim.y, 0.f,
+        pos.x + dim.x, pos.y + dim.y, 0.f,
+        pos.x + dim.x, pos.y, 0.f,
+    };
+
+    unsigned int indices[] = {
+        0, 1, 3,
+        1, 2, 3
+    };
+
+    vao_attrib(0, 3, GL_FLOAT, 3 * sizeof(float), NULL);
+
+    vbo_buffer_data(vertices, sizeof(vertices));
+    ibo_buffer_data(indices, sizeof(indices));
+
+    shader_uniform_vec4f(*ui.shader, "color", RGBA(color));
+
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 void ui_init() {
@@ -58,11 +79,19 @@ void ui_init() {
     ui.text.vbo = vbo_create(NULL, sizeof(float) * 6 * 4);
     vao_attrib(0, 4, GL_FLOAT, 4 * sizeof(float), 0);
 
+    vao_unbind();
+    vbo_unbind();
+
+    ui.texture.vao = vao_create();
+    ui.texture.vbo = vbo_create(NULL, 0);
+    ui.texture.ibo = ibo_create(NULL, 0);
+
     queue_init(&ui.text.items, sizeof(ui_text_t), UI_MAX);
     queue_init(&ui.texture.items, sizeof(ui_texture_t), UI_MAX);
 
     vao_unbind();
     vbo_unbind();
+    ibo_unbind();
 }
 
 void ui_destroy() {
@@ -71,12 +100,23 @@ void ui_destroy() {
 }
 
 void ui_render(const camera_t *camera) {
-    /* ui_texture_t *texture; */
-    /* ui.shader = renderer_use_shader(SHADER_UI_TEXTURE); */
-    /* for (size_t i = 0; i < ui.texture.items.len; i++) { */
-    /*     texture = queue_pop(&ui.texture.items); */
-    /*     // render texture */
-    /* } */
+    ui_texture_t *texture;
+    ui.shader = renderer_use_shader(SHADER_UI_TEXTURE);
+
+    vao_bind(&ui.texture.vao);
+    vbo_bind(&ui.texture.vbo);
+    ibo_bind(&ui.texture.ibo);
+
+    shader_uniform_mat4f(*ui.shader, "projection", camera->projection);
+
+    for (size_t i = 0; i < ui.texture.items.len; i++) {
+        texture = queue_pop(&ui.texture.items);
+        render_texture(texture->pos, texture->dim, texture->color);
+    }
+
+    vao_unbind();
+    vbo_unbind();
+    ibo_unbind();
 
     ui_text_t *text;
     ui.shader = renderer_use_shader(SHADER_UI_TEXT);
@@ -92,17 +132,31 @@ void ui_render(const camera_t *camera) {
         render_text(text->pos, text->scale, RGBA(text->color), text->text);
     }
 
+    ui.text.n = 0;
+
     vao_unbind();
     vbo_unbind();
 }
 
 void ui_clear() {
+    ui.text.n = 0;
     queue_clear(&ui.text.items);
     queue_clear(&ui.texture.items);
 }
 
+void ui_draw_debug(const char *text) {
+    ui_text_t elem = {
+        .pos = { UI_DEBUG_HORZ, UI_DEBUG_VERT - (ui.text.n++ * 20.f)},
+        .scale = 1.f,
+        .color = COLOR_WHITE,
+    };
+    assert(strlen(text) < 64);
+    strcpy(elem.text, text);
+    queue_push(&ui.text.items, &elem);
+}
+
 void ui_draw_text(vec2s pos, float scale, uint32_t color, const char *text) {
-    ui_text_t elem = (ui_text_t) {
+    ui_text_t elem = {
         .pos = pos,
         .scale = scale,
         .color = color,
@@ -110,4 +164,12 @@ void ui_draw_text(vec2s pos, float scale, uint32_t color, const char *text) {
     assert(strlen(text) < 64);
     strcpy(elem.text, text);
     queue_push(&ui.text.items, &elem);
+}
+
+void ui_draw_quad(vec2s pos, vec2s dim, uint32_t color) {
+    queue_push(&ui.texture.items, &(ui_texture_t) {
+        .pos = pos,
+        .dim = dim, 
+        .color = color,
+    });
 }

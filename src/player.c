@@ -9,14 +9,12 @@
 #include <cglm/struct.h>
 
 static inline void draw_debug(entity_t *self, world_t *world) {
-    draw_text((vec2s) { -315, 220 }, 1.f, COLOR_WHITE,
-              "Player Position: (%.2f, %.2f)", self->body.pos.x,
-              self->body.pos.y);
+    draw_debug_text("Player Position: (%.2f, %.2f)", self->body.pos.x,
+                    self->body.pos.y);
     vec2s screen = world_to_screen(world, self->body.pos);
-    draw_text((vec2s) { -315, 200 }, 1.f, COLOR_WHITE,
-              "Screen Position: (%.2f, %.2f)", screen.x, screen.y);
-    draw_text((vec2s) { -315, 180 }, 1.f, COLOR_WHITE, "Current Chunk: %d: %d",
-              world->chunk.index, self->body.page->index);
+    draw_debug_text("Screen Position: (%.2f, %.2f)", screen.x, screen.y);
+    draw_debug_text("Current Chunk: %d: %d", world->chunk.index,
+                    self->body.page->index);
 }
 
 static void init(entity_t *self, world_t *world) {
@@ -50,7 +48,7 @@ entity_t *player_init(vec2s pos, vec2s dim, world_t *world) {
     }, sizeof(entity_t));
 
     entity_init(self, world);
-    
+
     return self;
 }
 
@@ -60,13 +58,13 @@ void player_destroy(entity_t *self) {
 }
 
 void player_update(entity_t *self, world_t *world, float dt) {
-    entity_update(self, world, dt); 
+    entity_update(self, world, dt);
 }
 
 void player_sync(entity_t *self, world_t *world, float dt) {
-    entity_sync(self, world, dt); 
+    entity_sync(self, world, dt);
 }
 
 void player_render(entity_t *self, world_t *world) {
-   entity_render(self, world);
+    entity_render(self, world);
 }

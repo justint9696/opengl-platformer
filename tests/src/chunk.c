@@ -53,7 +53,7 @@ static void level_init() {
     memset(&state.level, 0, sizeof(state.level));
 
     chunk_t *chunk = &state.level.chunk;
-    chunk->origin = 11;
+    chunk->origin = 10;
     chunk->dim = (ivec2s) { 7, 3 };
 }
 
@@ -76,18 +76,20 @@ static int level_import(const char *fpath) {
             data.type, data.pos.x, data.pos.y, data.dim.x, data.dim.y);
 
     list_t ent;
+    int index = 0;
     for (int i = 0; i < chunk->dim.y; i++) {
         for (int j = 0; j < chunk->dim.x; j++) {
             fread(&ent.n, sizeof(size_t), 1, fp);
             fread(&ent.arr, sizeof(data_t), ent.n, fp);
 
-            printf("chunk (%d, %d) has %ld entities.\n",
-                    i, j, ent.n);
+            printf("chunk %d (%d, %d) has %ld entities.\n",
+                   index, i, j, ent.n);
             for (size_t i = 0; i < ent.n; i++) {
                 data_t *e = &ent.arr[i];
                 printf("{ type: %d, pos: (%.2f, %.2f), dim: (%.2f, %.2f) }\n",
                         e->type, e->pos.x, e->pos.y, e->dim.x, e->dim.y);
             }
+            index++;
         }
     }
 
@@ -136,7 +138,7 @@ static int level_export(const char *fpath) {
         fwrite(&count, sizeof(size_t), 1, fp);
 
 
-    float target = -CHUNK_SIZE * 4.f;
+    float target = -CHUNK_SIZE * 3.f;
 
     data_t data = (data_t) {
         .type = 2,

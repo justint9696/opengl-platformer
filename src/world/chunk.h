@@ -51,6 +51,9 @@ void chunk_render(chunk_t *);
 /* Returns the page asscoiated with the given position. */
 page_t *chunk_page_from_pos(chunk_t *, vec2s pos);
 
+/* Returns the chunk index associated with the given position. */
+int chunk_index_from_pos(chunk_t *, vec2s pos);
+
 /* Returns a free block of memory that is initialized as an array. */
 void *chunk_request_page(chunk_t *, page_t *);
 

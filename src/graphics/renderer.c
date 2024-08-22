@@ -33,6 +33,9 @@ void renderer_init() {
     renderer.shaders[SHADER_UI_TEXTURE] 
         = shader_create("shaders/texture2d.vs", "shaders/texture2d.fs");
 
+    // load textures
+    renderer.texture = texture_create("assets/images/white.png");
+
     // load text
     font_init("assets/fonts/helvetica.ttf"); 
 }
@@ -42,6 +45,9 @@ void renderer_destroy() {
     for (size_t i = 0; i < SHADER_MAX; i++) {
         shader_destroy(renderer.shaders[i]);
     }
+
+    // destroy textures
+    texture_destroy(renderer.texture);
 
     // destroy font textures
     font_destroy();
@@ -146,4 +152,15 @@ void draw_text(vec2s pos, float scale, uint32_t color,
     va_end(arg);
 
     ui_draw_text(pos, scale, color, text);
+}
+
+void draw_debug_text(const char *format, ...) {
+    va_list arg;
+    char text[64];
+
+    va_start(arg, format);
+    vsnprintf(text, 64, format, arg);
+    va_end(arg);
+
+    ui_draw_debug(text);
 }

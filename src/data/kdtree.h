@@ -7,7 +7,7 @@
 /* Implementation based on https://en.wikipedia.org/wiki/K-d_tree */
 
 /* Sorting function for kdtree data. */
-typedef void (*sort_fn_t)(void *, size_t, short);
+typedef void (*sort_fn_t)(void *, size_t, int);
 
 typedef struct kdnode_s {
     // reference to an object

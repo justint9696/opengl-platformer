@@ -18,9 +18,10 @@ _DECL_MODULE(camera_follow);
 entity_t *entity_create(void *data, world_t *world) {
     vec2s pos = ((entity_t *)data)->body.pos;
     page_t *page = chunk_page_from_pos(&world->chunk, pos);
-    int32_t id = array_push(page->entities, data);
+
+    int id;
     if ((id = array_push(page->entities, data)) == -1) {
-        log_fatal("Could not create entity within page %u\n", page->index);
+        log_fatal("Could not create entity within page %d\n", page->index);
     }
 
     entity_t *self = &page->entities[id];

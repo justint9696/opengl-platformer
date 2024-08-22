@@ -37,14 +37,14 @@ static kdnode_t *node_init(float *pos, void *data) {
     return self;
 }
 
-static void insert(kdnode_t **rootptr, float *pos, void *data, short depth) {
+static void insert(kdnode_t **rootptr, float *pos, void *data, int depth) {
     kdnode_t *root = *rootptr;
     if (!root) {
         *rootptr = node_init(pos, data);
         return;
     }
 
-    short axis = depth % 2;
+    int axis = depth % 2;
     float a = pos[axis], b = root->pos[axis];
     insert(((a <= b) ? &root->left : &root->right), pos, data, depth + 1);
 }
@@ -58,7 +58,7 @@ static inline bool is_leaf(const kdnode_t *root) {
 }
 
 static void nearest_neighbor(kdnode_t *root, float *pos, float *distance,
-                             kdnode_t *node, short depth) {
+                             kdnode_t *node, int depth) {
     // recursive base case
     if (!root)
         return;
@@ -71,7 +71,7 @@ static void nearest_neighbor(kdnode_t *root, float *pos, float *distance,
     }
 
     // traverse tree as normal
-    short axis = depth % 2;
+    int axis = depth % 2;
     float a = pos[axis], b = root->pos[axis];
     if (a <= b) {
         nearest_neighbor(root->left, pos, distance, node, depth + 1);
@@ -102,17 +102,17 @@ void *kdtree_nearest(kdtree_t *self, float *pos) {
     return node.data;
 }
 
-static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, short depth,
+static void kdtree(kdnode_t **rootptr, void *arr[], size_t len, int depth,
                    int offset, sort_fn_t sort) {
     if (len < 1)
         return;
 
     // sort items in array along current axis
-    short axis = depth % 2;
+    int axis = depth % 2;
     sort(arr, len, axis);
 
     // get the position of the item at the middle index
-    short mid = floorf(len / 2.f);
+    int mid = floorf(len / 2.f);
     void *data = arr[mid];
     float *pos = (float *)(data + offset);
 

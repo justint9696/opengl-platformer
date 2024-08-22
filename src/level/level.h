@@ -30,7 +30,7 @@ typedef struct {
 
 typedef struct {
     // array of offets within level file
-    uint32_t *offsets;
+    uint64_t *offsets;
 
     // pointer to file containing level data
     FILE *fp;

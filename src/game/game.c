@@ -5,6 +5,7 @@
 #include "graphics/renderer.h"
 #include "level/level.h"
 #include "ui/ui.h"
+#include "util/log.h"
 
 #include <cglm/struct.h>
 #include <glad/glad.h>
@@ -23,7 +24,7 @@ static void monitor_input(game_t *game) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    if (button_pressed(SDL_SCANCODE_RSHIFT) && button_pressed(SDL_SCANCODE_E)) {
+    if (button_held(SDL_SCANCODE_RSHIFT, 0) && button_pressed(SDL_SCANCODE_E)) {
         switch (game->state) {
             case GS_EDIT:
                 game->state = game->prev_state;
@@ -33,6 +34,7 @@ static void monitor_input(game_t *game) {
                 game->state = GS_EDIT;
                 break;
         }
+        log_debug("Game state set to: %d\n", game->state);
     }
 }
 
@@ -80,6 +82,11 @@ static void sync(game_t *self) {
         buttons_update();
         monitor_input(self);
 
+        if (self->state == GS_EDIT) {
+            editor_sync(&self->editor, &self->world);
+            continue;
+        }
+
         // synchonize game world
         world_sync(&self->world, self->time.delta_fixed);
     }
@@ -103,17 +110,13 @@ void game_run(game_t *self) {
 
         renderer_prepare_scene(&self->world.camera);
         {
+            draw_debug_text("FPS: %u", self->time.fps);
+            draw_debug_text("TPS: %u", self->time.tps);
+            draw_debug_text("Frame: %lums", (NOW() - start) / NS_PER_MS);
 
             update(self);
             sync(self);
             render(self);
-
-            draw_text((vec2s) { -315, 160 }, 1.f, COLOR_WHITE, 
-                      "FPS: %u", self->time.fps);
-            draw_text((vec2s) { -315, 140 }, 1.f, COLOR_WHITE, 
-                      "TPS: %u", self->time.tps);
-            draw_text((vec2s) { -315, 120 }, 1.f, COLOR_WHITE, 
-                      "Frame: %lums", (NOW() - start) / NS_PER_MS);
         }
         renderer_present_scene();
 
