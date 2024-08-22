@@ -1,0 +1,21 @@
+## OpenGL Platformer TODO
+- [x] Address grid updating with camera movement
+    - [x] Test it out on a flat level without chunks first
+- [x] Level chunking
+    - [x] When swapping page indexes, the chunk is misaligned; swap array pointer instead
+- [x] General code documentation for prototypes
+- [ ] Level editor initial implementations
+    - [x] Load level data into temp file
+    - [x] Store entities within temp file when swapping pages
+    - [x] Export data from temp file into a level file
+    - [x] Check if mouse is hovering an entity
+    - [x] Manipulate the hovered entity with the mouse
+    - [ ] Firgure out a system to place blocks
+    - [ ] Firgure out a system to change textures
+    - [ ] Right click to remove blocks
+    - [ ] Block snapping
+    - [ ] Draw grid for block snapping
+- [ ] UI Debug Methods
+    - [ ] Be able to draw a transparent quad anywhere on the screen
+    - [ ] Cleanup the ui file and make it more presentable
+    - [ ] Add brief documentation for prototypes

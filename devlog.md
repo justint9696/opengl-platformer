@@ -1,0 +1,3 @@
+## 2024/08/04 - 11:25am
+## Problem
+There are many problems with the chunking system. With my approach, I am trying to figure it out as I go along, but continuity issues are arising. The problem right now is swapping chunks in a proper order. When chunks are swapped, their indices and entity array pointers are swapped accordingly. The problem that arises is how the aabb's for pages are calculated and how the chunk associated with an entity's position is calculated. If the chunk index and position are modified before the chunks are swapped, the entities associated with those indices cannot be removed. If the chunk index and position are swapped after the pages are swapped, the page aabb's are calculated incorrectly.
