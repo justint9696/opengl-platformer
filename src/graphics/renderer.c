@@ -34,7 +34,7 @@ void renderer_init() {
         = shader_create("shaders/texture2d.vs", "shaders/texture2d.fs");
 
     // load textures
-    renderer.texture = texture_create("assets/images/white.png");
+    /* renderer.texture = texture_create("assets/images/white.png"); */
 
     // load text
     font_init("assets/fonts/helvetica.ttf"); 

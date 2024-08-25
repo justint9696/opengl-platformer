@@ -90,7 +90,7 @@ bool mouse_released(uint32_t index) {
             && time_since(button->released_tick) < NS_PER_MS);
 }
 
-ivec2s mouse_get_position() {
+ivec2s mouse_position() {
     int x, y;
     SDL_GetMouseState(&x, &y);
     return (ivec2s) { .x = x, .y = y };

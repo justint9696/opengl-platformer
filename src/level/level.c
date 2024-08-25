@@ -2,8 +2,8 @@
 
 #include "data/array.h"
 #include "entity/table.h"
-#include "util/assert.h"
 #include "player.h"
+#include "util/assert.h"
 #include "world/chunk.h"
 
 #include <assert.h>
@@ -34,6 +34,8 @@ static void page_load_data(page_t *page, world_t *world, ldata_t arr[],
     for (size_t i = 0; i < len; i++) {
         ldata_t *data = &arr[i];
 
+        // FIXME: if the player leaves the bounds of the world, a segmentation
+        // fault occurs
         page_t *tmp = chunk_page_from_pos(&world->chunk, data->pos);
         if (tmp->index != page->index) {
             n++;
@@ -136,10 +138,12 @@ void level_export(world_t *world, const char *fpath) {
     fwrite(&world->chunk.index, sizeof(int), 1, fp);
     fwrite(&world->chunk.dim, sizeof(ivec2s), 1, fp);
 
-    fwrite(&(ldata_t) {
-        .type = world->player->type,
-        .box = world->player->body.box,
-    }, sizeof(ldata_t), 1, fp);
+    fwrite(
+        &(ldata_t) {
+            .type = world->player->type,
+            .box = world->player->body.box,
+        },
+        sizeof(ldata_t), 1, fp);
 
     struct {
         size_t n;
@@ -175,7 +179,8 @@ static void pages_shift(world_t *world, uint32_t indices[], int it) {
         ldata_t data[CHUNK_MAX];
         size_t len = array_len(page->entities);
 
-        /* log_debug("Releasing %ld entities from page %d\n", len, page->index); */
+        /* log_debug("Releasing %ld entities from page %d\n", len, page->index);
+         */
         for (size_t n = 0; n < len; n++) {
             entity_t *entity = &page->entities[0];
             data[n] = (ldata_t) {
@@ -230,7 +235,8 @@ static void pages_replace(world_t *world, uint32_t indices[], int it) {
         if (index == -1)
             continue;
 
-        /* log_debug("Requesting index %d for page %d\n", index, page->index); */
+        /* log_debug("Requesting index %d for page %d\n", index, page->index);
+         */
         uint64_t offset = level.offsets[index];
         fseek(level.fp, offset, SEEK_SET);
 

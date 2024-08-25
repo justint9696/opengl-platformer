@@ -63,10 +63,12 @@ static void init(game_t *self) {
     time_init(&self->time);
     world_init(&self->world);
     ui_init();
+    editor_init(&self->editor);
 }
 
 static void destroy(game_t *self) {
     ui_destroy();
+    editor_destroy(&self->editor);
     level_shutdown(&self->world);
     world_destroy(&self->world);
     window_destroy(&self->window);
@@ -95,6 +97,7 @@ static void sync(game_t *self) {
 static void render(game_t *self) {
     world_render(&self->world);
     ui_render(&self->world.camera);
+    editor_render(&self->editor, &self->world);
 }
 
 void game_run(game_t *self) {

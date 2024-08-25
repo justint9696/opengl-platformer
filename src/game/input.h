@@ -66,6 +66,6 @@ bool mouse_held(uint32_t, time_t delay_ms);
 bool mouse_released(uint32_t);
 
 /* Returns the screen position of the mouse. */
-ivec2s mouse_get_position();
+ivec2s mouse_position();
 
 #endif // ifndef _GAME_INPUT_H_

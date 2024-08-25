@@ -33,6 +33,10 @@ void world_init(world_t *self) {
 
 void world_destroy(world_t *self) {
     chunk_destroy(&self->chunk);
+
+    vao_destroy(&self->vao);
+    vbo_destroy(&self->vbo);
+    ibo_destroy(&self->ibo);
 }
 
 void world_update(world_t *self, float dt) {
