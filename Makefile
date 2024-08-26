@@ -1,16 +1,11 @@
 CC = gcc
 
-BIN = bin
-INC = include
-OBJ = objs
-SRC = src
-
-SRCS = $(shell find $(SRC) -name "*.c")
-OBJS = $(patsubst $(SRC)%, $(OBJ)%, $(SRCS:.c=.o))
-DEPS = $(patsubst $(SRC)%, $(OBJ)%, $(SRCS:.c=.d))
+SRCS = $(wildcard src/*.c src/**/*.c)
+OBJS = $(patsubst src%, build%, $(SRCS:.c=.o))
+DEPS = $(patsubst src%, build%, $(SRCS:.c=.d))
 
 CPPFLAGS := -MMD -MP
-CPPFLAGS += -I$(SRC)
+CPPFLAGS += -Isrc
 CPPFLAGS += -Ilib/glad/include
 CPPFLAGS += -Ilib/stb
 CPPFLAGS += -Ilib/SDL2/include
@@ -40,7 +35,7 @@ LDFLAGS += -Llib/SDL2/build/build/.libs
 LDFLAGS += -Llib/cglm/build
 LDFLAGS += -Wl,--start-group $(LDLIBS) -Wl,--end-group
 
-TARGET = $(BIN)/game
+TARGET = bin/game
 
 .PHONY: all clean
 
@@ -64,7 +59,7 @@ $(TARGET): $(OBJS)
 	@mkdir -p $(dir $@)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
-$(OBJ)/%.o: $(SRC)/%.c
+build/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -o $@ -c $< $(CFLAGS)
 

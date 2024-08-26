@@ -1,7 +1,7 @@
 bin/
+build/
 include/
 lib/
-objs/
 
 *.a
 *.d
