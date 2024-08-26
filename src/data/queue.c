@@ -1,3 +1,10 @@
+/**
+ * @file queue.c
+ * @author Justin Tonkinson
+ * @date 2024/06/07
+ * @brief Queue implementation functions.
+ */
+
 #include "data/queue.h"
 
 #include <assert.h>

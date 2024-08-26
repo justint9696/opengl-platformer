@@ -1,53 +1,90 @@
+/**
+ * @file kdtree.h
+ * @author Justin Tonkinson
+ * @date 2024/05/24
+ * @brief KDTree function prototypes.
+ * Implementation based on https://en.wikipedia.org/wiki/K-d_tree
+ */
+
 #ifndef _DATA_KDTREE_H_
 #define _DATA_KDTREE_H_
 
 #include <cglm/types-struct.h>
 #include <stddef.h>
 
-/* Implementation based on https://en.wikipedia.org/wiki/K-d_tree */
-
-/* Sorting function for kdtree data. */
+/**
+ * @brief Sorting function for kdtree data.
+ */
 typedef void (*sort_fn_t)(void *, size_t, int);
 
 typedef struct kdnode_s {
-    // reference to an object
+    /** @brief A reference to an object's data. */
     void *data;
 
-    // reference to data->pos
+    /** @brief A reference to the position of an object. */
     float *pos;
 
-    // left and right children
+    /** @brief The left and right children of the current node. */
     struct kdnode_s *left, *right;
 } kdnode_t;
 
 typedef struct {
+    /** @brief The root of the kdtree. */
     kdnode_t *root;
 } kdtree_t;
 
-/* Initializes a kdtree. */
+/**
+ * @brief Initializes a kdtree.
+ * @param self a reference to a kdtree
+ */
 void kdtree_init(kdtree_t *);
 
-/* Releases the memory allocated for a kdtree. */
+/**
+ * @brief Released the memory allocated for a kdtree.
+ * @param self a reference to a kdtree
+ */
 void kdtree_destroy(kdtree_t *);
 
-/* Inserts an item at the appropriate leaf of a kdtree. */
+/**
+ * @brief Inserts an item into a kdtree.
+ * The item will be inserted at the leaf that corresponds to the given position.
+ * @param self a reference to a kdtree
+ * @param pos the world position of an object
+ * @param data the object being inserted
+ */
 void kdtree_insert(kdtree_t *, float *pos, void *data);
 
-/* Returns the item of the node closest to the provided position. */
+/**
+ * @brief Returns the data of the node in a kdtree that is closest to the given
+ * position.
+ * @param self a reference to a kdtree
+ * @param pos the world position of an object
+ */
 void *kdtree_nearest(kdtree_t *, float *);
 
-/*
- * Creates a kdtree from the provided array.
- * The `offset` is the memory location of the `position` field within the
- * structures contained within the array. This be calculated with `offsetof()`.
+/**
+ * @brief Creates a kdtree from objects in a dynamic array.
+ *
+ * The objects are inserted into the kdtree by the depth of the current node
+ * and the dimension of the position vector based on that depth. The sorting
+ * function should sort the remaining objects by their x coordinate at depth 1,
+ * by their y coordinate at depth 2, by their x coordinate at depth 3, and so
+ * on.
+ *
+ * The `offset` is the memory location of the position field for the objects
+ * contained within the array. This be calculated with `offsetof()`.
  * Example:
- * ```
- * struct foo {
- *      int id;
- *      float pos[2];
- *  };
- *  int offset = offsetof(struct foo, pos);
- * ```
+ * @code
+ * struct foo { int id; float pos[2]; };
+ * int offset = offsetof(struct foo, pos);
+ * @endcode
+ *
+ * @param self a reference to a kdtree
+ * @param arr a pointer to the data section of a dynamic array
+ * @param len the number of items in the array
+ * @param offset the memory offset of the position field for the objects in the
+ * array
+ * @param sort the sorting function for the objects in the array
  */
 void kdtree_from(kdtree_t *, void *arr, size_t len, int offset, sort_fn_t);
 

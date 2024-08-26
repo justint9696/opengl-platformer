@@ -1,61 +1,120 @@
+/**
+ * @file array.h
+ * @author Justin Tonkinson
+ * @date 2024/05/07
+ * @brief Dynamic array function prototypes.
+ */
+
 #ifndef _DATA_ARRAY_H_
 #define _DATA_ARRAY_H_
 
 #include <stddef.h>
 #include <stdint.h>
 
-/* For the internal headers of arrays. */
-typedef struct {
-    size_t capacity, size, len;
-    void *userdata;
+/** @brief Internal header that manages arrays. */
+typedef struct array_s {
+    /** @brief The number of items in the array. */
+    size_t len;
+
+    /** @brief The size of each item in the array. */
+    size_t size;
+
+    /** @brief The maximum number of items the array can hold. */
+    size_t capacity;
+
+    /** @brief The data section of the array. */
+    void *data;
 } array_t;
 
-#define array_header(_a)\
-    ((array_t *)(((void *)(_a)) - offsetof(array_t, userdata)))
+/** @brief Returns the header of an array's data section. */
+#define array_header(_array)\
+    ((array_t *)(((void *)(_array)) - offsetof(array_t, data)))
 
-/* Initializes an array at the given memory address. */
+/**
+ * @brief Initializes an array at the given memory address.
+ * @param ptr a pointer to a block of memory
+ * @param size the size of each item contained in the array
+ * @param capacity the maximum number of items the array can hold
+ * @returns a pointer to the data section of the array
+ */
 void *array_init(void *ptr, size_t size, size_t capacity);
 
-/* Allocates a block of memory and returns a pointer to its data section. */
+/**
+ * @brief Allocates memory for an array.
+ * @param size the size of each item contained in the array
+ * @param capacity the maximum number of items the array can hold
+ * @returns a pointer to the data section of the array 
+ */
 void *array_alloc(size_t size, size_t capacity);
 
-/* Releases the allocated block of memory. */
-void array_free(void *data);
-
-/* Removes all items from an array. */
-void array_clear(void *data);
-
-/* Reallocates the provided block of memory with provided capacity. */
-void array_resize(void **dataptr, size_t capacity);
-
-/* 
- * Pushes an item to the end of an array.
- * Returns -1 on failure or the index of the item on success.
+/**
+ * @brief Releases the memory allocated for an array.
+ * @param ptr a pointer to the data section of an array
  */
-int array_push(void *data, const void *item);
+void array_free(void *ptr);
 
-/*
- * Removes an item from an array.
- * Returns -1 on failure or 0 on success. 
+/**
+ * @brief Removes all items from an array.
+ * @param ptr a pointer to the data section of an array
  */
-int array_remove(void *data, const void *item);
+void array_clear(void *ptr);
 
-/*
- * Returns a pointer to the item at the provided index.
- * Returns NULL if index is invalid.
+/**
+ * @brief Reallocates memory for an array with updated capacity.
+ * The items in the array before reallocation will be kept, only the capacity is
+ * affected.
+ * @param ptr a pointer to the data section of an array
+ * @param capacity the maximum number of items the array can hold
+ * @returns a pointer to the data section of the reallocated array
  */
-void *array_get(void *data, uint32_t index);
+void *array_resize(void *ptr, size_t capacity);
 
-/* Returns the number of items in an array. */
-size_t array_len(void *data);
-
-/*
- * Allocates a block of memory and copies the items from indices [start:end].
- * Returns a pointer to the data section of allocated array.
+/**
+ * @brief Pushes an item to the end of an array.
+ * @param ptr a pointer to the data section of an array
+ * @param item a reference to the item being inserted into the array
+ * @returns the index of insertion on success or -1 on failure
  */
-void *array_slice(void *data, uint32_t start, uint32_t end);
+int array_push(void *ptr, const void *item);
 
-/* Copies the contents from the source array to the destination array. */
+/**
+ * @brief Removes an item from an array.
+ * @param ptr a pointer to the data section of an allocated array
+ * @param data the item to be removed
+ * @returns the size of the array on success or -1 on failure
+ */
+int array_remove(void *ptr, const void *item);
+
+/**
+ * @brief Returns a pointer to the item at an index of an array.
+ * @param ptr a pointer to the data section of an array
+ * @param index the index of an item within an array
+ * @returns the item at the given index or NULL if the index is invalid
+ */
+void *array_at(void *ptr, uint32_t index);
+
+/**
+ * @brief Returns the number of items in an array. 
+ * @param ptr a pointer to the data section of an array
+ * @returns the length of the array
+ */
+size_t array_len(void *ptr);
+
+/**
+ * @brief Allocates memory for an array and copies the items from the indices 
+ * start (inclusive) to end (inclusive).
+ * @param ptr a pointer to the data section of an array
+ * @param start the starting index
+ * @param end the ending index
+ * @returns a pointer to the data section of allocated array
+ */
+void *array_slice(void *ptr, uint32_t start, uint32_t end);
+
+/**
+ * @brief Copies the contents from the source array to the destination array. 
+ * @param dst a pointer to the data section of the destination array
+ * @param src a pointer to the data section of the source array
+ */
 void array_copy(void *dst, void *src);
 
 #endif // ifndef _DATA_ARRAY_H_

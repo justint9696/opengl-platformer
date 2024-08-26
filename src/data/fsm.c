@@ -1,3 +1,10 @@
+/**
+ * @file fsm.c
+ * @author Justin Tonkinson
+ * @date 2024/08/21
+ * @brief Finite state machine implementation functions.
+ */
+
 #include "data/fsm.h"
 
 #include "data/array.h"

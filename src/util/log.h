@@ -21,7 +21,7 @@
             _message, __FILE__, __LINE__, ##__VA_ARGS__)
 
 #define log_fatal(_message, ...) ({\
-        fprintf(stdout, "[ERROR][%s:%u]: "\
+        fprintf(stderr, "[ERROR][%s:%u]: "\
                 _message, __FILE__, __LINE__, ##__VA_ARGS__);\
         exit(1);\
     })

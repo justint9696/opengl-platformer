@@ -1,3 +1,10 @@
+/**
+ * @file grid.c
+ * @author Justin Tonkinson
+ * @date 2024/05/24
+ * @brief Dynamic array implementation functions.
+ */
+
 #include "data/grid.h"
 
 #include <assert.h>

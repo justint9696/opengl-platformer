@@ -1,3 +1,10 @@
+/**
+ * @file kdtree.c
+ * @author Justin Tonkinson
+ * @date 2024/05/24
+ * @brief KDTree implementation functions.
+ */
+
 #include "data/kdtree.h"
 
 #include "data/array.h"
@@ -144,7 +151,7 @@ void kdtree_from(kdtree_t *self, void *arr, size_t len, int offset,
     // create a stack allocated array of pointers to items in arr
     void *points[len];
     for (size_t i = 0; i < len; i++) {
-        points[i] = array_get(arr, i);
+        points[i] = array_at(arr, i);
     }
 
     // build kdtree from array of pointers
