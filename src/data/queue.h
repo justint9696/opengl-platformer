@@ -72,6 +72,7 @@ void queue_push(queue_t *, const void *data);
 
 /**
  * @brief Removes all items from a queue. 
+ * @param self a reference to a queue
  */
 void queue_clear(queue_t *);
 

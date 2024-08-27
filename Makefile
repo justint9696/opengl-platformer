@@ -1,8 +1,8 @@
 CC = gcc
 
 SRCS = $(wildcard src/*.c src/**/*.c)
-OBJS = $(patsubst src%, build%, $(SRCS:.c=.o))
-DEPS = $(patsubst src%, build%, $(SRCS:.c=.d))
+OBJS = $(patsubst src/%, build/%, $(SRCS:.c=.o))
+DEPS = $(patsubst src/%, build/%, $(SRCS:.c=.d))
 
 CPPFLAGS := -MMD -MP
 CPPFLAGS += -Isrc

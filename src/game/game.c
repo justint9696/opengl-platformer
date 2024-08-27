@@ -84,9 +84,12 @@ static void sync(game_t *self) {
         buttons_update();
         monitor_input(self);
 
-        if (self->state == GS_EDIT) {
-            editor_sync(&self->editor, &self->world);
-            continue;
+        switch (self->state) {
+            case GS_EDIT:
+                editor_sync(&self->editor, &self->world);
+                return;
+            default:
+                break;
         }
 
         // synchonize game world
@@ -97,7 +100,14 @@ static void sync(game_t *self) {
 static void render(game_t *self) {
     world_render(&self->world);
     ui_render(&self->world.camera);
-    editor_render(&self->editor, &self->world);
+
+    switch (self->state) {
+        case GS_EDIT:
+            editor_render(&self->editor, &self->world);
+            break;
+        default:
+            break;
+    }
 }
 
 void game_run(game_t *self) {

@@ -1,7 +1,5 @@
 #include "level/editor.h"
 
-#include "data/fsm.h"
-#include "data/grid.h"
 #include "entity/table.h"
 #include "game/input.h"
 #include "graphics/drawing.h"
@@ -9,7 +7,6 @@
 #include "graphics/renderer.h"
 #include "graphics/vao.h"
 #include "graphics/vbo.h"
-#include "world/world.h"
 
 #include <assert.h>
 #include <cglm/struct.h>
@@ -130,18 +127,9 @@ static void idle_update(editor_t *self, world_t *world) {
         return;
     }
 
-    // if ctrl and left mouse are pressed, check if there is an entity under
-    // mouse
-    if (button_held(SDL_SCANCODE_LCTRL, 0) && mouse_pressed(SDL_BUTTON_LEFT)) {
-        vec2s mouse = screen_to_world(world, mouse_position());
-        // if so, push it to array of selected entities and transition to edit
-        // state
-        self->entity = get_hovered_entity(world, mouse);
-        return;
-    }
-
-    if (button_released(SDL_SCANCODE_LCTRL) && self->entity) {
-        fsm_transition(&self->fsm, ES_EDIT, editor_fn_t, self, world);
+    // if ctrl and left mouse are pressed, transition to select state
+    if (button_pressed(SDL_SCANCODE_LCTRL)) {
+        fsm_transition(&self->fsm, ES_SELECT, editor_fn_t, self, world);
         return;
     }
 }
@@ -165,7 +153,18 @@ static void move_exit(editor_t *self, world_t *world) {
     self->entity->body.cell = cell;
 }
 
-static void select_update(editor_t *self, world_t *world) {}
+static void select_update(editor_t *self, world_t *world) {
+    if (button_released(SDL_SCANCODE_LCTRL)) {
+        fsm_transition(&self->fsm, ES_EDIT, editor_fn_t, self, world);
+        return;
+    }
+
+    if (mouse_pressed(SDL_BUTTON_LEFT)) {
+        vec2s mouse = screen_to_world(world, mouse_position());
+        self->entity = get_hovered_entity(world, mouse);
+        return;
+    }
+}
 
 void editor_init(editor_t *self) {
     memset(self, 0, sizeof(editor_t));
@@ -220,8 +219,20 @@ void editor_render(editor_t *self, world_t *world) {
     vbo_bind(&self->vbo);
     ibo_bind(&self->ibo);
 
-    if (self->entity) {
-        draw_quad(self->entity->body.pos, self->entity->body.dim, COLOR_RED);
+    switch (self->fsm.current) {
+        case ES_PLACE:
+            vec2s dim = (vec2s) { 50.f, 50.f };
+            vec2s mouse
+                = glms_vec2_sub(screen_to_world(world, mouse_position()),
+                                glms_vec2_scale(dim, 0.5f));
+            draw_quad(mouse, dim, 0xFF0000AA);
+            break;
+        default:
+            if (self->entity) {
+                draw_quad(self->entity->body.pos, self->entity->body.dim,
+                          COLOR_RED);
+            }
+            break;
     }
 
     vao_unbind();
