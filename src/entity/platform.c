@@ -1,3 +1,10 @@
+/**
+ * @file platform.c
+ * @author Justin Tonkinson
+ * @date 2024/07/05
+ * @brief Platform implementation functions.
+ */
+
 #include "entity/platform.h"
 
 #include "entity/entity.h"

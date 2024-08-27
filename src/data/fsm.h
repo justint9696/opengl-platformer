@@ -41,20 +41,20 @@ typedef struct fsm_s {
 
 /**
  * @brief Allocates memory for a fsm. 
- * @param self a reference to a fsm
+ * @param self a pointer to a fsm
  * @param capacity the total number of states
  */
 void fsm_init(fsm_t *self, size_t capacity, int start);
 
 /**
  * @brief Releases the memory allocated for a fsm.
- * @param self a reference to a fsm
+ * @param self a pointer to a fsm
  */
 void fsm_destroy(fsm_t *self);
 
 /**
  * @brief Adds a state to a fsm.
- * @param self a reference to a fsm
+ * @param self a pointer to a fsm
  * @param init an optional on enter function pointer
  * @param destroy an optional on exit function pointer
  * @param update a required update functions pointer

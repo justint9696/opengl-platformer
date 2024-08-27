@@ -1,3 +1,10 @@
+/**
+ * @brief game.h
+ * @author Justin Tonkinson
+ * @date 2024/05/06
+ * @brief Game function prototypes.
+ */
+
 #ifndef _GAME_GAME_H_
 #define _GAME_GAME_H_
 
@@ -8,24 +15,43 @@
 
 #include <stdbool.h>
 
+/** @brief All possible game states. */
 typedef enum {
     GS_QUIT = -1,
     GS_DEAD,
     GS_PAUSED,
     GS_PLAYING,
     GS_EDIT,
-} game_state_e;
+} game_state_t;
 
+/** @brief Game data structure. */
 typedef struct {
+    /** @brief Boolean wireframe variable. */
     bool wireframe;
-    game_state_e prev_state, state;
+
+    /** @brief The previous game state. */
+    game_state_t prev_state;
+
+    /** @brief The current game state. */
+    game_state_t state;
+
+    /** @brief The game window. */
     window_t window;
+
+    /** @brief Time management structure. */
     struct time_s time;
+
+    /** @brief The game world. */
     world_t world;
+
+    /** @brief The level editor. */
     editor_t editor;
 } game_t;
 
-/* Initializes the game and starts the game loop. */
+/**
+ * @brief Initializes the game and starts the game loop. 
+ * @param self a pointer to the game
+ */
 void game_run(game_t *);
 
 #endif // ifndef _GAME_GAME_H_

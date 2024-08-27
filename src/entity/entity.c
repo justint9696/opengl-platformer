@@ -1,3 +1,10 @@
+/**
+ * @file entity.c
+ * @author Justin Tonkinson
+ * @date 2024/05/07
+ * @brief Entity implementation functions. 
+ */
+
 #include "entity/entity.h"
 
 #include "data/array.h"

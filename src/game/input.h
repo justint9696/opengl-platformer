@@ -1,3 +1,10 @@
+/**
+ * @file input.h
+ * @author Justin Tonkinson
+ * @date 2024/05/07
+ * @brief Input prototype functions.
+ */
+
 #ifndef _GAME_INPUT_H_
 #define _GAME_INPUT_H_
 
@@ -9,7 +16,7 @@
 #include <stdint.h>
 #include <time.h>
 
-/* Entity button bits */
+/** @brief Entity button bits. */
 enum {
     BUTTON_UP     = 1 << 0,
     BUTTON_DOWN   = 1 << 1,
@@ -20,19 +27,22 @@ enum {
     BUTTON_RSHIFT = 1 << 6,
 };
 
+/** @brief All possible button states. */
 typedef enum {
     BS_RELEASED,
     BS_PRESSED,
     BS_HELD,
-} button_e;
+} button_state_t;
 
+/** @brief Individual button data structure. */
 typedef struct {
-    button_e state;
+    button_state_t state;
     time_t pressed_tick;
     time_t released_tick;
 } button_t;
 
-typedef struct {
+/** @brief Button input manager. */
+typedef struct input_s {
     struct {
         button_t buttons[SDL_NUM_SCANCODES];
     } keyboard;
@@ -41,31 +51,64 @@ typedef struct {
     } mouse;
 } input_t;
 
-/* Initializes the internal button state. */
+/**
+ * @brief Initializes the internal button state. 
+ */
 void buttons_init();
 
-/* Updates the internal button state. */
+/** 
+ * @brief Updates the internal button state. 
+ */
 void buttons_update();
 
-/* Returns true if the button state is pressed. */
+/** 
+ * @brief Returns true if the button state is pressed. 
+ * @param scancode SDL keyboard scancode
+ * @returns true if button is pressed
+ */
 bool button_pressed(SDL_Scancode);
 
-/* Returns true if the button state is held after a certain time. */
+/** 
+ * @brief Returns true if the button state is held after a certain time. 
+ * @param scancode SDL keyboard scancode
+ * @param delay_ms time to wait since last button update
+ * @returns true if button is held after the given delay
+ */
 bool button_held(SDL_Scancode, time_t delay_ms);
 
-/* Returns true if the button state is released. */
+/**
+ * @brief Returns true if the button state is released. 
+ * @param scancode SDL keyboard scancode
+ * @returns true if the button is released
+ */
 bool button_released(SDL_Scancode);
 
-/* Returns true if the button state is pressed. */
+/**
+ * @brief Returns true if the button state is pressed. 
+ * @param index SDL mouse button index
+ * @returns true if the button is pressed
+ */
 bool mouse_pressed(uint32_t);
 
-/* Returns true if the button state is held after a certain time. */
+/**
+ * @brief Returns true if the button state is held after a certain time. 
+ * @param index SDL mouse button index
+ * @param delay_ms time to wait since last button update
+ * @returns true if button is held after the given delay
+ */
 bool mouse_held(uint32_t, time_t delay_ms);
 
-/* Returns true if the button state is released. */
+/**
+ * @brief Returns true if the button state is released. 
+ * @param index SDL mouse button index
+ * @returns true if the button is released
+ */
 bool mouse_released(uint32_t);
 
-/* Returns the screen position of the mouse. */
+/**
+ * @brief Returns the screen position of the mouse. 
+ * @returns the screen position of the mouse
+ */
 ivec2s mouse_position();
 
 #endif // ifndef _GAME_INPUT_H_

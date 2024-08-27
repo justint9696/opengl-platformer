@@ -1,3 +1,10 @@
+/**
+ * @file enemy.c
+ * @author Justin Tonkinson
+ * @date 2024/05/24
+ * @brief Enemy implementation functions.
+ */
+
 #include "entity/enemy.h"
 
 #include "entity/entity.h"

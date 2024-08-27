@@ -31,7 +31,7 @@ typedef struct {
 
 /**
  * @brief Allocates a block of memory for a queue. 
- * @param self a reference to a queue
+ * @param self a pointer to a queue
  * @param size the size of each item contained in the array
  * @param capacity the maximum number of items the array can hold
  */
@@ -39,40 +39,40 @@ void queue_init(queue_t *, size_t size, size_t capacity);
 
 /**
  * @brief Releases the allocated block of memory. 
- * @param self a reference to a queue
+ * @param self a pointer to a queue
  */
 void queue_destroy(queue_t *);
 
 /**
  * @brief Returns the next item in a queue.
- * @param self a reference to a queue
+ * @param self a pointer to a queue
  * @returns the next item in the queue
  */
 void *queue_peak(const queue_t *);
 
 /**
  * @brief Returns the last item in a queue.
- * @param self a reference to a queue
+ * @param self a pointer to a queue
  * @returns the last item in the queue
  */
 void *queue_rear(const queue_t *);
 
 /**
  * @brief Dequeues the next item in a queue and returns it.
- * @param self a reference to a queue
+ * @param self a pointer to a queue
  * @returns the dequeued item
  */
 void *queue_pop(queue_t *);
 
 /**
  * @brief Pushes an item at the end of a queue.
- * @param self a reference to a queue
+ * @param self a pointer to a queue
  */
 void queue_push(queue_t *, const void *data);
 
 /**
  * @brief Removes all items from a queue. 
- * @param self a reference to a queue
+ * @param self a pointer to a queue
  */
 void queue_clear(queue_t *);
 

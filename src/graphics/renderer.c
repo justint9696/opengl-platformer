@@ -53,7 +53,7 @@ void renderer_destroy() {
     font_destroy();
 }
 
-shader_t *renderer_use_shader(shader_e index) {
+shader_t *renderer_use_shader(shader_type_t index) {
     shader_t *shader = &renderer.shaders[index];
     if (shader == renderer.shader)
         return renderer.shader;

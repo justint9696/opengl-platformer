@@ -43,7 +43,7 @@ typedef struct {
 
 /**
  * @brief Initializes a grid with the provided parameters.
- * @param self a reference to a grid
+ * @param self a pointer to a grid
  * @param size the size of the cells within the grid
  * @param width the size of the screen
  * @param height the height of the screen
@@ -53,24 +53,24 @@ void grid_init(grid_t *, int size, int width, int height);
 /**
  * @brief Inserts an item into the grid cell that corresponds to the given
  * position.
- * @param self a reference to a grid
+ * @param self a pointer to a grid
  * @param pos the screen position of an item
- * @param data a reference to the item being inserted
+ * @param data a pointer to the item being inserted
  */
 void grid_insert(grid_t *, vec2s pos, void *data);
 
 /**
  * @brief Removes an item from the grid cell that corresponds to the given
  * position.
- * @param self a reference to a grid
+ * @param self a pointer to a grid
  * @param pos the screen position of an item
- * @param data a reference to the item being inserted
+ * @param data a pointer to the item being inserted
  */
 void grid_remove(grid_t *, vec2s pos, void *data);
 
 /**
  * @brief Returns the cell of a grid that corresponds to the given position.
- * @param self a reference to a grid
+ * @param self a pointer to a grid
  * @param pos the screen position of an item
  * @returns a cell corresponding to the given screen position
  */
@@ -78,7 +78,7 @@ cell_t *grid_cell_from_pos(grid_t *, vec2s pos);
 
 /**
  * @brief Returns the cell at the (x, y) coordinates of the provided index.
- * @param self a reference to a grid
+ * @param self a pointer to a grid
  * @param index the indices (x and y coordinates) of a grid
  * @returns a cell corresponding to the given indices
  */
@@ -86,15 +86,15 @@ cell_t *grid_cell_from_index(grid_t *, ivec2s index);
 
 /**
  * @brief Inserts an item into the provided cell.
- * @param cell a reference to the cell of a grid
- * @param data a reference to the item being inserted
+ * @param cell a pointer to the cell of a grid
+ * @param data a pointer to the item being inserted
  */
 void cell_insert(cell_t *, void *data);
 
 /**
  * @brief Removes an item from the provided cell.
- * @param cell a reference to the cell of a grid
- * @param data a reference to the item being removed
+ * @param cell a pointer to the cell of a grid
+ * @param data a pointer to the item being removed
  */
 void cell_remove(cell_t *, void *data);
 

@@ -72,7 +72,7 @@ void *array_resize(void *ptr, size_t capacity);
 /**
  * @brief Pushes an item to the end of an array.
  * @param ptr a pointer to the data section of an array
- * @param item a reference to the item being inserted into the array
+ * @param item a pointer to the item being inserted into the array
  * @returns the index of insertion on success or -1 on failure
  */
 int array_push(void *ptr, const void *item);

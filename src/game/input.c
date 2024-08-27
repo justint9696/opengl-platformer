@@ -1,8 +1,13 @@
+/**
+ * @file input.c
+ * @author Justin Tonkinson
+ * @date 2024/05/07
+ * @brief Input implementation functions.
+ */
+
 #include "game/input.h"
 
 #include "util/time.h"
-
-#include <stdio.h>
 
 static input_t input;
 

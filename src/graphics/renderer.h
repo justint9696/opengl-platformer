@@ -12,7 +12,7 @@ typedef enum {
     SHADER_UI_TEXT,
     SHADER_UI_TEXTURE,
     SHADER_MAX,
-} shader_e;
+} shader_type_t;
 
 typedef struct {
     shader_t shaders[SHADER_MAX];
@@ -28,7 +28,7 @@ void renderer_init();
 void renderer_destroy();
 
 /* Binds the provided shader index if it has not already been bound. */
-shader_t *renderer_use_shader(shader_e);
+shader_t *renderer_use_shader(shader_type_t);
 
 /* Prepares the renderer scene based on the provided camera. */
 void renderer_prepare_scene(const camera_t *);

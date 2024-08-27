@@ -12,16 +12,14 @@
 #include <cglm/types-struct.h>
 #include <stddef.h>
 
-/**
- * @brief Sorting function for kdtree data.
- */
+/** @brief Sorting function for kdtree data. */
 typedef void (*sort_fn_t)(void *, size_t, int);
 
 typedef struct kdnode_s {
-    /** @brief A reference to an object's data. */
+    /** @brief A pointer to an object's data. */
     void *data;
 
-    /** @brief A reference to the position of an object. */
+    /** @brief A pointer to the position of an object. */
     float *pos;
 
     /** @brief The left and right children of the current node. */
@@ -35,20 +33,20 @@ typedef struct {
 
 /**
  * @brief Initializes a kdtree.
- * @param self a reference to a kdtree
+ * @param self a pointer to a kdtree
  */
 void kdtree_init(kdtree_t *);
 
 /**
  * @brief Released the memory allocated for a kdtree.
- * @param self a reference to a kdtree
+ * @param self a pointer to a kdtree
  */
 void kdtree_destroy(kdtree_t *);
 
 /**
  * @brief Inserts an item into a kdtree.
  * The item will be inserted at the leaf that corresponds to the given position.
- * @param self a reference to a kdtree
+ * @param self a pointer to a kdtree
  * @param pos the world position of an object
  * @param data the object being inserted
  */
@@ -57,7 +55,7 @@ void kdtree_insert(kdtree_t *, float *pos, void *data);
 /**
  * @brief Returns the data of the node in a kdtree that is closest to the given
  * position.
- * @param self a reference to a kdtree
+ * @param self a pointer to a kdtree
  * @param pos the world position of an object
  */
 void *kdtree_nearest(kdtree_t *, float *);
@@ -79,7 +77,7 @@ void *kdtree_nearest(kdtree_t *, float *);
  * int offset = offsetof(struct foo, pos);
  * @endcode
  *
- * @param self a reference to a kdtree
+ * @param self a pointer to a kdtree
  * @param arr a pointer to the data section of a dynamic array
  * @param len the number of items in the array
  * @param offset the memory offset of the position field for the objects in the

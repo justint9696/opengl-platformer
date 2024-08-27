@@ -1,3 +1,10 @@
+/**
+ * @brief camera.c
+ * @author Justin Tonkinson
+ * @date 2024/05/07
+ * @brief Camera implementation functions.
+ */
+
 #include "game/camera.h"
 
 #include <cglm/cam.h>

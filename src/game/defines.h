@@ -1,3 +1,10 @@
+/**
+ * @brief defines.h
+ * @author Justin Tonkinson
+ * @date 2024/06/18
+ * @brief Game constant macros. 
+ */
+
 #ifndef _GAME_DEFINES_H_
 #define _GAME_DEFINES_H_
 
