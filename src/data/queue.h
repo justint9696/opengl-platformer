@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 /** @brief Queue data structure. */
-typedef struct {
+typedef struct queue_s {
     /** @brief The number of items in the queue. */
     size_t len;
 

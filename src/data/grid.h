@@ -30,7 +30,7 @@ typedef struct cell_s {
 } cell_t;
 
 /** @brief Uniform grid data structure. */
-typedef struct {
+typedef struct grid_s {
     /** @brief The size of each cell in the grid. */
     int size;
 

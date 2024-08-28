@@ -1,3 +1,10 @@
+/**
+ * @file editor.c
+ * @author Justin Tonkinson
+ * @date 2024/06/10
+ * @brief Level editor implementation functions.
+ */
+
 #include "level/editor.h"
 
 #include "entity/table.h"
@@ -12,6 +19,7 @@
 #include <cglm/struct.h>
 #include <string.h>
 
+/** @brief Level editor function types for the state manager. */
 typedef void (*editor_fn_t)(editor_t *, world_t *);
 
 static entity_t *get_hovered_entity(world_t *world, vec2s mouse) {

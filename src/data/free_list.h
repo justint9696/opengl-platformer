@@ -55,7 +55,7 @@ void flist_init(flist_t *, size_t size, size_t capacity);
 void flist_destroy(flist_t *);
 
 /**
- * @brief Returns a block of memory that can hold `count` number of items.
+ * @brief Returns a block of memory that can hold @a count number of items.
  * If there is not a block of memory available, the program will log the error
  * and terminate the program.
  * @param self a pointer to a free list

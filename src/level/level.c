@@ -1,3 +1,11 @@
+/**
+ * @file level.c
+ * @author Justin Tonkinson
+ * @date 2024/06/10
+ * @brief Level implementation functions.
+ * @bug Moving to the left or right-most page crashes the program.
+ */
+
 #include "level/level.h"
 
 #include "data/array.h"
@@ -15,7 +23,9 @@
 
 static level_t level;
 
-/* Creates the page bounds based on the chunk position and page index. */
+/**
+ * @brief Creates the page bounds based on the chunk position and page index.
+ */
 static void page_calculate_aabb(page_t *page, world_t *world) {
     page->pos = glms_vec2_add(
         (vec2s) {
@@ -26,7 +36,7 @@ static void page_calculate_aabb(page_t *page, world_t *world) {
     page->dim = glms_vec2_fill(CHUNK_SIZE);
 }
 
-/* Loads level data into the provided page. */
+/** @brief Loads level data into the provided page. */
 static void page_load_data(page_t *page, world_t *world, ldata_t arr[],
                            size_t len) {
     size_t n = 0;
@@ -168,7 +178,7 @@ void level_export(world_t *world, const char *fpath) {
     fclose(fp);
 }
 
-/* Shifts the provided page indicies around the iterator. */
+/** @brief Shifts the provided page indicies around the iterator. */
 static void pages_shift(world_t *world, uint32_t indices[], int it) {
     // iterate through all the indices
     for (int i = 0; i < 3; i++) {
@@ -216,7 +226,7 @@ static void pages_shift(world_t *world, uint32_t indices[], int it) {
     }
 }
 
-/* Replaces the provided page indicies around the iterator. */
+/** @brief Replaces the provided page indicies around the iterator. */
 static void pages_replace(world_t *world, uint32_t indices[], int it) {
     struct {
         size_t n;
@@ -250,7 +260,7 @@ static void pages_replace(world_t *world, uint32_t indices[], int it) {
     }
 }
 
-/* Swaps the provided page indicies horizontally around the iterator. */
+/** @brief Swaps the provided page indicies horizontally around the iterator. */
 static void pages_swap_horz(world_t *world, uint32_t indices[], int it) {
     pages_shift(world, indices, it);
 
@@ -260,6 +270,7 @@ static void pages_swap_horz(world_t *world, uint32_t indices[], int it) {
     pages_replace(world, indices, it);
 }
 
+// TODO: implement swapping pages above or below the current page
 void level_swap_pages(world_t *world, page_t *page) {
     assert(level.fp);
 

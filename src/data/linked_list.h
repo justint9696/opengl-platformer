@@ -2,16 +2,16 @@
  * @file linked_list.h
  * @author Justin Tonkinson
  * @date 2024/06/27
- * @brief Macros for common linked list objects.
+ * @brief Macros for singly linked list objects.
  */
 
 #ifndef _DATA_LINKED_LIST_H_
 #define _DATA_LINKED_LIST_H_
 
-/** @brief Creates a common linked list node structure. */
+/** @brief Creates a singly linked list node structure. */
 #define LNODE(T) struct { T *next; }
 
-/** @brief Creates a common linked list structure. */
+/** @brief Creates a singly linked list structure. */
 #define LLIST(T) struct { T *head; }
 
 /** @brief Adds an item to the end of a linked linked. */

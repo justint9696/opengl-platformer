@@ -16,7 +16,7 @@
 #include <stdbool.h>
 
 /** @brief All possible game states. */
-typedef enum {
+typedef enum game_state_e {
     GS_QUIT = -1,
     GS_DEAD,
     GS_PAUSED,

@@ -26,7 +26,7 @@ typedef struct kdnode_s {
     struct kdnode_s *left, *right;
 } kdnode_t;
 
-typedef struct {
+typedef struct kdtree_s {
     /** @brief The root of the kdtree. */
     kdnode_t *root;
 } kdtree_t;
@@ -69,7 +69,7 @@ void *kdtree_nearest(kdtree_t *, float *);
  * by their y coordinate at depth 2, by their x coordinate at depth 3, and so
  * on.
  *
- * The `offset` is the memory location of the position field for the objects
+ * The @a offset is the memory location of the position field for the objects
  * contained within the array. This be calculated with `offsetof()`.
  * Example:
  * @code
