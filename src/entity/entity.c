@@ -22,7 +22,7 @@ _DECL_MODULE(physics);
 _DECL_MODULE(ai);
 _DECL_MODULE(camera_follow);
 
-entity_t *entity_create(void *data, world_t *world) {
+entity_t *entity_create(const void *data, world_t *world) {
     vec2s pos = ((entity_t *)data)->body.pos;
     page_t *page = chunk_page_from_pos(&world->chunk, pos);
 

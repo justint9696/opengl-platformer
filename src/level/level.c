@@ -4,6 +4,8 @@
  * @date 2024/06/10
  * @brief Level implementation functions.
  * @bug Moving to the left or right-most page crashes the program.
+ * @bug Entities that were added to the base level from exported level file are
+ * spawning in the wrong page.
  */
 
 #include "level/level.h"
@@ -41,6 +43,7 @@ static void page_load_data(page_t *page, world_t *world, ldata_t arr[],
                            size_t len) {
     size_t n = 0;
 
+    log_debug("Loading %ld entities into page %d\n", len, page->index);
     for (size_t i = 0; i < len; i++) {
         ldata_t *data = &arr[i];
 
@@ -49,6 +52,9 @@ static void page_load_data(page_t *page, world_t *world, ldata_t arr[],
         page_t *tmp = chunk_page_from_pos(&world->chunk, data->pos);
         if (tmp->index != page->index) {
             n++;
+            log_debug("Entity (%.2f, %.2f) loaded into the wrong page; %d "
+                      "rather than %d\n",
+                      data->pos.x, data->pos.y, tmp->index, page->index);
         }
 
         create_fn_t fn = table_lookup(data->type);
@@ -176,6 +182,7 @@ void level_export(world_t *world, const char *fpath) {
     }
 
     fclose(fp);
+    log_debug("Level exported to file `%s`\n", fpath);
 }
 
 /** @brief Shifts the provided page indicies around the iterator. */

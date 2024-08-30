@@ -48,7 +48,6 @@ entity_t *player_init(vec2s pos, vec2s dim, world_t *world) {
     }, sizeof(entity_t));
 
     entity_init(self, world);
-
     return self;
 }
 

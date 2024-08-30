@@ -82,7 +82,7 @@ typedef struct entity_s {
  * @param world a pointer to the game world
  * @returns a pointer to the entity
  */
-entity_t *entity_create(void *data, struct world_s *);
+entity_t *entity_create(const void *data, struct world_s *);
 
 /**
  * @brief Initializes an entity based on their flags and init param.

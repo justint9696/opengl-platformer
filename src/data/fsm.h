@@ -25,6 +25,9 @@ typedef struct state_s {
 
     /** @brief Optional on update function pointer. */
     void *update;
+
+    /** @brief Optional on render function pointer. */
+    void *render;
 } state_t;
 
 /** @brief Finite state machine data structure. */
@@ -55,15 +58,16 @@ void fsm_destroy(fsm_t *self);
 /**
  * @brief Adds a state to a fsm.
  * @param self a pointer to a fsm
- * @param init an optional on enter function pointer
- * @param destroy an optional on exit function pointer
- * @param update a required update functions pointer
+ * @param data the data that will be copied into the state
  */
-void fsm_add(fsm_t *self, void *init, void *destroy, void *update);
+void fsm_add(fsm_t *self, const void *data);
+
+#define _fsm_field(_name)
 
 /**
- * @brief Updates the current state of a fsm if it's on update function pointer
+ * @brief Updates the current state of a fsm if its on update function pointer
  * is defined.
+ *
  * Usage: @code fsm_update(&fsm, void(*)(int, char), 3, 'B'); @endcode
  */
 #define fsm_update(_fsm, _T, _args, ...) ({           \
@@ -75,7 +79,22 @@ void fsm_add(fsm_t *self, void *init, void *destroy, void *update);
 })
 
 /**
+ * @brief Renders the current state of a fsm if its on render function pointer
+ * is defined.
+ *
+ * Usage: @code fsm_render(&fsm, void(*)(int, char), 3, 'B'); @endcode
+ */
+#define fsm_render(_fsm, _T, _args, ...) ({           \
+    __typeof__(_fsm) __fsm = (_fsm);                  \
+    state_t *_state = &__fsm->arr[__fsm->current];    \
+    if (_state->render) {                             \
+        ((_T)(_state->render))(_args, ##__VA_ARGS__); \
+    }                                                 \
+})
+
+/**
  * @brief Transitions a fsm from one state to another. 
+ *
  * Usage: @code fsm_transition(&fsm, void(*)(int, char), 5, 'A'); @endcode
  */
 #define fsm_transition(_fsm, _next, _T, _args, ...) ({ \

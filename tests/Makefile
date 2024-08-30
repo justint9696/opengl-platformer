@@ -1,11 +1,8 @@
 CC = gcc
 
-BIN = bin
-SRC = src
-
-SRCS = $(shell find $(SRC) -name "*.c")
-OBJS = $(patsubst $(SRC)%, $(BIN)%, $(SRCS:.c=.o))
-DEPS = $(patsubst $(SRC)%, $(BIN)%, $(SRCS:.c=.d))
+SRCS = $(wildcard src/*.c src/**/*.c)
+OBJS = $(patsubst src/%, bin/%, $(SRCS:.c=.o))
+DEPS = $(patsubst src/%, bin/%, $(SRCS:.c=.d))
 
 CFLAGS := -std=c11
 CFLAGS += -g
@@ -19,13 +16,15 @@ LDLIBS := -lm
 
 LDFLAGS := -Wl,--start-group $(LDLIBS) -Wl,--end-group
 
+.PHONY: all clean
+
 all: $(OBJS)
 
-$(BIN)/%.o: $(SRC)/%.c
+bin/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -o $@ $^ -MMD -MP $(CFLAGS) $(LDFLAGS)
 
 clean:
-	$(RM) $(OBJS)
+	rm -f $(OBJS) $(DEPS)
 
 -include $(DEPS)

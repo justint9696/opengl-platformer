@@ -9,6 +9,7 @@
 #define _LEVEL_EDITOR_H_
 
 #include "data/fsm.h"
+#include "util/aabb.h"
 #include "world/world.h"
 
 #include <cglm/types-struct.h>
@@ -21,6 +22,7 @@ typedef enum editor_state_e {
     ES_MOVE,
     ES_PLACE,
     ES_SELECT,
+    ES_HIGHLIGHT,
     ES_CAMERA,
     ES_MAX,
 } editor_state_t;
@@ -33,11 +35,18 @@ typedef struct {
     /** @brief Offset from the mouse world position to entity position. */
     vec2s offset;
 
-    /** @brief The previous position of the selected entity. */
-    vec2s position;
-
     /** @brief The currently selected entity. */
     entity_t *entity;
+
+    union {
+        /** @brief The bounding box of the selection rectangle. */
+        box_t select;
+
+        /** @brief Coordinates for calculating camera movement. */
+        struct {
+            vec2s start, end;
+        };
+    };
 
     /** @brief Vertex buffer objects. */
     GLuint vao, vbo, ibo;

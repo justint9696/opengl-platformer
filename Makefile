@@ -64,6 +64,6 @@ build/%.o: src/%.c
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
-	$(RM) $(TARGET) $(OBJS) $(DEPS)
+	rm -f $(TARGET) $(OBJS) $(DEPS)
 
 -include $(DEPS)
