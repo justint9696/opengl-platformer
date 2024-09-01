@@ -62,7 +62,13 @@ void fsm_destroy(fsm_t *self);
  */
 void fsm_add(fsm_t *self, const void *data);
 
-#define _fsm_field(_name)
+/** @brief Internal macro to check if a state field exists and call it if so. */
+#define _fsm_field(_state, _field, _T, _args, ...) ({  \
+    __typeof__(_state) __state = (_state);             \
+    if (__state->_field) {                             \
+        ((_T)(__state->_field))(_args, ##__VA_ARGS__); \
+    }                                                  \
+})
 
 /**
  * @brief Updates the current state of a fsm if its on update function pointer
@@ -70,12 +76,10 @@ void fsm_add(fsm_t *self, const void *data);
  *
  * Usage: @code fsm_update(&fsm, void(*)(int, char), 3, 'B'); @endcode
  */
-#define fsm_update(_fsm, _T, _args, ...) ({           \
-    __typeof__(_fsm) __fsm = (_fsm);                  \
-    state_t *_state = &__fsm->arr[__fsm->current];    \
-    if (_state->update) {                             \
-        ((_T)(_state->update))(_args, ##__VA_ARGS__); \
-    }                                                 \
+#define fsm_update(_fsm, _T, _args, ...) ({               \
+    __typeof__(_fsm) __fsm = (_fsm);                      \
+    state_t *_state = &__fsm->arr[__fsm->current];        \
+    _fsm_field(_state, update, _T, _args, ##__VA_ARGS__); \
 })
 
 /**
@@ -84,12 +88,10 @@ void fsm_add(fsm_t *self, const void *data);
  *
  * Usage: @code fsm_render(&fsm, void(*)(int, char), 3, 'B'); @endcode
  */
-#define fsm_render(_fsm, _T, _args, ...) ({           \
-    __typeof__(_fsm) __fsm = (_fsm);                  \
-    state_t *_state = &__fsm->arr[__fsm->current];    \
-    if (_state->render) {                             \
-        ((_T)(_state->render))(_args, ##__VA_ARGS__); \
-    }                                                 \
+#define fsm_render(_fsm, _T, _args, ...) ({               \
+    __typeof__(_fsm) __fsm = (_fsm);                      \
+    state_t *_state = &__fsm->arr[__fsm->current];        \
+    _fsm_field(_state, render, _T, _args, ##__VA_ARGS__); \
 })
 
 /**
@@ -97,18 +99,14 @@ void fsm_add(fsm_t *self, const void *data);
  *
  * Usage: @code fsm_transition(&fsm, void(*)(int, char), 5, 'A'); @endcode
  */
-#define fsm_transition(_fsm, _next, _T, _args, ...) ({ \
-    __typeof__(_fsm) __fsm = (_fsm);                   \
-    state_t *_from = &__fsm->arr[__fsm->current];      \
-    state_t *_to = &__fsm->arr[_next];                 \
-    if (_from->destroy) {                              \
-        ((_T)(_from->destroy))(_args, ##__VA_ARGS__);  \
-    }                                                  \
-    if (_to->init) {                                   \
-        ((_T)(_to->init))(_args, ##__VA_ARGS__);       \
-    }                                                  \
-    __fsm->previous = __fsm->current;                  \
-    __fsm->current = (_next);                          \
+#define fsm_transition(_fsm, _next, _T, _args, ...) ({    \
+    __typeof__(_fsm) __fsm = (_fsm);                      \
+    state_t *_from = &__fsm->arr[__fsm->current];         \
+    _fsm_field(_from, destroy, _T, _args, ##__VA_ARGS__); \
+    state_t *_to = &__fsm->arr[_next];                    \
+    _fsm_field(_to, init, _T, _args, ##__VA_ARGS__);      \
+    __fsm->previous = __fsm->current;                     \
+    __fsm->current = (_next);                             \
 })
 
 #endif // ifndef  _DATA_FSM_H_

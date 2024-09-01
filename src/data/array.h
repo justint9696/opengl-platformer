@@ -43,7 +43,7 @@ void *array_init(void *ptr, size_t size, size_t capacity);
  * @brief Allocates memory for an array.
  * @param size the size of each item contained in the array
  * @param capacity the maximum number of items the array can hold
- * @returns a pointer to the data section of the array 
+ * @returns a pointer to the data section of the array
  */
 void *array_alloc(size_t size, size_t capacity);
 
@@ -61,8 +61,10 @@ void array_clear(void *ptr);
 
 /**
  * @brief Reallocates memory for an array with updated capacity.
+ *
  * The items in the array before reallocation will be kept, only the capacity is
  * affected.
+ *
  * @param ptr a pointer to the data section of an array
  * @param capacity the maximum number of items the array can hold
  * @returns a pointer to the data section of the reallocated array
@@ -94,14 +96,14 @@ int array_remove(void *ptr, const void *item);
 void *array_at(void *ptr, uint32_t index);
 
 /**
- * @brief Returns the number of items in an array. 
+ * @brief Returns the number of items in an array.
  * @param ptr a pointer to the data section of an array
  * @returns the length of the array
  */
 size_t array_len(void *ptr);
 
 /**
- * @brief Allocates memory for an array and copies the items from the indices 
+ * @brief Allocates memory for an array and copies the items from the indices
  * start (inclusive) to end (inclusive).
  * @param ptr a pointer to the data section of an array
  * @param start the starting index
@@ -111,10 +113,21 @@ size_t array_len(void *ptr);
 void *array_slice(void *ptr, uint32_t start, uint32_t end);
 
 /**
- * @brief Copies the contents from the source array to the destination array. 
+ * @brief Copies the contents from the source array to the destination array.
  * @param dst a pointer to the data section of the destination array
  * @param src a pointer to the data section of the source array
  */
 void array_copy(void *dst, void *src);
+
+/**
+ * @brief Inserts an item at a specific index of an array.
+ * @note The @a index must be between 0 and the length of the array. This
+ * function is not meant to reserve an index, but instead to modify the indices
+ * of an already existing array.
+ * @param ptr a pointer to the data section of an array
+ * @param index the index of an array
+ * @param item a pointer to the item being inserted into the array
+ */
+void array_insert(void *ptr, uint32_t index, const void *item);
 
 #endif // ifndef _DATA_ARRAY_H_

@@ -28,9 +28,9 @@ void window_init(window_t *self, const char *title) {
             SDL_GetError());
 
     // create window
-    self->handle = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
-                                    SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH,
-                                    SCREEN_HEIGHT, SDL_WINDOW_OPENGL);
+    self->handle = SDL_CreateWindow(
+        title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH,
+        SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_INPUT_GRABBED);
 
     XASSERT(self->handle, "Could not create SDL Window: %s\n", SDL_GetError());
 

@@ -6,6 +6,9 @@
  * @bug Moving to the left or right-most page crashes the program.
  * @bug Entities that were added to the base level from exported level file are
  * spawning in the wrong page.
+ * @bug Entities are being spawn into the "wrong page" because of how the level
+ * is being exported. Look into the primary page upon export (which depends on
+ * the player's location at the time of export).
  */
 
 #include "level/level.h"
@@ -47,13 +50,11 @@ static void page_load_data(page_t *page, world_t *world, ldata_t arr[],
     for (size_t i = 0; i < len; i++) {
         ldata_t *data = &arr[i];
 
-        // FIXME: if the player leaves the bounds of the world, a segmentation
-        // fault occurs
         page_t *tmp = chunk_page_from_pos(&world->chunk, data->pos);
         if (tmp->index != page->index) {
             n++;
-            log_debug("Entity (%.2f, %.2f) loaded into the wrong page; %d "
-                      "rather than %d\n",
+            log_debug("Entity at (%.2f, %.2f) was loaded into the wrong page; "
+                      "page %d instead of page %d.\n",
                       data->pos.x, data->pos.y, tmp->index, page->index);
         }
 
@@ -83,7 +84,7 @@ void level_import(world_t *world, const char *fpath) {
     XASSERT(fp, "Could not open file `%s`: %s.\n", fpath, strerror(errno));
 
     level.fp = tmpfile();
-    XASSERT(level.fp, "Failed to create temp file: `%s`\n", strerror(errno));
+    XASSERT(level.fp, "Failed to create temp file: %s\n", strerror(errno));
 
     fseek(fp, 0, SEEK_SET);
     fread(&world->chunk.index, sizeof(int), 1, fp);
@@ -97,6 +98,7 @@ void level_import(world_t *world, const char *fpath) {
     fwrite(&data, sizeof(ldata_t), 1, level.fp);
 
     world->player = player_init(data.pos, data.dim, world);
+    /* world->chunk.index = */
 
     struct {
         size_t n;
@@ -154,8 +156,7 @@ void level_export(world_t *world, const char *fpath) {
     fwrite(&world->chunk.index, sizeof(int), 1, fp);
     fwrite(&world->chunk.dim, sizeof(ivec2s), 1, fp);
 
-    fwrite(
-        &(ldata_t) {
+    fwrite(&(ldata_t) {
             .type = world->player->type,
             .box = world->player->body.box,
         },
@@ -168,6 +169,7 @@ void level_export(world_t *world, const char *fpath) {
 
     size_t len = array_len(level.offsets);
     for (size_t i = 0; i < len; i++) {
+        memset(&entities.arr, 0, sizeof(ldata_t) * CHUNK_MAX);
         // set file pointer to offset within file
         uint64_t offset = level.offsets[i];
         fseek(level.fp, offset, SEEK_SET);
@@ -316,8 +318,7 @@ void level_swap_pages(world_t *world, page_t *page) {
         case TOP_LEFT:
         case BOTTOM_LEFT:
         case LEFT:
-            uint32_t indices[] = { 2, 5, 8 };
-            pages_swap_horz(world, indices, -1);
+            pages_swap_horz(world, (uint32_t[]) { 2, 5, 8 }, -1);
             break;
     }
 
@@ -325,8 +326,7 @@ void level_swap_pages(world_t *world, page_t *page) {
         case TOP_RIGHT:
         case BOTTOM_RIGHT:
         case RIGHT:
-            uint32_t indices[] = { 0, 3, 6 };
-            pages_swap_horz(world, indices, 1);
+            pages_swap_horz(world, (uint32_t[]) { 0, 3, 6 }, 1);
             break;
     }
 

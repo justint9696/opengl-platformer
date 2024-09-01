@@ -63,7 +63,7 @@ static void camera_update(editor_t *self, world_t *world) {
     self->end = (vec2s) { mouse.x, mouse.y };
 
     vec2s diff = glms_vec2_sub(self->end, self->start);
-    world->camera.pos 
+    world->camera.pos
         = glms_vec3_add(world->camera.pos, (vec3s) { diff.x, -diff.y, 0 });
 
     self->start = self->end;
@@ -103,8 +103,8 @@ static void place_update(editor_t *self, world_t *world) {
 
 static void place_render(editor_t *self, world_t *world) {
     vec2s dim = (vec2s) { 50.f, 50.f };
-    vec2s mouse = glms_vec2_sub(mouse_to_world(world),
-                                glms_vec2_scale(dim, 0.5f));
+    vec2s mouse
+        = glms_vec2_sub(mouse_to_world(world), glms_vec2_scale(dim, 0.5f));
     draw_quad(mouse, dim, COLOR_RED_FADE);
 }
 
@@ -226,12 +226,12 @@ static void highlight_exit(editor_t *self, world_t *world) {
 }
 
 static void highlight_update(editor_t *self, world_t *world) {
-    if (button_released(SDL_SCANCODE_LSHIFT) 
+    if (button_released(SDL_SCANCODE_LSHIFT)
         || mouse_released(SDL_BUTTON_LEFT)) {
         fsm_transition(&self->fsm, ES_IDLE, editor_fn_t, self, world);
         return;
     }
-    
+
     self->select.dim = glms_vec2_sub(mouse_to_world(world), self->select.pos);
 }
 
@@ -251,26 +251,28 @@ void editor_init(editor_t *self) {
     fsm_init(&self->fsm, ES_MAX, ES_IDLE);
     fsm_add(&self->fsm, &(state_t) { .update = idle_update, .render = render });
     fsm_add(&self->fsm, &(state_t) { .update = edit_update, .render = render });
-    fsm_add(&self->fsm, &(state_t) { 
-        .init = move_enter, 
-        .destroy = move_exit, 
-        .render = render,
-        .update = move_update, 
-    });
-    fsm_add(&self->fsm, &(state_t) { 
-        .update = place_update, .render = place_render,
-    });
-    fsm_add(&self->fsm, &(state_t) { 
-        .update = select_update, .render = render,
+    fsm_add(&self->fsm, &(state_t) {
+        .init = move_enter, .destroy = move_exit,
+        .render = render, .update = move_update,
     });
     fsm_add(&self->fsm, &(state_t) {
-        .init = highlight_enter, 
-        .destroy = highlight_exit, 
+        .update = place_update,
+        .render = place_render,
+    });
+    fsm_add(&self->fsm, &(state_t) {
+        .update = select_update,
+        .render = render,
+    });
+    fsm_add(&self->fsm, &(state_t) {
+        .init = highlight_enter,
+        .destroy = highlight_exit,
         .render = highlight_render,
         .update = highlight_update,
     });
-    fsm_add(&self->fsm, &(state_t) { 
-        .init = camera_enter, .update = camera_update, .render = render,
+    fsm_add(&self->fsm, &(state_t) {
+        .init = camera_enter,
+        .update = camera_update,
+        .render = render,
     });
 
     self->vao = vao_create();

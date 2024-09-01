@@ -10,9 +10,9 @@
     - [x] Export data from temp file into a level file
     - [x] Check if mouse is hovering an entity
     - [x] Manipulate the hovered entity with the mouse
-    - [ ] Firgure out a system to place blocks
-    - [ ] Firgure out a system to change textures
-    - [ ] Right click to remove blocks
+    - [ ] Figure out a system to place blocks
+    - [ ] Figure out a system to change textures
+    - [x] Right click to remove blocks
     - [ ] Block snapping
     - [ ] Draw grid for block snapping
 - [ ] UI Debug Methods

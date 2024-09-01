@@ -101,29 +101,29 @@ void array_clear(void *data) {
 void *array_at(void *ptr, uint32_t index) {
     assert(ptr);
 
-    array_t *array = array_header(ptr);
-    if (index > array->len)
+    array_t *self = array_header(ptr);
+    if (index > self->len)
         return NULL;
 
-    return (void *)(ptr + (array->size * index));
+    return (void *)(ptr + (self->size * index));
 }
 
 size_t array_len(void *ptr) {
     assert(ptr);
 
-    array_t *array = array_header(ptr);
-    return array->len;
+    array_t *self = array_header(ptr);
+    return self->len;
 }
 
 void *array_slice(void *ptr, uint32_t start, uint32_t end) {
     assert(ptr);
 
-    array_t *array = array_header(ptr);
-    void *slice = array_alloc(array->size, array->capacity);
-    memcpy(slice, array_at(array, start), (end - start) * array->size);
+    array_t *self = array_header(ptr);
+    void *slice = array_alloc(self->size, self->capacity);
+    memcpy(slice, array_at(self, start), (end - start) * self->size);
 
-    array = array_header(slice);
-    array->len = (end - start);
+    self = array_header(slice);
+    self->len = (end - start);
 
     return slice;
 }
@@ -137,4 +137,20 @@ void array_copy(void *dst, void *src) {
 
     assert(a->capacity >= b->capacity);
     memcpy(&a->data, &b->data, b->size * b->len);
+}
+
+void array_insert(void *ptr, uint32_t index, const void *item) {
+    assert(ptr);
+
+    array_t *self = array_header(ptr);
+    assert(index < self->len);
+
+    void *src = array_at(ptr, index);
+    void *dst = (((void *)src) + self->size);
+    assert(self->len < self->capacity);
+
+    memcpy(dst, src, (self->len - index) * self->size);
+    memcpy(src, item, self->size);
+
+    self->len++;
 }

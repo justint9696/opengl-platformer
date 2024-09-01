@@ -2,7 +2,7 @@
  * @brief game.c
  * @author Justin Tonkinson
  * @date 2024/05/06
- * @brief Game implementation functions. 
+ * @brief Game implementation functions.
  */
 
 #include "game/game.h"
@@ -44,7 +44,6 @@ static void monitor_input(game_t *game) {
         log_debug("Game state set to: %d\n", game->state);
     }
 }
-
 
 static void poll_events(game_t *game) {
     SDL_Event ev;
