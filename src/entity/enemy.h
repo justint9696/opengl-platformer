@@ -15,9 +15,10 @@
 struct world_s;
 
 /**
- * @brief Creates an enemy and adds it to the world. 
+ * @brief Creates an enemy and adds it to the world.
  * @param pos starting position of enemy
  * @param dim dimensions of the enemy
+ * @param world a pointer to the game world
  * @returns a pointer to the enemy entity
  */
 entity_t *enemy_create(vec2s pos, vec2s dim, struct world_s *);

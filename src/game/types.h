@@ -19,7 +19,7 @@ struct cell_s;
 struct page_s;
 
 /** @brief Data structure for collision callbacks. */
-typedef struct {
+typedef struct collider_s {
     /** @brief The physical bounds of the collider. */
     union {
         box_t box;
@@ -36,7 +36,7 @@ typedef struct {
 } collider_t;
 
 /** @brief Represents a physical game body. */
-typedef struct {
+typedef struct body_s {
     /** @brief The physical bounds of the body. */
     union {
         box_t box;

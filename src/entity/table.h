@@ -16,8 +16,9 @@
 typedef void *(*create_fn_t)(vec2s, vec2s, world_t *);
 
 /**
- * @brief Returns the create function for an entity type. 
+ * @brief Returns the create function for an entity type.
  * @param type the type of entity
+ * @returns a pointer to the entity's create function
  */
 create_fn_t table_lookup(entity_type_t);
 

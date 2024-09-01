@@ -1,3 +1,10 @@
+/**
+ * @file player.c
+ * @author Justin Tonkinson
+ * @date 2024/08/15
+ * @brief Player implementation functions.
+ */
+
 #include "player.h"
 
 #include "entity/entity.h"
@@ -32,7 +39,7 @@ entity_t *player_init(vec2s pos, vec2s dim, world_t *world) {
         .init = init,
         .render = render,
         .body = {
-            .pos = pos, 
+            .pos = pos,
             .dim = dim,
             .solid = true,
             .mass = 3.f,
@@ -41,8 +48,8 @@ entity_t *player_init(vec2s pos, vec2s dim, world_t *world) {
             .dash_force = 50.f,
         },
         .type = ET_PLAYER,
-        .flags = EF_PLAYER_CONTROLLED 
-                 | EF_KINEMATIC 
+        .flags = EF_PLAYER_CONTROLLED
+                 | EF_KINEMATIC
                  | EF_GRAVITY
                  | EF_CAMERA_FOLLOW,
     }, sizeof(entity_t));

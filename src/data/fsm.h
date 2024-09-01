@@ -10,8 +10,6 @@
 
 #include <stddef.h>
 
-#include <stddef.h>
-
 /** @brief Represents a state of a finite state machine. */
 typedef struct state_s {
     /** @brief State identifier. */
@@ -43,7 +41,7 @@ typedef struct fsm_s {
 } fsm_t;
 
 /**
- * @brief Allocates memory for a fsm. 
+ * @brief Allocates memory for a fsm.
  * @param self a pointer to a fsm
  * @param capacity the total number of states
  */
@@ -58,7 +56,7 @@ void fsm_destroy(fsm_t *self);
 /**
  * @brief Adds a state to a fsm.
  * @param self a pointer to a fsm
- * @param data the data that will be copied into the state
+ * @param data the data to be copied into the state
  */
 void fsm_add(fsm_t *self, const void *data);
 
@@ -95,7 +93,7 @@ void fsm_add(fsm_t *self, const void *data);
 })
 
 /**
- * @brief Transitions a fsm from one state to another. 
+ * @brief Transitions a fsm from one state to another.
  *
  * Usage: @code fsm_transition(&fsm, void(*)(int, char), 5, 'A'); @endcode
  */

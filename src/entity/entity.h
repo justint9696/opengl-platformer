@@ -15,7 +15,7 @@
 struct world_s;
 
 /** @brief Flags that determine an entity's behavior. */
-typedef enum {
+typedef enum entity_flag_e {
     /** @brief The entity will respond to player input. */
     EF_PLAYER_CONTROLLED = 1 << 0,
 
@@ -36,7 +36,7 @@ typedef enum {
 } entity_flag_t;
 
 /** @brief Every type of entity. */
-typedef enum {
+typedef enum entity_type_e {
     ET_PLAYER,
     ET_ENEMY,
     ET_PLATFORM,
@@ -78,7 +78,7 @@ typedef struct entity_s {
 
 /**
  * @brief Creantes an entity and adds it to the world.
- * @param data the data that will be copied into the entity
+ * @param data the data to be copied into the entity
  * @param world a pointer to the game world
  * @returns a pointer to the entity
  */
