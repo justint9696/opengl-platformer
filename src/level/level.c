@@ -4,8 +4,6 @@
  * @date 2024/06/10
  * @brief Level implementation functions.
  * @bug Moving to the left or right-most page crashes the program.
- * @bug Entities that were added to the base level from exported level file are
- * spawning in the wrong page.
  * @bug Entities are being spawn into the "wrong page" because of how the level
  * is being exported. Look into the primary page upon export (which depends on
  * the player's location at the time of export).
@@ -93,17 +91,11 @@ void level_import(world_t *world, const char *fpath) {
     // FIXME: calculate the actual position based on the chunk index
     world->chunk.pos = glms_vec2_fill(-CHUNK_SIZE);
 
-    ldata_t data;
-    fread(&data, sizeof(ldata_t), 1, fp);
-    fwrite(&data, sizeof(ldata_t), 1, level.fp);
+    ldata_t player;
+    fread(&player, sizeof(ldata_t), 1, fp);
+    fwrite(&player, sizeof(ldata_t), 1, level.fp);
 
-    world->player = player_init(data.pos, data.dim, world);
-    /* world->chunk.index = */
-
-    struct {
-        size_t n;
-        ldata_t arr[CHUNK_MAX];
-    } entities;
+    world->player = player_init(player.pos, player.dim, world);
 
     int size = (world->chunk.dim.x * world->chunk.dim.y);
     level.offsets = array_alloc(sizeof(uint64_t), size);
@@ -114,18 +106,20 @@ void level_import(world_t *world, const char *fpath) {
     // top left page of starting chunk
     int target = glm_max(0, world->chunk.index - world->chunk.dim.x - 1);
 
+    size_t len;
+    ldata_t data[CHUNK_MAX];
     for (int i = 0; i < size; i++) {
         // offset within level file
         uint64_t offset = ftell(level.fp);
         array_push(level.offsets, &offset);
 
         // read data from level file
-        fread(&entities.n, sizeof(size_t), 1, fp);
-        fread(&entities.arr, sizeof(ldata_t), entities.n, fp);
+        fread(&len, sizeof(size_t), 1, fp);
+        fread(&data, sizeof(ldata_t), len, fp);
 
         // write data to temporary file with padding
-        fwrite(&entities.n, sizeof(size_t), 1, level.fp);
-        fwrite(&entities.arr, sizeof(ldata_t), CHUNK_MAX, level.fp);
+        fwrite(&len, sizeof(size_t), 1, level.fp);
+        fwrite(&data, sizeof(ldata_t), CHUNK_MAX, level.fp);
 
         // have all the pages been loaded or is the page not part of the chunk
         if ((index >= 9) || ((target - i) > 0))
@@ -140,7 +134,7 @@ void level_import(world_t *world, const char *fpath) {
         // load pages into memory
         page_t *page = &world->chunk.pages[index++];
         page_calculate_aabb(page, world);
-        page_load_data(page, world, entities.arr, entities.n);
+        page_load_data(page, world, data, len);
     }
 
     fclose(fp);
@@ -156,31 +150,52 @@ void level_export(world_t *world, const char *fpath) {
     fwrite(&world->chunk.index, sizeof(int), 1, fp);
     fwrite(&world->chunk.dim, sizeof(ivec2s), 1, fp);
 
-    fwrite(&(ldata_t) {
+    fwrite(
+        &(ldata_t) {
             .type = world->player->type,
             .box = world->player->body.box,
         },
         sizeof(ldata_t), 1, fp);
 
-    struct {
-        size_t n;
-        ldata_t arr[CHUNK_MAX];
-    } entities;
+    size_t len;
+    ldata_t data[CHUNK_MAX];
 
-    size_t len = array_len(level.offsets);
-    for (size_t i = 0; i < len; i++) {
-        memset(&entities.arr, 0, sizeof(ldata_t) * CHUNK_MAX);
+    for (int i = 0; i < 9; i++) {
+        page_t *page = &world->chunk.pages[i];
+        len = array_len(page->entities);
+        for (size_t n = 0; n < len; n++) {
+            entity_t *entity = &page->entities[n];
+            data[n] = (ldata_t) {
+                .type = entity->type,
+                .box = entity->body.box,
+            };
+        }
+
+        // set file pointer to offset within file
+        int index = chunk_index_from_pos(&world->chunk, page->pos);
+        uint64_t offset = level.offsets[index];
+        fseek(level.fp, offset, SEEK_SET);
+
+        // write primary pages to temp file
+        fwrite(&len, sizeof(size_t), 1, level.fp);
+        fwrite(&data, sizeof(ldata_t), CHUNK_MAX, level.fp);
+    }
+
+    size_t n = array_len(level.offsets);
+    for (size_t i = 0; i < n; i++) {
+        memset(&data, 0, sizeof(ldata_t) * CHUNK_MAX);
+
         // set file pointer to offset within file
         uint64_t offset = level.offsets[i];
         fseek(level.fp, offset, SEEK_SET);
 
         // read data at temp file offset
-        fread(&entities.n, sizeof(size_t), 1, level.fp);
-        fread(&entities.arr, sizeof(ldata_t), entities.n, level.fp);
+        fread(&len, sizeof(size_t), 1, level.fp);
+        fread(&data, sizeof(ldata_t), len, level.fp);
 
         // write data to export file without padding
-        fwrite(&entities.n, sizeof(size_t), 1, fp);
-        fwrite(&entities.arr, sizeof(ldata_t), entities.n, fp);
+        fwrite(&len, sizeof(size_t), 1, fp);
+        fwrite(&data, sizeof(ldata_t), len, fp);
     }
 
     fclose(fp);
@@ -201,6 +216,7 @@ static void pages_shift(world_t *world, uint32_t indices[], int it) {
         /* log_debug("Releasing %ld entities from page %d\n", len, page->index);
          */
         for (size_t n = 0; n < len; n++) {
+            // index 0 because as entities are destroyed, their indices offset
             entity_t *entity = &page->entities[0];
             data[n] = (ldata_t) {
                 .type = entity->type,
@@ -237,10 +253,8 @@ static void pages_shift(world_t *world, uint32_t indices[], int it) {
 
 /** @brief Replaces the provided page indicies around the iterator. */
 static void pages_replace(world_t *world, uint32_t indices[], int it) {
-    struct {
-        size_t n;
-        ldata_t arr[CHUNK_MAX];
-    } entities;
+    size_t len;
+    ldata_t data[CHUNK_MAX];
 
     // iterate through all the indices
     for (int i = 0; i < 3; i++) {
@@ -259,13 +273,13 @@ static void pages_replace(world_t *world, uint32_t indices[], int it) {
         uint64_t offset = level.offsets[index];
         fseek(level.fp, offset, SEEK_SET);
 
-        fread(&entities.n, sizeof(size_t), 1, level.fp);
-        fread(&entities.arr, sizeof(ldata_t), entities.n, level.fp);
+        fread(&len, sizeof(size_t), 1, level.fp);
+        fread(&data, sizeof(ldata_t), len, level.fp);
 
-        /* log_debug("Loading %ld entities into page %d\n", entities.n, */
+        /* log_debug("Loading %ld entities into page %d\n", len, */
         /*           page->index); */
 
-        page_load_data(page, world, entities.arr, entities.n);
+        page_load_data(page, world, data, len);
     }
 }
 

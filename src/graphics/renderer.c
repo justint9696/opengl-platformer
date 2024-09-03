@@ -26,18 +26,18 @@ void renderer_init() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // load shaders
-    renderer.shaders[SHADER_DEFAULT] 
+    renderer.shaders[SHADER_DEFAULT]
         = shader_create("shaders/default.vs", "shaders/default.fs");
-    renderer.shaders[SHADER_UI_TEXT] 
+    renderer.shaders[SHADER_UI_TEXT]
         = shader_create("shaders/text2d.vs", "shaders/text2d.fs");
-    renderer.shaders[SHADER_UI_TEXTURE] 
+    renderer.shaders[SHADER_UI_TEXTURE]
         = shader_create("shaders/texture2d.vs", "shaders/texture2d.fs");
 
     // load textures
     /* renderer.texture = texture_create("assets/images/white.png"); */
 
     // load text
-    font_init("assets/fonts/helvetica.ttf"); 
+    font_init("assets/fonts/helvetica.ttf");
 }
 
 void renderer_destroy() {
@@ -85,7 +85,7 @@ void draw_quad(vec2s pos, vec2s dim, uint32_t color) {
     };
 
     mat4s model = GLMS_MAT4_IDENTITY_INIT;
-    model = glms_translate(model, 
+    model = glms_translate(model,
                 glms_vec3_add(
                     renderer.camera->pos, (vec3s) { pos.x, pos.y, 0.f }));
 
@@ -97,7 +97,7 @@ void draw_quad(vec2s pos, vec2s dim, uint32_t color) {
     vbo_buffer_data(vertices, sizeof(vertices));
 
     shader_uniform_mat4f(*renderer.shader, "model", model);
-    shader_uniform_mat4f(*renderer.shader, "projection", 
+    shader_uniform_mat4f(*renderer.shader, "projection",
                          renderer.camera->projection);
     shader_uniform_mat4f(*renderer.shader, "view", renderer.camera->view);
 
@@ -109,18 +109,18 @@ void draw_quad(vec2s pos, vec2s dim, uint32_t color) {
 void draw_line(vec2s start, vec2s end, uint32_t color) {
     float x = (end.x - start.x), y = (end.y - start.y);
     float vertices[] = {
-        0.f, 0.f, 0.f, 
+        0.f, 0.f, 0.f,
           x,   y, 0.f,
     };
 
     mat4s model = GLMS_MAT4_IDENTITY_INIT;
-    model = glms_translate(model, 
+    model = glms_translate(model,
                 glms_vec3_add(
                     renderer.camera->pos, (vec3s) { start.x, start.y, 0.f }));
 
     vbo_buffer_data(vertices, sizeof(vertices));
     shader_uniform_mat4f(*renderer.shader, "model", model);
-    shader_uniform_mat4f(*renderer.shader, "projection", 
+    shader_uniform_mat4f(*renderer.shader, "projection",
                          renderer.camera->projection);
     shader_uniform_mat4f(*renderer.shader, "view", renderer.camera->view);
 
@@ -142,7 +142,7 @@ void draw_quad_line(vec2s pos, vec2s size, uint32_t color) {
     }
 }
 
-void draw_text(vec2s pos, float scale, uint32_t color, 
+void draw_text(vec2s pos, float scale, uint32_t color,
                const char *format, ...) {
     va_list arg;
     char text[64];

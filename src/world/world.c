@@ -36,7 +36,7 @@ void world_destroy(world_t *self) {
 
     vao_destroy(&self->vao);
     vbo_destroy(&self->vbo);
-    ibo_destroy(&self->ibo);
+    ibo_destroy(&self->vbo);
 }
 
 void world_update(world_t *self, float dt) {
@@ -58,20 +58,21 @@ void world_render(world_t *self) {
     vao_bind(&self->vao);
     vbo_bind(&self->vbo);
     ibo_bind(&self->ibo);
+    {
+        player_render(self->player, self);
 
-    player_render(self->player, self);
-
-    for (int i = 0; i < 9; i++) {
-        page_t *page = &self->chunk.pages[i];
-        size_t len = array_len(page->entities);
-        for (size_t j = 0; j < len; j++) {
-            entity_t *entity = &page->entities[j];
-            entity_render(entity, self);
+        for (int i = 0; i < 9; i++) {
+            page_t *page = &self->chunk.pages[i];
+            /* page_t *page = &self->chunk.pages[4]; */
+            size_t len = array_len(page->entities);
+            for (size_t j = 0; j < len; j++) {
+                entity_t *entity = &page->entities[j];
+                entity_render(entity, self);
+            }
         }
+
+        chunk_render(&self->chunk);
     }
-
-    chunk_render(&self->chunk);
-
     vao_unbind();
     vbo_unbind();
     ibo_unbind();

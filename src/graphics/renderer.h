@@ -7,7 +7,7 @@
 
 #include <glad/glad.h>
 
-typedef enum {
+typedef enum shader_type_e {
     SHADER_DEFAULT,
     SHADER_UI_TEXT,
     SHADER_UI_TEXTURE,

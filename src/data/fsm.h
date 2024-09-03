@@ -61,12 +61,8 @@ void fsm_destroy(fsm_t *self);
 void fsm_add(fsm_t *self, const void *data);
 
 /** @brief Internal macro to check if a state field exists and call it if so. */
-#define _fsm_field(_state, _field, _T, _args, ...) ({  \
-    __typeof__(_state) __state = (_state);             \
-    if (__state->_field) {                             \
-        ((_T)(__state->_field))(_args, ##__VA_ARGS__); \
-    }                                                  \
-})
+#define _fsm_field(_state, _field, _T, _args, ...)\
+    if ((_state)->_field) ((_T)((_state)->_field))(_args, ##__VA_ARGS__)
 
 /**
  * @brief Updates the current state of a fsm if its on update function pointer

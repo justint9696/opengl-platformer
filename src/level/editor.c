@@ -27,7 +27,7 @@ static const uint32_t COLOR_BLUE_FADE = 0x0078D780;
 /** @brief Level editor function types for the state manager. */
 typedef void (*editor_fn_t)(editor_t *, world_t *);
 
-static vec2s mouse_to_world(world_t *world) {
+static inline vec2s mouse_to_world(world_t *world) {
     return screen_to_world(world, mouse_position());
 }
 
@@ -109,8 +109,6 @@ static void place_render(editor_t *self, world_t *world) {
 }
 
 static void edit_update(editor_t *self, world_t *world) {
-    // if left mouse is pressed && there is an entity under the mouse,
-    // transition to move state
     bool left = mouse_pressed(SDL_BUTTON_LEFT);
     bool right = mouse_pressed(SDL_BUTTON_RIGHT);
 
@@ -124,8 +122,8 @@ static void edit_update(editor_t *self, world_t *world) {
         return;
     }
 
-    // if right mouse pressed && there is an entity under the mouse,
-    // delete the selected entities and transitoin to idle state
+    // if left mouse is pressed && there is an entity under the mouse,
+    // transition to move state
     if (left) {
         // calculate the offset from the entity pos to the mouse
         self->offset = glms_vec2_sub(mouse, self->entity->body.pos);
@@ -134,6 +132,8 @@ static void edit_update(editor_t *self, world_t *world) {
         return;
     }
 
+    // if right mouse pressed && there is an entity under the mouse,
+    // delete the selected entities and transitoin to idle state
     if (right) {
         entity_destroy(self->entity, world);
         self->entity = NULL;
@@ -159,15 +159,15 @@ static void move_update(editor_t *self, world_t *world) {
 }
 
 static void idle_update(editor_t *self, world_t *world) {
-    // if left mouse is pressed, transition to camera state
-    if (mouse_held(SDL_BUTTON_LEFT, 0)) {
-        fsm_transition(&self->fsm, ES_CAMERA, editor_fn_t, self, world);
-        return;
-    }
-
     // if shift is pressed, transition to highlight state
     if (button_held(SDL_SCANCODE_LSHIFT, 0) && mouse_pressed(SDL_BUTTON_LEFT)) {
         fsm_transition(&self->fsm, ES_HIGHLIGHT, editor_fn_t, self, world);
+        return;
+    }
+
+    // if left mouse is pressed, transition to camera state
+    if (mouse_held(SDL_BUTTON_LEFT, 0)) {
+        fsm_transition(&self->fsm, ES_CAMERA, editor_fn_t, self, world);
         return;
     }
 
@@ -256,23 +256,17 @@ void editor_init(editor_t *self) {
         .render = render, .update = move_update,
     });
     fsm_add(&self->fsm, &(state_t) {
-        .update = place_update,
-        .render = place_render,
+        .update = place_update, .render = place_render,
     });
     fsm_add(&self->fsm, &(state_t) {
-        .update = select_update,
-        .render = render,
+        .update = select_update, .render = render,
     });
     fsm_add(&self->fsm, &(state_t) {
-        .init = highlight_enter,
-        .destroy = highlight_exit,
-        .render = highlight_render,
-        .update = highlight_update,
+        .init = highlight_enter, .destroy = highlight_exit,
+        .render = highlight_render, .update = highlight_update,
     });
     fsm_add(&self->fsm, &(state_t) {
-        .init = camera_enter,
-        .update = camera_update,
-        .render = render,
+        .init = camera_enter, .update = camera_update, .render = render,
     });
 
     self->vao = vao_create();
@@ -324,9 +318,9 @@ void editor_render(editor_t *self, world_t *world) {
     vao_bind(&self->vao);
     vbo_bind(&self->vbo);
     ibo_bind(&self->ibo);
-
-    fsm_render(&self->fsm, editor_fn_t, self, world);
-
+    {
+        fsm_render(&self->fsm, editor_fn_t, self, world);
+    }
     vao_unbind();
     vbo_unbind();
     ibo_unbind();
