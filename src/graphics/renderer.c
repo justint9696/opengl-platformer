@@ -118,7 +118,11 @@ void draw_line(vec2s start, vec2s end, uint32_t color) {
                 glms_vec3_add(
                     renderer.camera->pos, (vec3s) { start.x, start.y, 0.f }));
 
+    vao_attrib(0, 3, GL_FLOAT, 3 * sizeof(float), NULL);
+
+    ibo_buffer_data(NULL, 0);
     vbo_buffer_data(vertices, sizeof(vertices));
+
     shader_uniform_mat4f(*renderer.shader, "model", model);
     shader_uniform_mat4f(*renderer.shader, "projection",
                          renderer.camera->projection);

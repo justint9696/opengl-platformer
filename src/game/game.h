@@ -25,7 +25,7 @@ typedef enum game_state_e {
 } game_state_t;
 
 /** @brief Game data structure. */
-typedef struct {
+typedef struct game_s {
     /** @brief Boolean wireframe variable. */
     bool wireframe;
 

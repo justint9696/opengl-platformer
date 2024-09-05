@@ -10,11 +10,11 @@
     - [x] Export data from temp file into a level file
     - [x] Check if mouse is hovering an entity
     - [x] Manipulate the hovered entity with the mouse
-    - [ ] Figure out a system to place blocks
+    - [x] Figure out a system to place blocks
     - [ ] Figure out a system to change textures
     - [x] Right click to remove blocks
-    - [ ] Block snapping
-    - [ ] Draw grid for block snapping
+    - [x] Block snapping
+    - [x] Draw grid for block snapping
 - [ ] UI Debug Methods
     - [ ] Be able to draw a transparent quad anywhere on the screen
     - [ ] Cleanup the ui file and make it more presentable

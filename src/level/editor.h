@@ -28,7 +28,10 @@ typedef enum editor_state_e {
 } editor_state_t;
 
 /** @brief Level editor data structure. */
-typedef struct {
+typedef struct editor_s {
+    /** @brief Boolean variable that enables grid snapping when placing. */
+    bool snap;
+
     /** @brief Editor state manager. */
     fsm_t fsm;
 
@@ -36,7 +39,7 @@ typedef struct {
     vec2s offset;
 
     /** @brief The currently selected entity. */
-    entity_t *entity;
+    entity_t(*entity);
 
     union {
         /** @brief The bounding box of the selection rectangle. */

@@ -15,6 +15,7 @@
 #include "graphics/renderer.h"
 #include "graphics/vao.h"
 #include "graphics/vbo.h"
+#include "graphics/window.h"
 #include "level/level.h"
 
 #include <assert.h>
@@ -153,9 +154,17 @@ static void move_update(editor_t *self, world_t *world) {
 
     assert(self->entity);
 
-    // move all the selected entities
     vec2s mouse = mouse_to_world(world);
-    self->entity->body.pos = glms_vec2_sub(mouse, self->offset);
+    if (self->snap) {
+        vec2s offset = (vec2s) {
+            .x = fmodf(mouse.x, 50.f),
+            .y = fmodf(mouse.y, 50.f),
+        };
+        self->entity->body.pos 
+            = glms_vec2_sub(mouse, offset);
+    } else {
+        self->entity->body.pos = glms_vec2_sub(mouse, self->offset);
+    }
 }
 
 static void idle_update(editor_t *self, world_t *world) {
@@ -241,13 +250,14 @@ static void highlight_render(editor_t *self, world_t *world) {
 
 static void render(editor_t *self, world_t *world) {
     if (self->entity) {
-        draw_quad(self->entity->body.pos, self->entity->body.dim,
-                  COLOR_RED_FADE);
+        draw_quad_line(self->entity->body.pos, self->entity->body.dim,
+                       COLOR_RED);
     }
 }
 
 void editor_init(editor_t *self) {
     memset(self, 0, sizeof(editor_t));
+
     fsm_init(&self->fsm, ES_MAX, ES_IDLE);
     fsm_add(&self->fsm, &(state_t) { .update = idle_update, .render = render });
     fsm_add(&self->fsm, &(state_t) { .update = edit_update, .render = render });
@@ -283,6 +293,12 @@ void editor_destroy(editor_t *self) {
 }
 
 void editor_sync(editor_t *self, world_t *world) {
+    if (button_pressed(SDL_SCANCODE_LSHIFT)) {
+        self->snap = true;
+    } else if (button_released(SDL_SCANCODE_LSHIFT)) {
+        self->snap = false;
+    }
+
     if (button_held(SDL_SCANCODE_RCTRL, 0)
         && button_held(SDL_SCANCODE_LSHIFT, 0)
         && button_pressed(SDL_SCANCODE_E)) {
@@ -310,8 +326,29 @@ static char *state_to_string(editor_t *self) {
     }
 }
 
+static void grid_render(editor_t *self, world_t *world) {
+    int offset;
+    vec2s pos = screen_to_world(world, GLMS_IVEC2_ZERO);
+
+    offset = fmodf(pos.x, 50.f);
+    for (int x = 0; x < SCREEN_WIDTH + offset; x += 50) {
+        vec2s a = screen_to_world(world, (ivec2s) { x - offset, 0 });
+        vec2s b 
+            = screen_to_world(world, (ivec2s) { x - offset, SCREEN_HEIGHT });
+        draw_line(a, b, COLOR_WHITE);
+    }
+
+    offset = fmodf(pos.y, 50.f);
+    for (int y = 0; y < SCREEN_HEIGHT + offset; y += 50) {
+        vec2s a = screen_to_world(world, (ivec2s) { 0, y + offset });
+        vec2s b = screen_to_world(world, (ivec2s) { SCREEN_WIDTH, y + offset });
+        draw_line(a, b, COLOR_WHITE);
+    }
+}
+
 void editor_render(editor_t *self, world_t *world) {
     draw_debug_text("Editor State: %s", state_to_string(self));
+    draw_debug_text("Snap: %s", (self->snap) ? "true" : "false");
 
     renderer_use_shader(SHADER_DEFAULT);
 
@@ -319,6 +356,7 @@ void editor_render(editor_t *self, world_t *world) {
     vbo_bind(&self->vbo);
     ibo_bind(&self->ibo);
     {
+        grid_render(self, world);
         fsm_render(&self->fsm, editor_fn_t, self, world);
     }
     vao_unbind();
