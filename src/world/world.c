@@ -1,3 +1,10 @@
+/**
+ * @brief world.c
+ * @author Justin Tonkinson
+ * @date 2024/07/04
+ * @brief World implementation functions.
+ */
+
 #include "world/world.h"
 
 #include "data/array.h"

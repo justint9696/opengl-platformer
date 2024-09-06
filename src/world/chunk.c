@@ -1,3 +1,10 @@
+/**
+ * @brief chunk.c
+ * @author Justin Tonkinson
+ * @date 2024/07/04
+ * @brief Chunk implementation functions.
+ */
+
 #include "world/chunk.h"
 
 #include "data/array.h"
@@ -8,6 +15,7 @@
 #include <cglm/struct.h>
 #include <string.h>
 
+/** @brief Internal free list that manages the memory of the current pages. */
 static flist_t entities;
 
 void chunk_init(chunk_t *self) {
