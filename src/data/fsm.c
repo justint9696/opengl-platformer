@@ -11,10 +11,17 @@
 
 #include <assert.h>
 
-void fsm_init(fsm_t *self, size_t capacity, int start) {
+void fsm_init(fsm_t *self, size_t capacity, int start, const state_t table[]) {
     self->current = start;
     self->previous = start;
     self->arr = array_alloc(sizeof(state_t), capacity);
+
+    if (table == NULL)
+        return;
+
+    for (size_t i = 0; i < capacity; i++) {
+        fsm_add(self, &table[i]);
+    }
 }
 
 void fsm_destroy(fsm_t *self) {

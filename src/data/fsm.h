@@ -42,10 +42,13 @@ typedef struct fsm_s {
 
 /**
  * @brief Allocates memory for a fsm.
+ * @note The @a table param can be NULL. If this is the case, the state table
+ * will need to be built manually; @see fsm_add
  * @param self a pointer to a fsm
  * @param capacity the total number of states
+ * @param table optional state table the fsm will reference for states
  */
-void fsm_init(fsm_t *self, size_t capacity, int start);
+void fsm_init(fsm_t *self, size_t capacity, int start, const state_t table[]);
 
 /**
  * @brief Releases the memory allocated for a fsm.

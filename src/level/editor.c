@@ -7,23 +7,21 @@
 
 #include "level/editor.h"
 
-#include "data/fsm.h"
 #include "entity/table.h"
 #include "game/input.h"
 #include "graphics/drawing.h"
-#include "graphics/ibo.h"
 #include "graphics/renderer.h"
-#include "graphics/vao.h"
-#include "graphics/vbo.h"
 #include "graphics/window.h"
 #include "level/level.h"
 
 #include <assert.h>
 #include <cglm/struct.h>
-#include <string.h>
 
 static const uint32_t COLOR_RED_FADE = 0xFF000080;
 static const uint32_t COLOR_BLUE_FADE = 0x0078D780;
+
+/** @brief Level editor state transition table. */
+static const state_t STATE_TABLE[ES_MAX];
 
 /** @brief Level editor function types for the state manager. */
 typedef void (*editor_fn_t)(editor_t *, world_t *);
@@ -104,9 +102,18 @@ static void place_update(editor_t *self, world_t *world) {
 
 static void place_render(editor_t *self, world_t *world) {
     vec2s dim = (vec2s) { 50.f, 50.f };
-    vec2s mouse
-        = glms_vec2_sub(mouse_to_world(world), glms_vec2_scale(dim, 0.5f));
-    draw_quad(mouse, dim, COLOR_RED_FADE);
+    vec2s mouse = mouse_to_world(world);
+    vec2s offset = GLMS_VEC2_ZERO;
+    if (self->snap) {
+        offset = (vec2s) {
+            .x = fmodf(mouse.x, 50.f),
+            .y = fmodf(mouse.y, 50.f),
+        };
+    } else {
+        offset = glms_vec2_scale(dim, 0.5f);
+    }
+
+    draw_quad(glms_vec2_sub(mouse, offset), dim, COLOR_RED_FADE);
 }
 
 static void edit_update(editor_t *self, world_t *world) {
@@ -160,7 +167,7 @@ static void move_update(editor_t *self, world_t *world) {
             .x = fmodf(mouse.x, 50.f),
             .y = fmodf(mouse.y, 50.f),
         };
-        self->entity->body.pos 
+        self->entity->body.pos
             = glms_vec2_sub(mouse, offset);
     } else {
         self->entity->body.pos = glms_vec2_sub(mouse, self->offset);
@@ -257,27 +264,7 @@ static void render(editor_t *self, world_t *world) {
 
 void editor_init(editor_t *self) {
     memset(self, 0, sizeof(editor_t));
-
-    fsm_init(&self->fsm, ES_MAX, ES_IDLE);
-    fsm_add(&self->fsm, &(state_t) { .update = idle_update, .render = render });
-    fsm_add(&self->fsm, &(state_t) { .update = edit_update, .render = render });
-    fsm_add(&self->fsm, &(state_t) {
-        .init = move_enter, .destroy = move_exit,
-        .render = render, .update = move_update,
-    });
-    fsm_add(&self->fsm, &(state_t) {
-        .update = place_update, .render = place_render,
-    });
-    fsm_add(&self->fsm, &(state_t) {
-        .update = select_update, .render = render,
-    });
-    fsm_add(&self->fsm, &(state_t) {
-        .init = highlight_enter, .destroy = highlight_exit,
-        .render = highlight_render, .update = highlight_update,
-    });
-    fsm_add(&self->fsm, &(state_t) {
-        .init = camera_enter, .update = camera_update, .render = render,
-    });
+    fsm_init(&self->fsm, ES_MAX, ES_IDLE, STATE_TABLE);
 
     self->vao = vao_create();
     self->vbo = vbo_create(NULL, 0);
@@ -333,7 +320,7 @@ static void grid_render(editor_t *self, world_t *world) {
     offset = fmodf(pos.x, 50.f);
     for (int x = 0; x < SCREEN_WIDTH + offset; x += 50) {
         vec2s a = screen_to_world(world, (ivec2s) { x - offset, 0 });
-        vec2s b 
+        vec2s b
             = screen_to_world(world, (ivec2s) { x - offset, SCREEN_HEIGHT });
         draw_line(a, b, COLOR_WHITE);
     }
@@ -363,3 +350,13 @@ void editor_render(editor_t *self, world_t *world) {
     vbo_unbind();
     ibo_unbind();
 }
+
+static const state_t STATE_TABLE[ES_MAX] = {
+    [ES_IDLE] = { .init = NULL, .destroy = NULL, .update = idle_update, .render = render, },
+    [ES_EDIT] = { .init = NULL, .destroy = NULL, .update = edit_update, .render = render, },
+    [ES_MOVE] = { .init = move_enter, . destroy = move_exit, .update = move_update, .render = render, },
+    [ES_PLACE] = { .init = NULL, .destroy = NULL, .update = place_update, .render = place_render, },
+    [ES_SELECT] = { .init = NULL, .destroy = NULL, .update = select_update, .render = render, },
+    [ES_HIGHLIGHT] = { .init = highlight_enter, .destroy = highlight_exit, .update = highlight_update, .render = highlight_render, },
+    [ES_CAMERA] = { .init = camera_enter, .destroy = NULL, .update = camera_update, .render = render, },
+};

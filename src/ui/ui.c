@@ -1,11 +1,8 @@
 #include "ui/ui.h"
 
-#include "graphics/color.h"
+#include "graphics/drawing.h"
 #include "graphics/font.h"
 #include "graphics/renderer.h"
-#include "graphics/vao.h"
-#include "graphics/vbo.h"
-#include "graphics/ibo.h"
 
 #include <cglm/struct.h>
 #include <string.h>
@@ -169,7 +166,7 @@ void ui_draw_text(vec2s pos, float scale, uint32_t color, const char *text) {
 void ui_draw_quad(vec2s pos, vec2s dim, uint32_t color) {
     queue_push(&ui.texture.items, &(ui_texture_t) {
         .pos = pos,
-        .dim = dim, 
+        .dim = dim,
         .color = color,
     });
 }

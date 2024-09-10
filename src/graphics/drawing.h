@@ -2,6 +2,9 @@
 #define _GRAPHICS_DRAWING_H_
 
 #include "graphics/color.h"
+#include "graphics/ibo.h"
+#include "graphics/vao.h"
+#include "graphics/vbo.h"
 
 #include <cglm/types-struct.h>
 #include <stdint.h>

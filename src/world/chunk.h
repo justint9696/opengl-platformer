@@ -34,7 +34,8 @@ typedef struct page_s {
     entity_t *entities;
 } page_t;
 
-typedef struct {
+/** @brief Represents a chunk of memory within a region of the game world. */
+typedef struct chunk_s {
     /** @brief The index of the center chunk. */
     int32_t index;
 

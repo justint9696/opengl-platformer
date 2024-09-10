@@ -90,6 +90,7 @@ static void sync(game_t *self) {
     while (time_sync(&self->time)) {
         buttons_update();
         monitor_input(self);
+        level_sync(&self->world, self->time.delta_fixed);
 
         switch (self->state) {
             case GS_EDIT:

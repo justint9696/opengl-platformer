@@ -9,10 +9,8 @@
 
 #include "data/array.h"
 
-#include "graphics/ibo.h"
+#include "graphics/drawing.h"
 #include "graphics/renderer.h"
-#include "graphics/vao.h"
-#include "graphics/vbo.h"
 #include "graphics/window.h"
 
 #include "player.h"
@@ -114,14 +112,15 @@ vec2s screen_to_world(const world_t *self, ivec2s pos) {
     vec4s clip = (vec4s) {
         .x = (2.f * pos.x / SCREEN_WIDTH - 1),
         .y = (-2.f * pos.y / SCREEN_HEIGHT + 1),
-        .z = 0.f, .w = 1.f,
+        .z = 0.f,
+        .w = 1.f,
     };
 
     mat4s view = glms_mat4_inv(
         glms_mat4_mul(self->camera.projection, self->camera.view));
 
-    vec4s camera = ((vec4s) {
-        self->camera.pos.x, self->camera.pos.y, self->camera.pos.z, 1.f });
+    vec4s camera = ((vec4s) { self->camera.pos.x, self->camera.pos.y,
+                              self->camera.pos.z, 1.f });
 
     vec4s world = glms_vec4_sub(glms_mat4_mulv(view, clip), camera);
 
@@ -138,7 +137,8 @@ size_t world_get_colliders(world_t *self, entity_t *entity, collider_t arr[],
                            size_t len) {
     cell_t *cell = grid_cell_from_pos(&self->grid,
                                       world_to_screen(self, entity->body.pos));
-    assert(cell);
+    if (!cell)
+        return 0;
 
     size_t n = 0;
     ivec2s pos = cell->pos, dim = self->grid.dim;

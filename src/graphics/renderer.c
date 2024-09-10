@@ -2,9 +2,6 @@
 
 #include "graphics/drawing.h"
 #include "graphics/font.h"
-#include "graphics/ibo.h"
-#include "graphics/vao.h"
-#include "graphics/vbo.h"
 #include "graphics/window.h"
 #include "ui/ui.h"
 

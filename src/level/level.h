@@ -49,7 +49,7 @@ typedef struct level_s {
  * padding to support adding or removing additional entities in pages.
  *
  * @param world a pointer to the game world
- * @param fpath relative file path to a level file
+ * @param fpath relative path to a level file
  */
 void level_import(world_t *, const char *fpath);
 
@@ -78,5 +78,12 @@ void level_shutdown(world_t *);
  * @param page a pointer to a page within the chunk
  */
 void level_swap_pages(world_t *, page_t *);
+
+/**
+ * @brief Synchronizes the level with the tick rate.
+ * @param world a pointer to the game world
+ * @param float dt
+ */
+void level_sync(world_t *, float dt);
 
 #endif // ifndef _LEVEL_LEVEL_H_

@@ -3,10 +3,14 @@
  * @author Justin Tonkinson
  * @date 2024/06/10
  * @brief Level implementation functions.
- * @bug Moving to the left or right-most page crashes the program.
  * @bug Entities are being spawn into the "wrong page" because of how the level
  * is being exported. Look into the primary page upon export (which depends on
  * the player's location at the time of export).
+ * @bug Since the pages are now being swapped around the camera's position and
+ * the player exists independently from the world, the game is crashing because
+ * it is trying to modify the grid while the player is off screen.
+ * @bug After extending the level bounds, exporting the level occasionally
+ * crashes the game.
  */
 
 #include "level/level.h"
@@ -15,7 +19,6 @@
 #include "entity/table.h"
 #include "player.h"
 #include "util/assert.h"
-#include "world/chunk.h"
 
 #include <assert.h>
 #include <cglm/struct.h>
@@ -24,7 +27,21 @@
 #include <stdio.h>
 #include <string.h>
 
+/** @brief Internal level state. */
 static level_t level;
+
+/** @brief The position of the page with respects to the center. */
+enum {
+    TOP_LEFT,
+    TOP_MIDDLE,
+    TOP_RIGHT,
+    LEFT,
+    CENTER,
+    RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_MIDDLE,
+    BOTTOM_RIGHT,
+};
 
 /**
  * @brief Creates the page bounds based on the chunk position and page index.
@@ -49,6 +66,8 @@ static void page_load_data(page_t *page, world_t *world, ldata_t arr[],
         ldata_t *data = &arr[i];
 
         page_t *tmp = chunk_page_from_pos(&world->chunk, data->pos);
+        assert(tmp);
+
         if (tmp->index != page->index) {
             n++;
             log_debug("Entity at (%.2f, %.2f) was loaded into the wrong page; "
@@ -98,7 +117,7 @@ void level_import(world_t *world, const char *fpath) {
     world->player = player_init(player.pos, player.dim, world);
 
     int size = (world->chunk.dim.x * world->chunk.dim.y);
-    level.offsets = array_alloc(sizeof(uint64_t), size);
+    level.offsets = array_alloc(sizeof(uint64_t), 128);
 
     // current page index
     int index = 0;
@@ -268,8 +287,7 @@ static void pages_replace(world_t *world, uint32_t indices[], int it) {
         if (index == -1)
             continue;
 
-        /* log_debug("Requesting index %d for page %d\n", index, page->index);
-         */
+        log_debug("Requesting index %d for page %d\n", index, page->index);
         uint64_t offset = level.offsets[index];
         fseek(level.fp, offset, SEEK_SET);
 
@@ -296,18 +314,6 @@ static void pages_swap_horz(world_t *world, uint32_t indices[], int it) {
 // TODO: implement swapping pages above or below the current page
 void level_swap_pages(world_t *world, page_t *page) {
     assert(level.fp);
-
-    enum {
-        TOP_LEFT,
-        TOP_MIDDLE,
-        TOP_RIGHT,
-        LEFT,
-        CENTER,
-        RIGHT,
-        BOTTOM_LEFT,
-        BOTTOM_MIDDLE,
-        BOTTOM_RIGHT,
-    };
 
     // calculate the direction the pages are moving
     uint32_t index = page->index;
@@ -343,6 +349,94 @@ void level_swap_pages(world_t *world, page_t *page) {
             pages_swap_horz(world, (uint32_t[]) { 0, 3, 6 }, 1);
             break;
     }
+}
 
-    log_debug("Player moved to page %d\n", world->chunk.index);
+/** @brief Extends the bounds of the level within the temporary level file */
+static void level_extend_bounds(world_t *world, uint32_t start, size_t n,
+                                int it) {
+    size_t len = 0;
+    ldata_t data[CHUNK_MAX] = { 0 };
+
+    uint32_t index = start;
+    for (size_t i = 0; i < n; i++) {
+        // move temp file pointer to the end of the file
+        fseek(level.fp, 0, SEEK_END);
+
+        // insert temp file offset into the offsets array at the current index
+        uint64_t offset = ftell(level.fp);
+        /* log_debug("index %d offset %ld len %ld\n", index, offset, */
+        /*           array_len(level.offsets)); */
+        array_insert(level.offsets, index, &offset);
+        assert(level.offsets[index] == offset);
+
+        // write empty data to temp file with padding
+        fwrite(&len, sizeof(size_t), 1, level.fp);
+        fwrite(&data, sizeof(ldata_t), CHUNK_MAX, level.fp);
+
+        index += it;
+    }
+}
+
+void level_sync(world_t *world, float dt) {
+    // index 4 is the center page
+    page_t *page = &world->chunk.pages[4];
+    vec2s pos = { -world->camera.pos.x, -world->camera.pos.y };
+
+    if (aabb_intersect_2d(&page->box, pos))
+        return;
+
+    int index = chunk_index_from_pos(&world->chunk, pos);
+    page_t *tmp = chunk_page_from_pos(&world->chunk, pos);
+    if ((index == -1) || (index % world->chunk.dim.x == 0)) {
+        index = tmp->index;
+
+        switch (index) {
+            case TOP_LEFT:
+            case TOP_MIDDLE:
+            case TOP_RIGHT:
+                // extend the bounds upward
+                break;
+        }
+
+        switch (index) {
+            case BOTTOM_LEFT:
+            case BOTTOM_MIDDLE:
+            case BOTTOM_RIGHT:
+                // extend the bounds downward
+                break;
+        }
+
+        switch (index) {
+            case TOP_LEFT:
+            case BOTTOM_LEFT:
+            case LEFT:
+                // extend the bounds left
+                world->chunk.index
+                    += floorf(1.f * world->chunk.index / world->chunk.dim.x)
+                       + 1;
+                int it = ++world->chunk.dim.x;
+                size_t n = world->chunk.dim.y;
+                level_extend_bounds(world, 0, n, it);
+                break;
+        }
+
+        switch (index) {
+            case TOP_RIGHT:
+            case BOTTOM_RIGHT:
+            case RIGHT:
+                // extend the bounds right
+                world->chunk.index
+                    += floorf(1.f * world->chunk.index / world->chunk.dim.x);
+                int it = ++world->chunk.dim.x;
+                size_t n = world->chunk.dim.y;
+                level_extend_bounds(world, n, n, it);
+                break;
+        }
+
+        log_debug("Extended level bounds: (%d, %d) %d\n", world->chunk.dim.x,
+                  world->chunk.dim.y, world->chunk.index);
+    }
+
+    level_swap_pages(world, tmp);
+    log_debug("Camera moved to page %d.\n", world->chunk.index);
 }

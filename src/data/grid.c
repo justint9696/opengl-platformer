@@ -41,7 +41,9 @@ void grid_remove(grid_t *self, vec2s pos, void *data) {
 }
 
 cell_t *grid_cell_from_pos(grid_t *self, vec2s pos) {
-    assert(pos.x >= 0 && pos.y >= 0);
+    if (pos.x < 0 || pos.y < 0)
+        return NULL;
+
     uint32_t x = floorf(pos.x / self->size);
     uint32_t y = floorf(pos.y / self->size);
     return &self->bucket[offset(x, y, self->dim.x)];
