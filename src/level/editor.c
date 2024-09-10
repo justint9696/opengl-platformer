@@ -30,6 +30,17 @@ static inline vec2s mouse_to_world(world_t *world) {
     return screen_to_world(world, mouse_position());
 }
 
+static vec2s grid_offset(vec2s mouse) {
+    vec2s offset = (vec2s) {
+        .x = fmodf(mouse.x, 50.f),
+        .y = fmodf(mouse.y, 50.f),
+    };
+    return (vec2s) {
+        .x = mouse.x - ((mouse.x < 0.f) ? offset.x + 50.f : offset.x),
+        .y = mouse.y - ((mouse.y < 0.f) ? offset.y + 50.f : offset.y),
+    };
+}
+
 static entity_t *get_hovered_entity(world_t *world, vec2s mouse) {
     collider_t arr[64];
     size_t n = world_get_colliders(world, &(entity_t) { .body.pos = mouse },
@@ -91,7 +102,12 @@ static void place_update(editor_t *self, world_t *world) {
     assert(fn);
 
     vec2s dim = (vec2s) { 50.f, 50.f };
-    vec2s pos = glms_vec2_sub(mouse, glms_vec2_scale(dim, 0.5f));
+    vec2s pos = GLMS_VEC2_ZERO;
+    if (self->snap) {
+        pos = grid_offset(mouse);
+    } else {
+        pos = glms_vec2_sub(mouse, glms_vec2_scale(dim, 0.5f));
+    }
     self->entity = fn(pos, dim, world);
 
     // calculate the offset from the entity pos to the mouse
@@ -103,17 +119,14 @@ static void place_update(editor_t *self, world_t *world) {
 static void place_render(editor_t *self, world_t *world) {
     vec2s dim = (vec2s) { 50.f, 50.f };
     vec2s mouse = mouse_to_world(world);
-    vec2s offset = GLMS_VEC2_ZERO;
+    vec2s pos = GLMS_VEC2_ZERO;
     if (self->snap) {
-        offset = (vec2s) {
-            .x = fmodf(mouse.x, 50.f),
-            .y = fmodf(mouse.y, 50.f),
-        };
+        pos = grid_offset(mouse);
     } else {
-        offset = glms_vec2_scale(dim, 0.5f);
+        pos = glms_vec2_sub(mouse, glms_vec2_scale(dim, 0.5f));
     }
 
-    draw_quad(glms_vec2_sub(mouse, offset), dim, COLOR_RED_FADE);
+    draw_quad(pos, dim, COLOR_RED_FADE);
 }
 
 static void edit_update(editor_t *self, world_t *world) {
@@ -163,12 +176,7 @@ static void move_update(editor_t *self, world_t *world) {
 
     vec2s mouse = mouse_to_world(world);
     if (self->snap) {
-        vec2s offset = (vec2s) {
-            .x = fmodf(mouse.x, 50.f),
-            .y = fmodf(mouse.y, 50.f),
-        };
-        self->entity->body.pos
-            = glms_vec2_sub(mouse, offset);
+        self->entity->body.pos = grid_offset(mouse);
     } else {
         self->entity->body.pos = glms_vec2_sub(mouse, self->offset);
     }
