@@ -6,7 +6,8 @@
  * @details The structure of level data files is as follows:
  * @code
  * int      origin;
- * ivec2s   dchunk; // (width, height)
+ * vec2s    pos; // abs position of world bounds
+ * vec2s    dim; // width, height
  * ldata_t  player;
  * for (0 .. nchunk) {
  *     size_t nent;

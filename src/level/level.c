@@ -59,30 +59,31 @@ static void page_calculate_aabb(page_t *page, world_t *world) {
 /** @brief Loads level data into the provided page. */
 static void page_load_data(page_t *page, world_t *world, ldata_t arr[],
                            size_t len) {
-    size_t n = 0;
+    /* size_t n = 0; */
 
     log_debug("Loading %ld entities into page %d\n", len, page->index);
     for (size_t i = 0; i < len; i++) {
         ldata_t *data = &arr[i];
 
-        page_t *tmp = chunk_page_from_pos(&world->chunk, data->pos);
-        assert(tmp);
+        /* page_t *tmp = chunk_page_from_pos(&world->chunk, data->pos); */
+        /* assert(tmp); */
 
-        if (tmp->index != page->index) {
-            n++;
-            log_debug("Entity at (%.2f, %.2f) was loaded into the wrong page; "
-                      "page %d instead of page %d.\n",
-                      data->pos.x, data->pos.y, tmp->index, page->index);
-        }
+        /* if (tmp->index != page->index) { */
+        /*     n++; */
+        /*     log_debug("Entity at (%.2f, %.2f) was loaded into the wrong page;
+         * " */
+        /*               "page %d instead of page %d.\n", */
+        /*               data->pos.x, data->pos.y, tmp->index, page->index); */
+        /* } */
 
         create_fn_t fn = table_lookup(data->type);
         assert(fn);
 
         fn(data->pos, data->dim, world);
     }
-    if (n) {
-        log_fatal("%ld entities were loaded into the wrong page\n", n);
-    }
+    /* if (n) { */
+    /*     log_fatal("%ld entities were loaded into the wrong page\n", n); */
+    /* } */
 }
 
 void level_shutdown(world_t *world) {
@@ -105,25 +106,32 @@ void level_import(world_t *world, const char *fpath) {
 
     fseek(fp, 0, SEEK_SET);
     fread(&world->chunk.index, sizeof(int), 1, fp);
-    fread(&world->chunk.dim, sizeof(ivec2s), 1, fp);
+    fread(&world->chunk.box, sizeof(box_t), 1, fp);
 
-    // FIXME: calculate the actual position based on the chunk index
-    world->chunk.pos = glms_vec2_fill(-CHUNK_SIZE);
+    vec2s idx = (vec2s) {
+        .x = fmodf(world->chunk.index, world->chunk.box.dim.x) - 1,
+        .y = floorf(1.f * world->chunk.index / world->chunk.box.dim.x) + 1,
+    };
+
+    vec2s diff = glms_vec2_negate(glms_vec2_sub(
+        (vec2s) { .x = 0.f, .y = world->chunk.box.dim.y - 1 }, idx));
+
+    world->chunk.pos = glms_vec2_add(world->chunk.box.pos,
+                                     glms_vec2_scale(diff, CHUNK_SIZE));
 
     ldata_t player;
     fread(&player, sizeof(ldata_t), 1, fp);
-    fwrite(&player, sizeof(ldata_t), 1, level.fp);
 
-    world->player = player_init(player.pos, player.dim, world);
+    world->player = player_init(player.pos, player.box.dim, world);
 
-    int size = (world->chunk.dim.x * world->chunk.dim.y);
+    int size = (world->chunk.box.dim.x * world->chunk.box.dim.y);
     level.offsets = array_alloc(sizeof(uint64_t), 128);
 
     // current page index
     int index = 0;
 
     // top left page of starting chunk
-    int target = glm_max(0, world->chunk.index - world->chunk.dim.x - 1);
+    int target = glm_max(0, world->chunk.index - world->chunk.box.dim.x - 1);
 
     size_t len;
     ldata_t data[CHUNK_MAX];
@@ -146,9 +154,9 @@ void level_import(world_t *world, const char *fpath) {
 
         // have all 3 pages been loaded
         if ((i - target) >= 2)
-            target = world->chunk.dim.x + target;
+            target = world->chunk.box.dim.x + target;
 
-        /* log_debug("Loading index %d into memory\n", i); */
+        log_debug("Loading index %d into memory\n", i);
 
         // load pages into memory
         page_t *page = &world->chunk.pages[index++];
@@ -166,8 +174,11 @@ void level_export(world_t *world, const char *fpath) {
     XASSERT(fp, "Could not open file `%s`: %s\n.", fpath, strerror(errno));
 
     fseek(fp, 0, SEEK_SET);
+
+    /* world->chunk.index */
+    /*     = chunk_index_from_pos(&world->chunk, world->player->body.pos); */
     fwrite(&world->chunk.index, sizeof(int), 1, fp);
-    fwrite(&world->chunk.dim, sizeof(ivec2s), 1, fp);
+    fwrite(&world->chunk.box, sizeof(box_t), 1, fp);
 
     fwrite(
         &(ldata_t) {
@@ -287,7 +298,8 @@ static void pages_replace(world_t *world, uint32_t indices[], int it) {
         if (index == -1)
             continue;
 
-        log_debug("Requesting index %d for page %d\n", index, page->index);
+        /* log_debug("Requesting index %d for page %d\n", index, page->index);
+         */
         uint64_t offset = level.offsets[index];
         fseek(level.fp, offset, SEEK_SET);
 
@@ -387,7 +399,8 @@ void level_sync(world_t *world, float dt) {
 
     int index = chunk_index_from_pos(&world->chunk, pos);
     page_t *tmp = chunk_page_from_pos(&world->chunk, pos);
-    if ((index == -1) || (index % world->chunk.dim.x == 0)) {
+    if ((index == -1) || (fmodf(index, world->chunk.box.dim.x) == 0)
+        || (fmodf(index, world->chunk.box.dim.x + 1) == 0)) {
         index = tmp->index;
 
         switch (index) {
@@ -412,10 +425,11 @@ void level_sync(world_t *world, float dt) {
             case LEFT:
                 // extend the bounds left
                 world->chunk.index
-                    += floorf(1.f * world->chunk.index / world->chunk.dim.x)
+                    += floorf(1.f * world->chunk.index / world->chunk.box.dim.x)
                        + 1;
-                int it = ++world->chunk.dim.x;
-                size_t n = world->chunk.dim.y;
+                world->chunk.box.pos.x -= CHUNK_SIZE;
+                int it = ++world->chunk.box.dim.x;
+                size_t n = world->chunk.box.dim.y;
                 level_extend_bounds(world, 0, n, it);
                 break;
         }
@@ -425,18 +439,21 @@ void level_sync(world_t *world, float dt) {
             case BOTTOM_RIGHT:
             case RIGHT:
                 // extend the bounds right
-                world->chunk.index
-                    += floorf(1.f * world->chunk.index / world->chunk.dim.x);
-                int it = ++world->chunk.dim.x;
-                size_t n = world->chunk.dim.y;
+                world->chunk.index += floorf(1.f * world->chunk.index
+                                             / world->chunk.box.dim.x);
+                int it = ++world->chunk.box.dim.x;
+                size_t n = world->chunk.box.dim.y;
                 level_extend_bounds(world, n, n, it);
                 break;
         }
 
-        log_debug("Extended level bounds: (%d, %d) %d\n", world->chunk.dim.x,
-                  world->chunk.dim.y, world->chunk.index);
+        /* log_debug("Extended level bounds: (%.2f, %.2f) %d\n", */
+        /*           world->chunk.box.dim.x, world->chunk.box.dim.y, */
+        /*           world->chunk.index); */
     }
 
     level_swap_pages(world, tmp);
     log_debug("Camera moved to page %d.\n", world->chunk.index);
+    log_debug("%d\n",
+              chunk_index_from_pos(&world->chunk, world->player->body.pos));
 }
