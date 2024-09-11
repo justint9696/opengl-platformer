@@ -42,18 +42,18 @@ TARGET = bin/game
 all: $(TARGET)
 
 run: all
-	@$(TARGET)
+	@$(TARGET) $(FNAME)
 
-glad: 
+glad:
 	@cd lib/glad && $(CC) -o libglad.a -Iinclude -c src/glad.c
 
 sdl:
-	@cd lib/SDL2 && mkdir -p build && cd build && ../configure && make -j 6 
+	@cd lib/SDL2 && mkdir -p build && cd build && ../configure && make -j 6
 
 cglm:
-	@cd lib/cglm && mkdir -p build && cd build && cmake .. && make -j 6 
+	@cd lib/cglm && mkdir -p build && cd build && cmake .. && make -j 6
 
-libs: glad sdl cglm 
+libs: glad sdl cglm
 
 $(TARGET): $(OBJS)
 	@mkdir -p $(dir $@)

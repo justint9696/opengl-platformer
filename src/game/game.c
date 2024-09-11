@@ -118,11 +118,11 @@ static void render(game_t *self) {
     }
 }
 
-void game_run(game_t *self) {
+void game_run(game_t *self, const char *fpath) {
     // initialize application
     init(self);
 
-    level_import(&self->world, "data/level.dat");
+    level_import(&self->world, (fpath) ? fpath : "data/level.dat");
     /* level_export(&self->world, "data/demo.dat"); */
 
     while (self->state != GS_QUIT) {

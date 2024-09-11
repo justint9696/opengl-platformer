@@ -49,9 +49,10 @@ typedef struct game_s {
 } game_t;
 
 /**
- * @brief Initializes the game and starts the game loop. 
+ * @brief Initializes the game and starts the game loop.
  * @param self a pointer to the game
+ * @param fpath relative path to a level file or NULL
  */
-void game_run(game_t *);
+void game_run(game_t *, const char *fpath);
 
 #endif // ifndef _GAME_GAME_H_
