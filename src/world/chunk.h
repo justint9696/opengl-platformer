@@ -12,8 +12,8 @@
 
 #include <stdint.h>
 
-#define CHUNK_SIZE  384
-#define CHUNK_MAX   64
+#define CHUNK_SIZE  512
+#define CHUNK_MAX   128
 #define CHUNK_WIDTH 3
 
 /** @brief Represents the data that is stored in a region of the current chunk.
@@ -39,10 +39,10 @@ typedef struct chunk_s {
     /** @brief The index of the center chunk. */
     int32_t index;
 
-    /** @brief The size of the level. */
-    ivec2s dim;
+    /** @brief The absolute bounds of the level. */
+    box_t box;
 
-    /** @brief The position in world space. */
+    /** @brief The current position in world space. */
     vec2s pos;
 
     /** @brief The current pages loaded into memory. */
@@ -93,8 +93,8 @@ int chunk_index_from_pos(chunk_t *, vec2s pos);
  */
 void *chunk_request_page(chunk_t *, page_t *);
 
-/** 
- * @brief Releases an occupied block of memory and marks it as free. 
+/**
+ * @brief Releases an occupied block of memory and marks it as free.
  * @param self a pointer to a chunk
  * @param page a pointer to a page
  */

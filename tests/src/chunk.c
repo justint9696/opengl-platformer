@@ -4,16 +4,17 @@
 
 #include <cglm/struct.h>
 
-#define XASSERT(_e, _msg, ...) do {\
-    if (!(_e)) {\
-        fprintf(stderr, "ERROR: %s:%d: " \
-                _msg, __FILE__, __LINE__, __VA_ARGS__);\
-        exit(1);\
-    }\
-} while (0);
+#define XASSERT(_e, _msg, ...)                                                 \
+    do {                                                                       \
+        if (!(_e)) {                                                           \
+            fprintf(stderr, "ERROR: %s:%d: " _msg, __FILE__, __LINE__,         \
+                    __VA_ARGS__);                                              \
+            exit(1);                                                           \
+        }                                                                      \
+    } while (0);
 
-#define CHUNK_SIZE 384
-#define CHUNK_MAX  64
+#define CHUNK_SIZE 512
+#define CHUNK_MAX  128
 
 typedef struct {
     int type;
@@ -32,9 +33,20 @@ typedef struct {
 } page_t;
 
 typedef struct {
+    vec2s pos;
+    vec2s dim;
+} box_t;
+
+typedef struct {
     int origin;
-    ivec2s dim;
-    vec2s spawn;
+    union {
+        box_t box;
+        struct {
+            vec2s pos;
+            vec2s dim;
+        };
+    };
+    vec2s player;
     page_t pages[9];
 } chunk_t;
 
@@ -54,7 +66,8 @@ static void level_init() {
 
     chunk_t *chunk = &state.level.chunk;
     chunk->origin = 10;
-    chunk->dim = (ivec2s) { 7, 3 };
+    chunk->pos = (vec2s) { .x = -CHUNK_SIZE * 3, .y = -CHUNK_SIZE };
+    chunk->dim = (vec2s) { .x = 7, .y = 3 };
 }
 
 static int level_import(const char *fpath) {
@@ -68,12 +81,16 @@ static int level_import(const char *fpath) {
 
     chunk_t *chunk = &state.level.chunk;
     fread(&chunk->origin, sizeof(int), 1, fp);
-    fread(&chunk->dim, sizeof(ivec2s), 1, fp);
+    fread(&chunk->pos, sizeof(vec2s), 1, fp);
+    fread(&chunk->dim, sizeof(vec2s), 1, fp);
+
+    printf("Chunk is at (%.2f, %.2f) and has dimensions (%.2f, %.2f)\n",
+           chunk->pos.x, chunk->pos.y, chunk->dim.x, chunk->dim.y);
 
     data_t data;
     fread(&data, sizeof(data_t), 1, fp);
     printf("player = { type: %d, pos: (%.2f, %.2f), dim: (%.2f, %.2f) }\n",
-            data.type, data.pos.x, data.pos.y, data.dim.x, data.dim.y);
+           data.type, data.pos.x, data.pos.y, data.dim.x, data.dim.y);
 
     list_t ent;
     int index = 0;
@@ -82,12 +99,11 @@ static int level_import(const char *fpath) {
             fread(&ent.n, sizeof(size_t), 1, fp);
             fread(&ent.arr, sizeof(data_t), ent.n, fp);
 
-            printf("chunk %d (%d, %d) has %ld entities.\n",
-                   index, i, j, ent.n);
+            printf("chunk %d (%d, %d) has %ld entities.\n", index, i, j, ent.n);
             for (size_t i = 0; i < ent.n; i++) {
                 data_t *e = &ent.arr[i];
                 printf("{ type: %d, pos: (%.2f, %.2f), dim: (%.2f, %.2f) }\n",
-                        e->type, e->pos.x, e->pos.y, e->dim.x, e->dim.y);
+                       e->type, e->pos.x, e->pos.y, e->dim.x, e->dim.y);
             }
             index++;
         }
@@ -102,7 +118,7 @@ done:
 
 /*
  * int      origin;
- * ivec2s   dchunk;
+ * vec2s    dchunk;
  * vec2s    spawnpoint;
  * for (0 .. nchunk) {
  *     size_t nent;
@@ -121,14 +137,17 @@ static int level_export(const char *fpath) {
     // chunk origin
     fwrite(&state.level.chunk.origin, sizeof(int), 1, fp);
 
+    // chunk position
+    fwrite(&state.level.chunk.pos, sizeof(vec2s), 1, fp);
+
     // chunk dimensions
-    fwrite(&state.level.chunk.dim, sizeof(ivec2s), 1, fp);
+    fwrite(&state.level.chunk.dim, sizeof(vec2s), 1, fp);
 
     // chunk player
     data_t player = {
         .type = 0,
         .pos = (vec2s) { 128.f, 128.f },
-        .dim = (vec2s) { 50.f, 50.f },
+        .dim = (vec2s) {  50.f,  50.f },
     };
     fwrite(&player, sizeof(data_t), 1, fp);
 
@@ -137,13 +156,12 @@ static int level_export(const char *fpath) {
     for (int i = 0; i < state.level.chunk.dim.x; i++)
         fwrite(&count, sizeof(size_t), 1, fp);
 
-
     float target = -CHUNK_SIZE * 3.f;
 
     data_t data = (data_t) {
         .type = 2,
         .pos = { target, 25.f },
-        .dim = { 50.f, 50.f },
+        .dim = {   50.f, 50.f },
     };
 
     size_t n;

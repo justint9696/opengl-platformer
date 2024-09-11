@@ -3,6 +3,8 @@
  * @author Justin Tonkinson
  * @date 2024/07/04
  * @brief Chunk implementation functions.
+ * @bug chunk_index_from_pos() is returning the wrong index when trying to grab
+ * the players absolute chunk index for level exporting
  */
 
 #include "world/chunk.h"
@@ -61,21 +63,21 @@ int chunk_index_from_pos(chunk_t *self, vec2s pos) {
     // calculate the offset of the center chunk with respects to the chunk
     // dimensions
     vec2s idx = (vec2s) {
-        .x = self->index % self->dim.x,
-        .y = floorf(1.f * self->index / self->dim.x),
+        .x = fmodf(self->index, self->box.dim.x),
+        .y = floorf(1.f * self->index / self->box.dim.x),
     };
 
     idx = glms_vec2_add(idx, coord);
 
     // this allows (-1, -1) to be the top left page
     // instead of the bottom left page.
-    idx.y = self->dim.y - idx.y - 1;
+    idx.y = self->box.dim.y - idx.y - 1;
 
-    if ((idx.x < 0 || idx.x >= self->dim.x)
-        || (idx.y < 0 || idx.y > self->dim.y))
+    if ((idx.x < 0 || idx.x >= self->box.dim.x)
+        || (idx.y < 0 || idx.y > self->box.dim.y))
         return -1;
 
-    int32_t index = ((floorf(idx.y) * self->dim.x) + floorf(idx.x));
+    int32_t index = ((floorf(idx.y) * self->box.dim.x) + floorf(idx.x));
     return index;
 }
 
