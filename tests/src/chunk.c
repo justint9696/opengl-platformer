@@ -116,6 +116,14 @@ done:
     return ret;
 }
 
+static int chunk_index_from_pos(vec2s pos) {
+    vec2s coord
+        = glms_vec2_divs(glms_vec2_sub(pos, state.level.chunk.pos), CHUNK_SIZE);
+    return fabsf(floorf(coord.x)
+                 + ((state.level.chunk.dim.y - fabsf(floorf(coord.y)) - 1)
+                    * state.level.chunk.dim.x));
+}
+
 /*
  * int      origin;
  * vec2s    dchunk;
@@ -167,18 +175,21 @@ static int level_export(const char *fpath) {
     size_t n;
     data_t arr[24];
 
+    int index = chunk_index_from_pos(data.pos);
     for (int i = 0; i < state.level.chunk.dim.x; i++) {
         n = 0;
         memset(arr, 0, sizeof(data_t) * 24);
 
         target += CHUNK_SIZE;
-        while (data.pos.x <= target && n < 24) {
+        while (index == chunk_index_from_pos(data.pos) && n < 24) {
             memcpy(&arr[n++], &data, sizeof(data_t));
             data.pos.x += 50.f;
         }
 
         fwrite(&n, sizeof(size_t), 1, fp);
         fwrite(&arr, sizeof(data_t), n, fp);
+
+        index = chunk_index_from_pos(data.pos);
     }
 
     /* size_t n = floorf(CHUNK_SIZE / 50.f); */
