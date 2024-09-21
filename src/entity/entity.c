@@ -44,7 +44,7 @@ entity_t *entity_create(const void *data, world_t *world) {
 
 void entity_init(entity_t *self, world_t *world) {
     self->body.page = chunk_page_from_pos(&world->chunk, self->body.pos);
-    /* assert(self->body.page); */
+    assert(self->body.page);
 
     if (self->init) {
         self->init(self, world);
@@ -101,6 +101,8 @@ void entity_sync(entity_t *self, world_t *world, float dt) {
         camera_follow_sync(self, world, dt);
     }
 
+    // TODO: this fix is to allow the camera to snap back to player's position
+    // after exiting level editor, but may produce complications later
     bool visible = world_is_on_screen(world, self->body.pos);
     if (self->flags & EF_KINEMATIC) {
         if (visible) {

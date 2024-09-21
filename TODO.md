@@ -19,6 +19,8 @@
     - [x] Make swap chunks based on camera position rather than the player
       position
     - [ ] Add above and below pages && allow them to be swapped
+    - [ ] Grab entities under selection rectangle and push to dynamic array
+    - [ ] Make edit state work for all entities within the dynamic array
     - [x] Calculate the correct chunk position when importing the level
 - [ ] UI Debug Methods
     - [ ] Be able to draw a transparent quad anywhere on the screen

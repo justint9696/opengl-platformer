@@ -229,7 +229,9 @@ static void move_exit(editor_t *self, world_t *world) {
 
 static void select_update(editor_t *self, world_t *world) {
     if (button_released(SDL_SCANCODE_LCTRL)) {
-        fsm_transition(&self->fsm, ES_EDIT, editor_fn_t, self, world);
+        int previous = self->fsm.previous;
+        fsm_transition(&self->fsm, (self->entity) ? ES_EDIT : previous,
+                       editor_fn_t, self, world);
         return;
     }
 

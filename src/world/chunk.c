@@ -3,8 +3,6 @@
  * @author Justin Tonkinson
  * @date 2024/07/04
  * @brief Chunk implementation functions.
- * @bug chunk_index_from_pos() is returning the wrong index when trying to grab
- * the players absolute chunk index for level exporting
  */
 
 #include "world/chunk.h"
@@ -12,6 +10,7 @@
 #include "data/array.h"
 #include "data/free_list.h"
 #include "graphics/drawing.h"
+#include "util/log.h"
 
 #include <assert.h>
 #include <cglm/struct.h>
@@ -56,29 +55,12 @@ page_t *chunk_page_from_pos(chunk_t *self, vec2s pos) {
 }
 
 int chunk_index_from_pos(chunk_t *self, vec2s pos) {
-    // calculate the offset from the center chunk
-    vec2s coord = glms_vec2_subs(
-        glms_vec2_divs(glms_vec2_sub(pos, self->pos), CHUNK_SIZE), 1.f);
-
-    // calculate the offset of the center chunk with respects to the chunk
-    // dimensions
-    vec2s idx = (vec2s) {
-        .x = fmodf(self->index, self->box.dim.x),
-        .y = floorf(1.f * self->index / self->box.dim.x),
-    };
-
-    idx = glms_vec2_add(idx, coord);
-
-    // this allows (-1, -1) to be the top left page
-    // instead of the bottom left page.
-    idx.y = self->box.dim.y - idx.y - 1;
-
-    if ((idx.x < 0 || idx.x >= self->box.dim.x)
-        || (idx.y < 0 || idx.y > self->box.dim.y))
-        return -1;
-
-    int32_t index = ((floorf(idx.y) * self->box.dim.x) + floorf(idx.x));
-    return index;
+    vec2s coord = glms_vec2_divs(glms_vec2_sub(pos, self->pos), CHUNK_SIZE);
+    glms_vec2_print(pos, stdout);
+    glms_vec2_print(coord, stdout);
+    return fabsf(
+        floorf(coord.x)
+        + ((self->box.dim.y - floorf(fabsf(coord.y)) - 1) * self->box.dim.x));
 }
 
 void *chunk_request_page(chunk_t *self, page_t *page) {
