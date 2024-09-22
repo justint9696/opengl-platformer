@@ -117,11 +117,9 @@ done:
 }
 
 static int chunk_index_from_pos(vec2s pos) {
-    vec2s coord
-        = glms_vec2_divs(glms_vec2_sub(pos, state.level.chunk.pos), CHUNK_SIZE);
-    return fabsf(floorf(coord.x)
-                 + ((state.level.chunk.dim.y - fabsf(floorf(coord.y)) - 1)
-                    * state.level.chunk.dim.x));
+    vec2s dim = state.level.chunk.box.dim;
+    vec2s coord = glms_vec2_divs(glms_vec2_sub(pos, state.level.chunk.box.pos), CHUNK_SIZE);
+    return (floorf(coord.x) + (dim.y - floorf(coord.y) - 1) * dim.x);
 }
 
 /*
