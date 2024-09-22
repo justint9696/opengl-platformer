@@ -4,8 +4,8 @@
 #include <SDL2/SDL_video.h>
 #include <stdbool.h>
 
-#define SCREEN_WIDTH  640
-#define SCREEN_HEIGHT 480
+#define SCREEN_WIDTH  1280
+#define SCREEN_HEIGHT 720
 
 typedef struct {
     char title[64];

@@ -4,6 +4,7 @@
 #include "data/queue.h"
 #include "game/camera.h"
 #include "graphics/shader.h"
+#include "graphics/window.h"
 
 #include <cglm/types-struct.h>
 #include <glad/glad.h>
@@ -11,8 +12,8 @@
 
 #define UI_MAX 32
 
-#define UI_DEBUG_HORZ -315
-#define UI_DEBUG_VERT  220
+#define UI_DEBUG_HORZ ((-SCREEN_WIDTH / 2.f) + 5.f)
+#define UI_DEBUG_VERT ((SCREEN_HEIGHT / 2.f) - 20.f)
 
 typedef struct {
     vec2s pos;

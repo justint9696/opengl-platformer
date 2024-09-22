@@ -38,7 +38,6 @@ entity_t *entity_create(const void *data, world_t *world) {
     self->id = id;
 
     entity_init(self, world);
-
     return self;
 }
 

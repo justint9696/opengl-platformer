@@ -32,10 +32,9 @@ static inline vec2s glms_vec2_abs(vec2s v) {
 }
 
 static int chunk_index_from_pos(vec2s pos) {
+    vec2s dim = chunk.dim;
     vec2s coord = glms_vec2_divs(glms_vec2_sub(pos, chunk.pos), CHUNK_SIZE);
-    glms_vec2_print(coord, stdout);
-    return fabsf(floorf(coord.x)
-                 + ((chunk.dim.y - fabsf(floorf(coord.y)) - 1) * chunk.dim.x));
+    return (coord.x + (dim.y - floorf(coord.y) - 1) * dim.x);
 }
 
 static void run_tests_one(vec2s v[], int a[], size_t n) {
@@ -88,20 +87,21 @@ static void run_tests_two() {
 int main(void) {
     init();
     vec2s v[] = {
-        { -1536,     0 },
-        { -1280,   256 },
-        { -1024,     0 },
-        {  -768,   256 },
-        {  -512,     0 },
-        {     0,     0 },
-        {   128,   128 },
-        {   256,   256 },
+        { -1536,    0 },
+        { -1280,  256 },
+        { -1024,    0 },
+        {  -768,  256 },
+        {  -512,    0 },
+        {     0,    0 },
+        {   128,  128 },
+        {   256,  256 },
         { -1536, -512 },
-        { -1, 109 },
+        {    -1,  109 },
+        {    -1,   87 },
     };
 
     int a[] = {
-        7, 7, 8, 8, 9, 10, 10, 10, 14, 9,
+        7, 7, 8, 8, 9, 10, 10, 10, 14, 9, 9,
     };
     run_tests_one(v, a, arraylen(v));
     run_tests_two();

@@ -143,7 +143,12 @@ void array_insert(void *ptr, uint32_t index, const void *item) {
     assert(ptr);
 
     array_t *self = array_header(ptr);
-    assert(index < self->len);
+    assert(index < self->capacity);
+
+    if (index >= self->len) {
+        array_push(ptr, item);
+        return;
+    }
 
     void *src = array_at(ptr, index);
     void *dst = (((void *)src) + self->size);

@@ -3,6 +3,7 @@
  * @author Justin Tonkinson
  * @date 2024/07/04
  * @brief Chunk implementation functions.
+ * @bug chunk_page_from_pos() has the wrong index now.
  */
 
 #include "world/chunk.h"
@@ -49,18 +50,22 @@ void chunk_render(chunk_t *self) {
 
 page_t *chunk_page_from_pos(chunk_t *self, vec2s pos) {
     vec2s coord = glms_vec2_divs(glms_vec2_sub(pos, self->pos), CHUNK_SIZE);
+    glms_vec2_print(coord, stdout);
     uint32_t index = ((floorf(coord.y) * CHUNK_WIDTH) + floorf(coord.x));
-    assert(index < 9);
+    /* uint32_t index */
+    /*     = (floorf(coord.x) + (fabs(CHUNK_WIDTH - floorf(coord.y))) * CHUNK_WIDTH); */
+    log_debug("chunk index: %d\n", index);
+
+    if (index >= 9)
+        return NULL;
+
     return &self->pages[index];
 }
 
 int chunk_index_from_pos(chunk_t *self, vec2s pos) {
-    vec2s coord = glms_vec2_divs(glms_vec2_sub(pos, self->pos), CHUNK_SIZE);
-    glms_vec2_print(pos, stdout);
-    glms_vec2_print(coord, stdout);
-    return fabsf(
-        floorf(coord.x)
-        + ((self->box.dim.y - floorf(fabsf(coord.y)) - 1) * self->box.dim.x));
+    vec2s dim = self->box.dim;
+    vec2s coord = glms_vec2_divs(glms_vec2_sub(pos, self->box.pos), CHUNK_SIZE);
+    return (floorf(coord.x) + (dim.y - floorf(coord.y) - 1) * dim.x);
 }
 
 void *chunk_request_page(chunk_t *self, page_t *page) {
