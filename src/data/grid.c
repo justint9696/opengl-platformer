@@ -16,7 +16,7 @@
 
 void grid_init(grid_t *self, int size, int width, int height) {
     memset(self, 0, sizeof(grid_t));
-    assert(((width / size) * (height / size) < BUCKET_MAX));
+    assert(((width / size) * (height / size)) < BUCKET_MAX);
     self->size = size;
     self->dim = (ivec2s) {
         .x = ceilf(1.f * width / size),
@@ -24,7 +24,6 @@ void grid_init(grid_t *self, int size, int width, int height) {
     };
     for (int y = 0; y < self->dim.y; y++) {
         for (int x = 0; x < self->dim.x; x++) {
-            assert(offset(x, y, self->dim.x) < BUCKET_MAX);
             cell_t *cell = &self->bucket[offset(x, y, self->dim.x)];
             cell->pos = (ivec2s) { x, y };
         }

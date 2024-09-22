@@ -11,7 +11,7 @@
 #include <cglm/types-struct.h>
 #include <stddef.h>
 
-#define BUCKET_MAX 1024
+#define BUCKET_MAX 512
 #define CELL_MAX   32
 
 /**
