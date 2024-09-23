@@ -49,14 +49,16 @@ void chunk_render(chunk_t *self) {
 }
 
 page_t *chunk_page_from_pos(chunk_t *self, vec2s pos) {
-    vec2s coord = glms_vec2_divs(glms_vec2_sub(pos, self->pos), CHUNK_SIZE);
-    glms_vec2_print(coord, stdout);
-    uint32_t index = ((floorf(coord.y) * CHUNK_WIDTH) + floorf(coord.x));
-    /* uint32_t index */
-    /*     = (floorf(coord.x) + (fabs(CHUNK_WIDTH - floorf(coord.y))) * CHUNK_WIDTH); */
-    log_debug("chunk index: %d\n", index);
+    glms_vec2_print(self->pages[6].pos, stdout);
+    glms_vec2_print(self->pos, stdout);
 
-    if (index >= 9)
+    assert(!memcmp(&self->pages[6].pos, &self->pos, sizeof(vec2s)));
+
+    vec2s coord = glms_vec2_divs(glms_vec2_sub(pos, self->pos), CHUNK_SIZE);
+    int index = (floorf(coord.x) + ((2 - floorf(coord.y)) * 3));
+
+    log_debug("chunk index: %d\n", index);
+    if (index < 0 || index >= 9)
         return NULL;
 
     return &self->pages[index];

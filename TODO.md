@@ -1,4 +1,4 @@
-## OpenGL Platformer TODO
+# TODO
 - [x] Address grid updating with camera movement
     - [x] Test it out on a flat level without chunks first
 - [x] Level chunking

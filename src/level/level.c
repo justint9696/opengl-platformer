@@ -104,6 +104,11 @@ void level_import(world_t *world, const char *fpath) {
     world->chunk.pos = glms_vec2_add(world->chunk.box.pos,
                                      glms_vec2_scale(diff, CHUNK_SIZE));
 
+    for (int i = 0; i < 9; i++) {
+        page_t *page = &world->chunk.pages[i];
+        page_calculate_aabb(page, world);
+    }
+
     ldata_t player;
     fread(&player, sizeof(ldata_t), 1, fp);
 
@@ -145,7 +150,6 @@ void level_import(world_t *world, const char *fpath) {
 
         // load pages into memory
         page_t *page = &world->chunk.pages[index++];
-        page_calculate_aabb(page, world);
         page_load_data(page, world, data, len);
     }
 
@@ -289,7 +293,7 @@ static void pages_replace(world_t *world, uint32_t indices[], int it) {
         fread(&len, sizeof(size_t), 1, level.fp);
         fread(&data, sizeof(ldata_t), len, level.fp);
 
-        /* log_debug("Loading %ld entities into page %d\n", len, page->index); */
+        log_debug("Loading %ld entities into page %d\n", len, page->index);
         page_load_data(page, world, data, len);
     }
 }
@@ -384,10 +388,10 @@ static void level_extend_bounds(world_t *world, page_t *page, int index) {
     bool case4 = floorf(index / world->chunk.box.dim.x)
                  == (world->chunk.box.dim.y - 1);
 
-    log_debug("Index: %d Coords: (%.0f, %.0f)\n", index,
-              fmodf(index, world->chunk.box.dim.x),
-              floorf(index / world->chunk.box.dim.x));
-    log_debug("%d: %d: %d: %d\n", case1, case2, case3, case4);
+    /* log_debug("Index: %d Coords: (%.0f, %.0f)\n", index, */
+    /*           fmodf(index, world->chunk.box.dim.x), */
+    /*           floorf(index / world->chunk.box.dim.x)); */
+    /* log_debug("%d: %d: %d: %d\n", case1, case2, case3, case4); */
 
     if (case1 || case2 || case3 || case4) {
         index = page->index;
@@ -443,7 +447,6 @@ static void level_extend_bounds(world_t *world, page_t *page, int index) {
                 break;
         }
 
-        glms_vec2_print(world->chunk.box.dim, stdout);
         log_debug("Extended level bounds: (%.2f, %.2f) %d\n",
                   world->chunk.box.dim.x, world->chunk.box.dim.y,
                   world->chunk.index);
