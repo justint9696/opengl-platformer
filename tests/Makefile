@@ -1,15 +1,15 @@
 CC = gcc
 
-SRCS = $(wildcard src/*.c src/**/*.c)
-OBJS = $(patsubst src/%, bin/%, $(SRCS:.c=.o))
-DEPS = $(patsubst src/%, bin/%, $(SRCS:.c=.d))
+SRCS = $(wildcard *.c)
+OBJS = $(patsubst %, bin/%, $(SRCS:.c=.o))
+DEPS = $(patsubst %, bin/%, $(SRCS:.c=.d))
 
 CFLAGS := -std=c11
 CFLAGS += -g
 CFLAGS += -O2
 CFLAGS += -Wall
 CFLAGS += -Wextra
-CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wpedantic
 CFLAGS += -Wno-missing-braces
 
 LDLIBS := -lm
@@ -20,8 +20,10 @@ LDFLAGS := -Wl,--start-group $(LDLIBS) -Wl,--end-group
 
 all: $(OBJS)
 
-bin/%.o: src/%.c
-	@mkdir -p $(dir $@)
+run: $(OBJS)
+	@$(foreach file, $^, ./$(file);)
+
+bin/%.o: %.c
 	$(CC) -o $@ $^ -MMD -MP $(CFLAGS) $(LDFLAGS)
 
 clean:

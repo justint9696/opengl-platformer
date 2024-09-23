@@ -48,10 +48,10 @@ glad:
 	@cd lib/glad && $(CC) -o libglad.a -Iinclude -c src/glad.c
 
 sdl:
-	@cd lib/SDL2 && mkdir -p build && cd build && ../configure && make -j 6
+	@cd lib/SDL2 && mkdir -p build && cd build && ../configure && make -j 6 && sudo make install
 
 cglm:
-	@cd lib/cglm && mkdir -p build && cd build && cmake .. && make -j 6
+	@cd lib/cglm && mkdir -p build && cd build && cmake .. && make -j 6 && sudo make install
 
 libs: glad sdl cglm
 
@@ -65,5 +65,10 @@ build/%.o: src/%.c
 
 clean:
 	rm -f $(TARGET) $(OBJS) $(DEPS)
+
+.PHONY: tests
+
+tests:
+	@cd tests && $(MAKE) run
 
 -include $(DEPS)
