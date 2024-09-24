@@ -71,7 +71,8 @@ void chunk_render(chunk_t *);
  * @brief Returns the page asscoiated with the given position.
  * @param self a pointer to a chunk
  * @param pos a position in world space
- * @returns a pointer to the page that contains the given position
+ * @returns a pointer to the page that contains the given position or NULL if
+ * position is out of bounds
  */
 page_t *chunk_page_from_pos(chunk_t *, vec2s pos);
 
@@ -80,7 +81,7 @@ page_t *chunk_page_from_pos(chunk_t *, vec2s pos);
  * @param self a pointer to a chunk
  * @param pos a position in world space
  * @returns the index of the page within the entire world that contains the
- * given position or -1 if the position is invalid
+ * given position
  */
 int chunk_index_from_pos(chunk_t *, vec2s pos);
 
