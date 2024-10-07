@@ -22,6 +22,7 @@ CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-missing-braces
+CFLAGS += -Wno-unused-result
 CFLAGS += $(CPPFLAGS)
 
 LDLIBS := -lm
@@ -34,6 +35,7 @@ LDFLAGS := -Llib/glad
 LDFLAGS += -Llib/SDL2/build/build/.libs
 LDFLAGS += -Llib/cglm/build
 LDFLAGS += -Wl,--start-group $(LDLIBS) -Wl,--end-group
+LDFLAGS += -Wl,-rpath=lib/SDL2/build/build/.libs
 
 TARGET = bin/game
 
@@ -48,10 +50,10 @@ glad:
 	@cd lib/glad && $(CC) -o libglad.a -Iinclude -c src/glad.c
 
 sdl:
-	@cd lib/SDL2 && mkdir -p build && cd build && ../configure && make -j 6 && sudo make install
+	@cd lib/SDL2 && mkdir -p build && cd build && ../configure && make -j 6
 
 cglm:
-	@cd lib/cglm && mkdir -p build && cd build && cmake .. && make -j 6 && sudo make install
+	@cd lib/cglm && mkdir -p build && cd build && cmake .. && make -j 6
 
 libs: glad sdl cglm
 
