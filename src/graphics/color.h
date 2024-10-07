@@ -1,3 +1,11 @@
+/**
+ * @file color.h
+ * @author Justin Tonkinson
+ * @date 2024/05/06
+ * @brief RGBA integer colors with a macro to convert them into a 4 float
+ * vector.
+ */
+
 #ifndef _GRAPHICS_COLOR_H_
 #define _GRAPHICS_COLOR_H_
 
@@ -12,7 +20,10 @@
 #define COLOR_ORANGE 0xFFA500FF
 #define COLOR_YELLOW 0xFFFF00FF
 
-/* Converts a color represented as an integer (RGBA) into a 4d float vector. */
+/**
+ * @brief Converts a color represented as an integer (RGBA) into a 4d float
+ * vector.
+ */
 #define RGBA(c) ((vec4s) {\
         ((c >> 24) & 0xFF) / 255.f,\
         ((c >> 16) & 0xFF) / 255.f,\

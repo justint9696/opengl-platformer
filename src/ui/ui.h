@@ -1,3 +1,10 @@
+/**
+ * @file ui.h
+ * @author Justin Tonkinson
+ * @date 2024/06/08
+ * @brief UI data structures and function prototypes.
+ */
+
 #ifndef _UI_UI_H_
 #define _UI_UI_H_
 

@@ -1,3 +1,10 @@
+/**
+ * @file renderer.c
+ * @author Justin Tonkinson
+ * @date 2024/05/06
+ * @brief Renderer implementation functions.
+ */
+
 #include "graphics/renderer.h"
 
 #include "graphics/drawing.h"
@@ -44,7 +51,7 @@ void renderer_destroy() {
     }
 
     // destroy textures
-    texture_destroy(renderer.texture);
+    /* texture_destroy(renderer.texture); */
 
     // destroy font textures
     font_destroy();

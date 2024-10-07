@@ -9,6 +9,8 @@
 
 #include "util/time.h"
 
+#include <string.h>
+
 static input_t input;
 
 void buttons_init() {

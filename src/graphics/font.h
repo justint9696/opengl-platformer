@@ -1,3 +1,10 @@
+/**
+ * @file font.h
+ * @author Justin Tonkinson
+ * @date 2024/06/07
+ * @brief Font data structures and function prototypes.
+ */
+
 #ifndef _GRAPHICS_FONT_H_
 #define _GRAPHICS_FONT_H_
 
@@ -8,26 +15,34 @@
 #define FONTCHAR_MAX 128
 
 typedef struct fontchar_s {
-    // texture id
+    /** @brief Texture handle. */
     GLuint id;
 
-    // size of texture
+    /** @brief Dimensions of the texture. */
     ivec2s dim;
 
-    // offset from the base to the left/top of texture
+    /** @brief Offset from the base to the top left of the texture. */
     ivec2s bearing;
 
-    // offset of next texture
+    /** @brief Offset of the next texture. */
     GLuint advance;
 } fontchar_t;
 
-/* Initializes the internal font table. */
+/**
+ * @brief Initializes the internal font table.
+ * @param relative path of font file
+ */
 void font_init(const char *fpath);
 
-/* Releases the allocated memory for the internal font table. */
+/**
+ * @brief Releases the allocated memory for the internal font table.
+ */
 void font_destroy();
 
-/* Returns a fontchar from the ASCII value (or `idx`) of a character. */
+/**
+ * @brief Returns a fontchar from the ASCII value of a character.
+ * @param idx index of the char
+ */
 const fontchar_t *font_get_char(size_t idx);
 
 #endif // ifndef _GRAPHICS_FONT_H_

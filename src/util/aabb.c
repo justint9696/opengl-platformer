@@ -1,3 +1,10 @@
+/**
+ * @file aabb.c
+ * @author Justin Tonkinson
+ * @date 2024/05/24
+ * @brief Axis-aligned bounding box (AABB) implementation functions.
+ */
+
 #include "util/aabb.h"
 
 #include <cglm/struct.h>
@@ -18,7 +25,7 @@ inline bool aabb_collision_2d(const box_t *a, const box_t *b) {
     assert(a);
     assert(b);
 
-    return ((a->pos.x < b->pos.x + b->dim.x) 
+    return ((a->pos.x < b->pos.x + b->dim.x)
             && (a->pos.x + a->dim.x > b->pos.x)
             && (a->pos.y < b->pos.y + b->dim.y)
             && (a->pos.y + a->dim.y > b->pos.y));

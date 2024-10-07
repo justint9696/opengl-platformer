@@ -1,3 +1,10 @@
+/**
+ * @file ibo.c
+ * @author Justin Tonkinson
+ * @date 2024/06/07
+ * @brief OpenGL index buffer wrapper implementation functions.
+ */
+
 #include "graphics/ibo.h"
 
 inline GLuint ibo_create(const void *data, size_t len) {

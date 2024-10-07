@@ -1,22 +1,45 @@
+/**
+ * @file vbo.h
+ * @author Justin Tonkinson
+ * @date 2024/06/07
+ * @brief OpenGL vertex buffer wrapper functions.
+ */
+
 #ifndef _GRAPHICS_VBO_H_
 #define _GRAPHICS_VBO_H_
 
 #include <glad/glad.h>
 #include <stddef.h>
 
-/* Creates a vertex buffer and sets its data. */
+/**
+ * @brief Creates a vertex buffer and sets its data.
+ * @param data data to copy to the buffer
+ * @param len size of the data in bytes
+ */
 GLuint vbo_create(const void *data, size_t len);
 
-/* Releases a vertex buffer. */
-void vbo_destroy(GLuint *);
+/**
+ * @brief Releases a vertex buffer.
+ * @param self vertex buffer handle
+ */
+void vbo_destroy(GLuint *self);
 
-/* Binds a vertex buffer. */
-void vbo_bind(GLuint *);
+/**
+ * @brief Binds a vertex buffer.
+ * @param self vertex buffer handle
+ */
+void vbo_bind(GLuint *self);
 
-/* Unbinds a vertex buffer. */
+/**
+ * @brief Unbinds a vertex buffer.
+ */
 void vbo_unbind();
 
-/* Sets the data for a vertex buffer. */
+/**
+ * @brief Sets the data for a vertex buffer.
+ * @param data data to copy to the buffer
+ * @param len size of the data in bytes
+ */
 void vbo_buffer_data(const void *data, size_t len);
 
 #endif // ifndef _GRAPHICS_VBO_H_

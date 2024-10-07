@@ -1,3 +1,10 @@
+/**
+ * @file vbo.c
+ * @author Justin Tonkinson
+ * @date 2024/06/07
+ * @brief OpenGL vertex buffer wrapper functions.
+ */
+
 #include "graphics/vbo.h"
 
 inline GLuint vbo_create(const void *data, size_t len) {

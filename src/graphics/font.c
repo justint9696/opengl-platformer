@@ -1,3 +1,10 @@
+/**
+ * @file font.c
+ * @author Justin Tonkinson
+ * @date 2024/06/07
+ * @brief Font implementation functions.
+ */
+
 #include "graphics/font.h"
 
 #include "util/assert.h"

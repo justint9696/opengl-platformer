@@ -83,7 +83,7 @@ void level_swap_pages(world_t *, page_t *);
 /**
  * @brief Synchronizes the level with the tick rate.
  * @param world a pointer to the game world
- * @param float dt
+ * @param dt delta time
  */
 void level_sync(world_t *, float dt);
 

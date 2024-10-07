@@ -71,8 +71,7 @@ static void page_load_data(page_t *page, world_t *world, ldata_t arr[],
 }
 
 void level_shutdown(world_t *world) {
-    if (level.fp)
-        return;
+    assert(level.fp);
 
     fclose(level.fp);
     array_free(level.offsets);

@@ -2,7 +2,7 @@
 #include "util/log.h"
 
 #define SDL_MAIN_HANDLED
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 int main(int argc, char *argv[]) {
     const char *fname = NULL;

@@ -1,16 +1,23 @@
+/**
+ * @file window.c
+ * @author Justin Tonkinson
+ * @date 2024/05/06
+ * @brief Window implementation functions.
+ */
+
 #include "graphics/window.h"
 
 #include "graphics/renderer.h"
 #include "util/assert.h"
 #include "util/log.h"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_video.h>
+#include <SDL.h>
 
 #include <assert.h>
 #include <glad/glad.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 void window_init(window_t *self, const char *title) {
     memset(self, 0, sizeof(window_t));

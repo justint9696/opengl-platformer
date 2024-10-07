@@ -1,3 +1,10 @@
+/**
+ * @file shader.c
+ * @author Justin Tonkinson
+ * @date 2024/05/06
+ * @brief Shader implementation functions.
+ */
+
 #include "graphics/shader.h"
 #include "util/log.h"
 

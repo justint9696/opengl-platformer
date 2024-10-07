@@ -1,3 +1,10 @@
+/**
+ * @file time.h
+ * @author Justin Tonkinson
+ * @date 2024/05/06
+ * @brief Time management data structure and function prototypes.
+ */
+
 #ifndef _UTIL_TIME_H_
 #define _UTIL_TIME_H_
 
@@ -18,12 +25,14 @@
 
 #define DELTA_FIXED   ((double)TICK_DELAY / (double)NS_PER_SECOND)
 
+/** @brief Returns the current UTC time in nanoseconds. */
 #define NOW() ({\
         struct timespec ts;\
         timespec_get(&ts, TIME_UTC);\
         ((ts.tv_sec * NS_PER_SECOND) + ts.tv_nsec);\
     })
 
+/** @brief Time management data structure. */
 struct time_s {
     time_t delta_ns;
     time_t last_second, last_tick, last_frame;
@@ -32,20 +41,37 @@ struct time_s {
     uint32_t fps, tps;
 };
 
-/* Initializes the time structure. */
+/**
+ * @brief Initializes the time structure.
+ * @param self a pointer to a time manager
+ */
 void time_init(struct time_s *);
 
-/* Updates the time structure. */
+/**
+ * @brief Updates the time structure.
+ * @param self a pointer to a time manager
+ */
 void time_update(struct time_s *);
 
-/* Returns true if the time since the last tick is greater than the tick delay.
+/**
+ * @brief Determines if the game should synchronize and updates the time manager
+ * accordingly.
+ * @param self a pointer to a time manager
+ * @returns true if the the time since the last tick is greater than the tick
+ * delay or false otherwise
  */
 bool time_sync(struct time_s *);
 
-/* Returns the time passed since the provided tick in nanoseconds. */
+/**
+ * @brief Returns the time passed since the provided tick in nanoseconds.
+ * @param tick a point in time
+ */
 time_t time_since(time_t);
 
-/* Returns the time passed since the provided tick in milliseconds. */
+/**
+ * @brief Returns the time passed since the provided tick in milliseconds.
+ * @param tick a point in time
+ */
 time_t time_since_ms(time_t);
 
 #endif // ifndef _UTIL_TIME_H_

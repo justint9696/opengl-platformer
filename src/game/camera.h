@@ -22,8 +22,8 @@ typedef struct {
     mat4s view;
 } camera_t;
 
-/** 
- * @brief Initializes a camera with a frustrum of size (width x height). 
+/**
+ * @brief Initializes a camera with a frustrum of size (width x height).
  * @param self a pointer to a camera
  * @param pos starting position in 2-dimensional space
  * @param width the width of the frustrum

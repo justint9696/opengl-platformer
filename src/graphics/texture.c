@@ -1,3 +1,10 @@
+/**
+ * @file texture.c
+ * @author Justin Tonkinson
+ * @date 2024/08/22
+ * @brief Texture implementation functions.
+ */
+
 #include "graphics/texture.h"
 
 #define STB_IMAGE_IMPLEMENTATION

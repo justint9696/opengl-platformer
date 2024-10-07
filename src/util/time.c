@@ -1,3 +1,10 @@
+/**
+ * @file time.c
+ * @author Justin Tonkinson
+ * @date 2024/05/06
+ * @brief Time management implementation functions.
+ */
+
 #include "util/time.h"
 
 #include <string.h>

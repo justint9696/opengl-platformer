@@ -15,6 +15,7 @@
 #include "level/level.h"
 
 #include <assert.h>
+#include <string.h>
 #include <cglm/struct.h>
 
 static const uint32_t COLOR_RED_FADE = 0xFF000080;

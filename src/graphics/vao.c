@@ -1,3 +1,10 @@
+/**
+ * @file vao.h
+ * @author Justin Tonkinson
+ * @date 2024/06/07
+ * @brief OpenGL vertex array wrapper implementation functions.
+ */
+
 #include "graphics/vao.h"
 
 inline GLuint vao_create() {
@@ -19,7 +26,7 @@ inline void vao_unbind() {
 }
 
 inline void vao_attrib(GLint index, GLint size, GLenum type, GLsizei stride,
-                const void *data) {
-    glVertexAttribPointer(index, size, type, GL_FALSE, stride, data);
+                       const void *offset) {
+    glVertexAttribPointer(index, size, type, GL_FALSE, stride, offset);
     glEnableVertexAttribArray(index);
 }

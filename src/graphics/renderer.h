@@ -1,3 +1,10 @@
+/**
+ * @file renderer.h
+ * @author Justin Tonkinson
+ * @date 2024/05/06
+ * @brief Renderer data structure and function prototypes.
+ */
+
 #ifndef _GRAPHICS_RENDERER_H_
 #define _GRAPHICS_RENDERER_H_
 
@@ -7,6 +14,7 @@
 
 #include <glad/glad.h>
 
+/** @brief All possible shader types. */
 typedef enum shader_type_e {
     SHADER_DEFAULT,
     SHADER_UI_TEXT,
@@ -14,26 +22,45 @@ typedef enum shader_type_e {
     SHADER_MAX,
 } shader_type_t;
 
+/** @brief Renderer data structure. */
 typedef struct {
+    /** @brief An array of the shaders. */
     shader_t shaders[SHADER_MAX];
+
+    /** @brief The currently bound shader. */
     shader_t *shader;
-    texture_t texture;
+
+    /** @brief */
+    /* texture_t texture; */
+
+    /** @brief A pointer to the camera the scene should be rendered from. */
     const camera_t *camera;
 } renderer_t;
 
-/* Initializes the internal renderer. */
+/**
+ * @brief Initializes the internal renderer.
+ */
 void renderer_init();
 
-/* Destroys the internal renderer. */
+/**
+ * @brief Destroys the internal renderer.
+ */
 void renderer_destroy();
 
-/* Binds the provided shader index if it has not already been bound. */
-shader_t *renderer_use_shader(shader_type_t);
+/**
+ * @brief Binds the provided shader index if it has not already been bound.
+ * @param index index of the shader to bind
+ */
+shader_t *renderer_use_shader(shader_type_t index);
 
-/* Prepares the renderer scene based on the provided camera. */
-void renderer_prepare_scene(const camera_t *);
+/**
+ * @brief Prepares the renderer scene based on the provided camera.
+ * @brief camera a pointer to a camera*/
+void renderer_prepare_scene(const camera_t *camera);
 
-/* Presents the renderer scene. */
+/**
+ * @brief Presents the renderer scene.
+ */
 void renderer_present_scene();
 
 #endif // ifndef _GRAPHICS_RENDERER_H_

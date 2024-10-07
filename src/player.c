@@ -14,6 +14,7 @@
 #include "world/world.h"
 
 #include <cglm/struct.h>
+#include <string.h>
 
 static inline void draw_debug(entity_t *self, world_t *world) {
     draw_debug_text("Player Position: (%.2f, %.2f)", self->body.pos.x,

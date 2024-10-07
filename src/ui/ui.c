@@ -1,3 +1,10 @@
+/**
+ * @file ui.c
+ * @author Justin Tonkinson
+ * @date 2024/06/08
+ * @brief UI implementation functions.
+ */
+
 #include "ui/ui.h"
 
 #include "graphics/drawing.h"
