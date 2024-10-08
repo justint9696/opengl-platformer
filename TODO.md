@@ -1,4 +1,4 @@
-# TODO
+## TODO
 - [x] Address grid updating with camera movement
     - [x] Test it out on a flat level without chunks first
 - [x] Level chunking
@@ -18,11 +18,11 @@
     - [x] Draw grid for block snapping
     - [x] Make swap chunks based on camera position rather than the player
       position
-    - [ ] Add above and below pages && allow them to be swapped
+    - [x] Add above and below pages && allow them to be swapped
     - [ ] Grab entities under selection rectangle and push to dynamic array
     - [ ] Make edit state work for all entities within the dynamic array
     - [x] Calculate the correct chunk position when importing the level
-- [ ] UI Debug Methods
-    - [ ] Be able to draw a transparent quad anywhere on the screen
-    - [ ] Cleanup the ui file and make it more presentable
-    - [ ] Add brief documentation for prototypes
+    - [ ] Open blank canvas
+ - [ ] Renderer
+    - [ ] Sprite batch rendering
+    - [ ] Texture atlas and animation
