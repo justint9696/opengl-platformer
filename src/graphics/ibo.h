@@ -16,7 +16,7 @@
  * @param data data to copy to the buffer
  * @param len size of the data in bytes
  */
-GLuint ibo_create(const void *data, size_t len);
+GLuint ibo_create(const void *data, GLsizei len);
 
 /**
  * @brief Releases an index buffer.
@@ -40,6 +40,14 @@ void ibo_unbind();
  * @param data data to copy to the buffer
  * @param len size of the data in bytes
  */
-void ibo_buffer_data(const void *data, size_t len);
+void ibo_buffer_data(const void *data, GLsizei len);
+
+/**
+ * @brief Sets the sub data for an index buffer.
+ * @param data data to copy to the buffer
+ * @param offset offset of the data
+ * @param len size of the data in bytes
+ */
+void ibo_buffer_sub_data(const void *data, GLsizei offset, GLsizei len);
 
 #endif // ifndef _GRAPHICS_IBO_H_

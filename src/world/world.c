@@ -28,9 +28,9 @@
 void world_init(world_t *self) {
     memset(self, 0, sizeof(world_t));
 
-    self->vao = vao_create();
-    self->vbo = vbo_create(NULL, 0);
-    self->ibo = ibo_create(NULL, 0);
+    /* self->vao = vao_create(); */
+    /* self->vbo = vbo_create(NULL, 0); */
+    /* self->ibo = ibo_create(NULL, 0); */
 
     chunk_init(&self->chunk);
     grid_init(&self->grid, 60, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -39,9 +39,9 @@ void world_init(world_t *self) {
 void world_destroy(world_t *self) {
     chunk_destroy(&self->chunk);
 
-    vao_destroy(&self->vao);
-    vbo_destroy(&self->vbo);
-    ibo_destroy(&self->vbo);
+    /* vao_destroy(&self->vao); */
+    /* vbo_destroy(&self->vbo); */
+    /* ibo_destroy(&self->vbo); */
 }
 
 void world_update(world_t *self, float dt) {
@@ -60,9 +60,9 @@ void world_update(world_t *self, float dt) {
 void world_render(world_t *self) {
     renderer_use_shader(SHADER_DEFAULT);
 
-    vao_bind(&self->vao);
-    vbo_bind(&self->vbo);
-    ibo_bind(&self->ibo);
+    /* vao_bind(&self->vao); */
+    /* vbo_bind(&self->vbo); */
+    /* ibo_bind(&self->ibo); */
     {
         player_render(self->player, self);
 
@@ -78,9 +78,9 @@ void world_render(world_t *self) {
 
         chunk_render(&self->chunk);
     }
-    vao_unbind();
-    vbo_unbind();
-    ibo_unbind();
+    /* vao_unbind(); */
+    /* vbo_unbind(); */
+    /* ibo_unbind(); */
 }
 
 void world_sync(world_t *self, float dt) {

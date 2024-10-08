@@ -16,7 +16,7 @@
  * @param data data to copy to the buffer
  * @param len size of the data in bytes
  */
-GLuint vbo_create(const void *data, size_t len);
+GLuint vbo_create(const void *data, GLsizei len);
 
 /**
  * @brief Releases a vertex buffer.
@@ -40,6 +40,14 @@ void vbo_unbind();
  * @param data data to copy to the buffer
  * @param len size of the data in bytes
  */
-void vbo_buffer_data(const void *data, size_t len);
+void vbo_buffer_data(const void *data, GLsizei len);
+
+/**
+ * @brief Sets the sub data for a vertex buffer.
+ * @param data data to copy to the buffer
+ * @param offset offset of the data
+ * @param len size of the data in bytes
+ */
+void vbo_buffer_sub_data(const void *data, GLsizei offset, GLsizei len);
 
 #endif // ifndef _GRAPHICS_VBO_H_

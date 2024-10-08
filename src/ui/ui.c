@@ -17,7 +17,7 @@
 static ui_t ui;
 
 static void render_text(vec2s pos, float scale, vec4s color, const char *text) {
-    shader_uniform_3f(*ui.shader, "color", color.r, color.g, color.b);
+    shader_uniform_3f(ui.shader, "color", color.r, color.g, color.b);
     glActiveTexture(GL_TEXTURE0);
 
     size_t len = strlen(text);
@@ -69,7 +69,7 @@ static void render_texture(vec2s pos, vec2s dim, uint32_t color) {
     vbo_buffer_data(vertices, sizeof(vertices));
     ibo_buffer_data(indices, sizeof(indices));
 
-    shader_uniform_vec4f(*ui.shader, "color", RGBA(color));
+    shader_uniform_vec4f(ui.shader, "color", RGBA(color));
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
@@ -111,7 +111,7 @@ void ui_render(const camera_t *camera) {
     vbo_bind(&ui.texture.vbo);
     ibo_bind(&ui.texture.ibo);
 
-    shader_uniform_mat4f(*ui.shader, "projection", camera->projection);
+    shader_uniform_mat4f(ui.shader, "projection", camera->projection);
 
     for (size_t i = 0; i < ui.texture.items.len; i++) {
         texture = queue_pop(&ui.texture.items);
@@ -128,7 +128,7 @@ void ui_render(const camera_t *camera) {
     vao_bind(&ui.text.vao);
     vbo_bind(&ui.text.vbo);
 
-    shader_uniform_mat4f(*ui.shader, "projection", camera->projection);
+    shader_uniform_mat4f(ui.shader, "projection", camera->projection);
 
     size_t len = ui.text.items.len;
     for (size_t i = 0; i < len; i++) {

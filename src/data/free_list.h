@@ -17,10 +17,10 @@ typedef struct fnode_s {
     /** @brief The maximum number of items the block can hold. */
     size_t capacity;
 
-    /** 
+    /**
      * @brief Linked list node that points to the next item in the free list. */
     LNODE(struct fnode_s);
-    
+
     /** @brief The data section of the node. */
     void *data;
 } fnode_t;

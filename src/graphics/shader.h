@@ -11,29 +11,25 @@
 #include <cglm/types-struct.h>
 #include <glad/glad.h>
 
-typedef struct {
-    GLuint handle, fs, vs;
-} shader_t;
-
 /**
  * @brief Creates a shader program from the provided files.
  * @param vs_path vertex shader relative path
  * @param fs_path fragment shader relative path
  * @returns the resultant shader program
  */
-shader_t shader_create(const char *vs_path, const char *fs_path);
+GLint shader_create(const char *vs_path, const char *fs_path);
 
 /**
  * @brief Releases a shader program.
  * @param self the shader to destroy
  */
-void shader_destroy(shader_t);
+void shader_destroy(GLint self);
 
 /**
  * @brief Binds a shader program.
  * @param self the shader to use
  */
-void shader_use(shader_t);
+void shader_use(GLint self);
 
 /**
  * @brief Sets a shader's 4d float matrix uniform.
@@ -41,7 +37,7 @@ void shader_use(shader_t);
  * @param uniform the shader uniform to set
  * @param val the uniform value
  */
-void shader_uniform_mat4f(shader_t, const char *uniform, mat4s val);
+void shader_uniform_mat4f(GLint self, const char *uniform, mat4s val);
 
 /**
  * @brief Sets a shader's 3d float vector uniform.
@@ -49,7 +45,7 @@ void shader_uniform_mat4f(shader_t, const char *uniform, mat4s val);
  * @param uniform the shader uniform to set
  * @param val the uniform value
  */
-void shader_uniform_vec3f(shader_t, const char *uniform, vec3s val);
+void shader_uniform_vec3f(GLint self, const char *uniform, vec3s val);
 
 /**
  * @brief Sets a shader's 4d float vector uniform.
@@ -57,7 +53,7 @@ void shader_uniform_vec3f(shader_t, const char *uniform, vec3s val);
  * @param uniform the shader uniform to set
  * @param val the uniform value
  */
-void shader_uniform_vec4f(shader_t, const char *uniform, vec4s val);
+void shader_uniform_vec4f(GLint self, const char *uniform, vec4s val);
 
 /**
  * @brief Sets a shader's 3 float uniform.
@@ -67,6 +63,6 @@ void shader_uniform_vec4f(shader_t, const char *uniform, vec4s val);
  * @param y uniform y value
  * @param z uniform z value
  */
-void shader_uniform_3f(shader_t, const char *uniform, float x, float y, float z);
+void shader_uniform_3f(GLint self, const char *uniform, float x, float y, float z);
 
 #endif // ifndef _GRAPHICS_SHADER_H_

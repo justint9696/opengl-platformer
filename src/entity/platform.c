@@ -21,7 +21,7 @@ entity_t *platform_create(vec2s pos, vec2s dim, world_t *world) {
     return entity_create(&(entity_t) {
         .render = render,
         .body = {
-            .pos = pos, 
+            .pos = pos,
             .dim = dim,
             .solid = true,
             .collision_callback = collision_callback,

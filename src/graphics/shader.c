@@ -46,45 +46,43 @@ static GLint shader_compile(const char *fpath, GLenum type) {
     return handle;
 }
 
-shader_t shader_create(const char *vs_path, const char *fs_path) {
-    shader_t self;
-    self.vs = shader_compile(vs_path, GL_VERTEX_SHADER);
-    self.fs = shader_compile(fs_path, GL_FRAGMENT_SHADER);
-    self.handle = glCreateProgram();
+GLint shader_create(const char *vs_path, const char *fs_path) {
+    GLint vs = shader_compile(vs_path, GL_VERTEX_SHADER);
+    GLint fs = shader_compile(fs_path, GL_FRAGMENT_SHADER);
+    GLint shader = glCreateProgram();
 
-    glAttachShader(self.handle, self.vs);
-    glAttachShader(self.handle, self.fs);
-    glLinkProgram(self.handle);
+    glAttachShader(shader, vs);
+    glAttachShader(shader, fs);
+    glLinkProgram(shader);
 
-    return self;
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+
+    return shader;
 }
 
-void shader_destroy(shader_t self) {
-    glDeleteProgram(self.handle);
-    glDeleteShader(self.vs);
-    glDeleteShader(self.fs);
+void shader_destroy(GLint self) {
+    glDeleteProgram(self);
 }
 
-void shader_use(shader_t self) {
-    glUseProgram(self.handle);
+void shader_use(GLint self) {
+    glUseProgram(self);
 }
 
-void shader_uniform_mat4f(shader_t self, const char *uniform, mat4s val) {
-    glUniformMatrix4fv(glGetUniformLocation(self.handle, uniform), 1, GL_FALSE,
+void shader_uniform_mat4f(GLint self, const char *uniform, mat4s val) {
+    glUniformMatrix4fv(glGetUniformLocation(self, uniform), 1, GL_FALSE,
                        (const GLfloat *)&val);
 }
 
-void shader_uniform_vec3f(shader_t self, const char *uniform, vec3s val) {
-    glUniform3fv(glGetUniformLocation(self.handle, uniform), 1,
-                 (const GLfloat *)&val);
+void shader_uniform_vec3f(GLint self, const char *uniform, vec3s val) {
+    glUniform3fv(glGetUniformLocation(self, uniform), 1, (const GLfloat *)&val);
 }
 
-void shader_uniform_vec4f(shader_t self, const char *uniform, vec4s val) {
-    glUniform4fv(glGetUniformLocation(self.handle, uniform), 1,
-                 (const GLfloat *)&val);
+void shader_uniform_vec4f(GLint self, const char *uniform, vec4s val) {
+    glUniform4fv(glGetUniformLocation(self, uniform), 1, (const GLfloat *)&val);
 }
 
-void shader_uniform_3f(shader_t self, const char *uniform, float x, float y,
+void shader_uniform_3f(GLint self, const char *uniform, float x, float y,
                        float z) {
-    glUniform3f(glGetUniformLocation(self.handle, uniform), x, y, z);
+    glUniform3f(glGetUniformLocation(self, uniform), x, y, z);
 }

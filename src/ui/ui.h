@@ -47,7 +47,7 @@ typedef struct {
         GLuint vao, vbo, ibo;
     } texture;
 
-    const shader_t *shader;
+    GLint shader;
 } ui_t;
 
 void ui_init();

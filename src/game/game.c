@@ -107,7 +107,7 @@ static void sync(game_t *self) {
 
 static void render(game_t *self) {
     world_render(&self->world);
-    ui_render(&self->world.camera);
+    /* ui_render(&self->world.camera); */
 
     switch (self->state) {
         case GS_EDIT:

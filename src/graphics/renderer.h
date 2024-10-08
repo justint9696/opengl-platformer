@@ -10,6 +10,7 @@
 
 #include "game/camera.h"
 #include "graphics/shader.h"
+#include "graphics/sprite.h"
 #include "graphics/texture.h"
 
 #include <glad/glad.h>
@@ -25,10 +26,12 @@ typedef enum shader_type_e {
 /** @brief Renderer data structure. */
 typedef struct {
     /** @brief An array of the shaders. */
-    shader_t shaders[SHADER_MAX];
+    GLint shaders[SHADER_MAX];
 
     /** @brief The currently bound shader. */
-    shader_t *shader;
+    GLint shader;
+
+    sprite_batch_t sprites;
 
     /** @brief */
     /* texture_t texture; */
@@ -51,11 +54,12 @@ void renderer_destroy();
  * @brief Binds the provided shader index if it has not already been bound.
  * @param index index of the shader to bind
  */
-shader_t *renderer_use_shader(shader_type_t index);
+GLint renderer_use_shader(shader_type_t index);
 
 /**
  * @brief Prepares the renderer scene based on the provided camera.
- * @brief camera a pointer to a camera*/
+ * @brief camera a pointer to the scene camera
+ */
 void renderer_prepare_scene(const camera_t *camera);
 
 /**

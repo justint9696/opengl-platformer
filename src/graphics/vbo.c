@@ -7,7 +7,7 @@
 
 #include "graphics/vbo.h"
 
-inline GLuint vbo_create(const void *data, size_t len) {
+inline GLuint vbo_create(const void *data, GLsizei len) {
     GLuint self;
     glGenBuffers(1, &self);
     glBindBuffer(GL_ARRAY_BUFFER, self);
@@ -27,6 +27,10 @@ inline void vbo_unbind() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-inline void vbo_buffer_data(const void *data, size_t len) {
+inline void vbo_buffer_data(const void *data, GLsizei len) {
     glBufferData(GL_ARRAY_BUFFER, len, data, GL_DYNAMIC_DRAW);
+}
+
+inline void vbo_buffer_sub_data(const void *data, GLsizei offset, GLsizei len) {
+    glBufferSubData(GL_ARRAY_BUFFER, offset, len, data);
 }

@@ -7,7 +7,7 @@
 
 #include "graphics/ibo.h"
 
-inline GLuint ibo_create(const void *data, size_t len) {
+inline GLuint ibo_create(const void *data, GLsizei len) {
     GLuint self;
     glGenBuffers(1, &self);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self);
@@ -27,6 +27,10 @@ inline void ibo_unbind() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-inline void ibo_buffer_data(const void *data, size_t len) {
+inline void ibo_buffer_data(const void *data, GLsizei len) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, len, data, GL_DYNAMIC_DRAW);
+}
+
+inline void ibo_buffer_sub_data(const void *data, GLsizei offset, GLsizei len) {
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, len, data);
 }
