@@ -1,3 +1,10 @@
+/**
+ * @file line.c
+ * @author Justin Tonkinson
+ * @date 2024/10/09
+ * @brief This file contains the implementation functions for line batching.
+ */
+
 #include "graphics/line.h"
 
 #include "data/array.h"
@@ -16,26 +23,26 @@ typedef struct vertex_s {
 } vertex_t;
 
 void lines_init() {
-    lines.items = array_alloc(sizeof(line_t), 128);
+    lines.arr = array_alloc(sizeof(line_t), 128);
 
     lines.vao = vao_create();
     lines.vbo = vbo_create(NULL, sizeof(vertex_t) * 1024);
 }
 
 void lines_destroy() {
-    array_free(lines.items);
+    array_free(lines.arr);
 
     vao_destroy(&lines.vao);
     vbo_destroy(&lines.vbo);
 }
 
 void lines_push(vec2s start, vec2s end, float z, uint32_t color) {
-    array_push(lines.items, &(line_t) {
+    array_push(lines.arr, &((line_t) {
         .start = start,
         .end = end,
         .z = z,
         .color = color,
-    });
+    }));
 }
 
 static void line_to_world(const line_t *line, vertex_t vertices[], size_t n,
@@ -57,11 +64,11 @@ static void line_to_world(const line_t *line, vertex_t vertices[], size_t n,
 }
 
 void lines_render(const camera_t *camera) {
-    size_t len = array_len(lines.items);
+    size_t len = array_len(lines.arr);
     vertex_t vertices[len * 2];
 
     for (size_t i = 0; i < len; i++) {
-        const line_t *line = &lines.items[i];
+        const line_t *line = &lines.arr[i];
         line_to_world(line, vertices, i * 2, camera);
     }
 
@@ -82,10 +89,8 @@ void lines_render(const camera_t *camera) {
 
     glDrawArrays(GL_LINES, 0, len * 2);
 
-    /* glDrawElements(GL_LINES, (len * 2), GL_UNSIGNED_INT, 0); */
-
     vao_unbind();
     vbo_unbind();
 
-    array_clear(lines.items);
+    array_clear(lines.arr);
 }

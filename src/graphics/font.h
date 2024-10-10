@@ -30,7 +30,7 @@ typedef struct fontchar_s {
 
 /**
  * @brief Initializes the internal font table.
- * @param relative path of font file
+ * @param fpath relative path of font file
  */
 void font_init(const char *fpath);
 

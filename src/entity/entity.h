@@ -63,7 +63,7 @@ typedef struct entity_s {
     /** @brief Optional initialize function pointer. */
     void (*init)(struct entity_s *, struct world_s *);
 
-    /** @brief Optional deinitialize function pointer. */
+    /** @brief Optional destroy function pointer. */
     void (*destroy)(struct entity_s *, struct world_s *);
 
     /** @brief Optional render function pointer. */
@@ -77,7 +77,7 @@ typedef struct entity_s {
 } entity_t;
 
 /**
- * @brief Creantes an entity and adds it to the world.
+ * @brief Creates an entity and adds it to the world.
  * @param data the data to be copied into the entity
  * @param world a pointer to the game world
  * @returns a pointer to the entity

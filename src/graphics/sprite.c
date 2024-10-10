@@ -1,9 +1,17 @@
+/**
+ * @file sprite.c
+ * @author Justin Tonkinson
+ * @date 2024/10/08
+ * @brief This file contains the implementation functions for sprite batching.
+ */
+
 #include "graphics/sprite.h"
 
 #include "data/array.h"
 #include "graphics/drawing.h"
 #include "graphics/renderer.h"
 #include "graphics/shader.h"
+#include "util/log.h"
 
 #include <cglm/struct.h>
 #include <string.h>
@@ -20,7 +28,7 @@ static const uint32_t SPRITE_INDICES[6];
 static const vertex_t SPRITE_VERTICES[4];
 
 void sprites_init() {
-    sprites.items = array_alloc(sizeof(sprite_t), 128);
+    sprites.arr = array_alloc(sizeof(sprite_t), 128);
 
     sprites.vao = vao_create();
     sprites.vbo = vbo_create(NULL, sizeof(vertex_t) * 1024);
@@ -28,7 +36,7 @@ void sprites_init() {
 }
 
 void sprites_destroy() {
-    array_free(sprites.items);
+    array_free(sprites.arr);
 
     vao_destroy(&sprites.vao);
     vbo_destroy(&sprites.vbo);
@@ -36,12 +44,12 @@ void sprites_destroy() {
 }
 
 void sprites_push(vec2s pos, vec2s dim, float z, uint32_t color) {
-    array_push(sprites.items, &(sprite_t) {
+    array_push(sprites.arr, &((sprite_t) {
         .pos = pos,
         .dim = dim,
         .z = z,
         .color = color,
-    });
+    }));
 }
 
 static void sprite_to_world(const sprite_t *sprite, vertex_t vertices[],
@@ -63,12 +71,12 @@ static void sprite_to_world(const sprite_t *sprite, vertex_t vertices[],
 }
 
 void sprites_render(const camera_t *camera) {
-    size_t len = array_len(sprites.items);
+    size_t len = array_len(sprites.arr);
     uint32_t indices[len * 6];
     vertex_t vertices[len * 4];
 
     for (size_t i = 0; i < len; i++) {
-        const sprite_t *sprite = &sprites.items[i];
+        const sprite_t *sprite = &sprites.arr[i];
         for (size_t j = 0; j < 6; j++) {
             uint32_t idx = SPRITE_INDICES[j] + (i * 4);
             indices[(i * 6) + j] = idx;
@@ -101,7 +109,7 @@ void sprites_render(const camera_t *camera) {
     vbo_unbind();
     ibo_unbind();
 
-    array_clear(sprites.items);
+    array_clear(sprites.arr);
 }
 
 static const uint32_t SPRITE_INDICES[6] = {

@@ -5,6 +5,7 @@
  * @brief This file contains the data structures and function prototypes needed
  * for sprite batching.
  */
+
 #ifndef _GRAPHICS_SPRITE_H_
 #define _GRAPHICS_SPRITE_H_
 
@@ -29,22 +30,23 @@ typedef struct sprite_s {
     uint32_t color;
 } sprite_t;
 
+/** @brief Sprite batch data structure. */
 typedef struct sprite_batch_s {
     /** @brief Dynamic array of sprites to be rendered. */
-    sprite_t *items;
+    sprite_t *arr;
 
     /** @brief Vertex buffer objects. */
     GLuint vao, vbo, ibo;
 } sprite_batch_t;
 
 /**
- * @brief Allocates memory for the sprite batch.
+ * @brief Initializes the sprite batch internal state.
  * @param self a pointer to a sprite batch
  */
 void sprites_init();
 
 /**
- * @brief Released the memory allocated for a sprite batch.
+ * @brief Destroys the sprite batch internal state.
  * @param self a pointer to a sprite batch
  */
 void sprites_destroy();
