@@ -9,6 +9,8 @@
 
 #include "graphics/drawing.h"
 #include "graphics/font.h"
+#include "graphics/line.h"
+#include "graphics/sprite.h"
 #include "graphics/window.h"
 #include "ui/ui.h"
 #include "util/log.h"
@@ -43,7 +45,8 @@ void renderer_init() {
     /*     renderer.batch[i].vertices = batch_alloc(1024); */
     /* } */
 
-    sprite_init(&renderer.sprites);
+    sprites_init();
+    lines_init();
 
     // load textures
     /* renderer.texture = texture_create("assets/images/white.png"); */
@@ -58,12 +61,8 @@ void renderer_destroy() {
         shader_destroy(renderer.shaders[i]);
     }
 
-    sprite_destroy(&renderer.sprites);
-
-    /* for (size_t i = 0; i < SHADER_MAX; i++) { */
-    /*     batch_free(renderer.batch[i].indices); */
-    /*     batch_free(renderer.batch[i].vertices); */
-    /* } */
+    sprites_destroy();
+    lines_destroy();
 
     // destroy textures
     /* texture_destroy(renderer.texture); */
@@ -75,10 +74,11 @@ void renderer_destroy() {
 GLint renderer_use_shader(shader_type_t index) {
     const GLint shader = renderer.shaders[index];
     if (shader == renderer.shader)
-        return renderer.shader;
+        return shader;
 
     renderer.shader = shader;
-    shader_use(renderer.shaders[index]);
+    shader_use(shader);
+
     return shader;
 }
 
@@ -88,49 +88,16 @@ void renderer_prepare_scene(const camera_t *camera) {
 }
 
 void renderer_present_scene() {
-    sprite_render(&renderer.sprites, renderer.camera);
+    sprites_render(renderer.camera);
+    lines_render(renderer.camera);
 }
 
 void draw_quad(vec2s pos, vec2s dim, uint32_t color) {
-    sprite_push(&renderer.sprites, pos, dim, 0.f, color);
-
-    /* glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); */
+    sprites_push(pos, dim, 0.f, color);
 }
 
 void draw_line(vec2s start, vec2s end, uint32_t color) {
-    /* typedef struct { */
-    /*     vec3s pos; */
-    /*     vec4s color; */
-    /* } vertex_t; */
-
-    /* vec4s vc = RGBA(color); */
-    /* float x = (end.x - start.x), y = (end.y - start.y); */
-    /* vertex_t vertices[] = { */
-    /*     { .pos = { 0.f, 0.f, 0.f, }, .color = vc, }, */
-    /*     { .pos = {   x,   y, 0.f, }, .color = vc, }, */
-    /* }; */
-
-    /* mat4s model = GLMS_MAT4_IDENTITY_INIT; */
-    /* model = glms_translate(model, */
-    /*             glms_vec3_add( */
-    /*                 renderer.camera->pos, (vec3s) { start.x, start.y, 0.f })); */
-
-    /* for (size_t i = 0; i < 2; i++) { */
-    /*     vertex_to_world(&vertices[i].pos, model); */
-    /* } */
-
-    /* vao_attrib(0, 3, GL_FLOAT, sizeof(vertex_t), */
-    /*            (void *)offsetof(vertex_t, pos)); */
-    /* vao_attrib(1, 4, GL_FLOAT, sizeof(vertex_t), */
-    /*            (void *)offsetof(vertex_t, color)); */
-
-    /* vbo_buffer_data(vertices, sizeof(vertices)); */
-
-    /* shader_uniform_mat4f(renderer.shader, "projection", */
-    /*                      renderer.camera->projection); */
-    /* shader_uniform_mat4f(renderer.shader, "view", renderer.camera->view); */
-
-    /* glDrawArrays(GL_LINES, 0, 2); */
+    lines_push(start, end, 0.f, color);
 }
 
 void draw_quad_line(vec2s pos, vec2s size, uint32_t color) {
@@ -155,7 +122,7 @@ void draw_text(vec2s pos, float scale, uint32_t color,
     vsnprintf(text, 64, format, arg);
     va_end(arg);
 
-    /* ui_draw_text(pos, scale, color, text); */
+    ui_draw_text(pos, scale, color, text);
 }
 
 void draw_debug_text(const char *format, ...) {
@@ -166,5 +133,5 @@ void draw_debug_text(const char *format, ...) {
     vsnprintf(text, 64, format, arg);
     va_end(arg);
 
-    /* ui_draw_debug(text); */
+    ui_draw_debug(text);
 }

@@ -31,9 +31,6 @@ typedef struct world_s {
 
     /** @brief The chunk of the current pages loaded in memory. */
     chunk_t chunk;
-
-    /** @brief Vertex buffer objects. */
-    GLuint vao, vbo, ibo;
 } world_t;
 
 /**

@@ -22,7 +22,7 @@ static flist_t entities;
 void chunk_init(chunk_t *self) {
     memset(self, 0, sizeof(chunk_t));
 
-    size_t capacity = ((CHUNK_MAX * 9) + sizeof(array_t));
+    size_t capacity = ((CHUNK_MAX * 9) * sizeof(array_t));
     flist_init(&entities, sizeof(entity_t), capacity);
 
     for (int i = 0; i < 9; i++) {

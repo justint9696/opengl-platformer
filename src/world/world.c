@@ -28,20 +28,12 @@
 void world_init(world_t *self) {
     memset(self, 0, sizeof(world_t));
 
-    /* self->vao = vao_create(); */
-    /* self->vbo = vbo_create(NULL, 0); */
-    /* self->ibo = ibo_create(NULL, 0); */
-
     chunk_init(&self->chunk);
     grid_init(&self->grid, 60, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 void world_destroy(world_t *self) {
     chunk_destroy(&self->chunk);
-
-    /* vao_destroy(&self->vao); */
-    /* vbo_destroy(&self->vbo); */
-    /* ibo_destroy(&self->vbo); */
 }
 
 void world_update(world_t *self, float dt) {
@@ -60,27 +52,17 @@ void world_update(world_t *self, float dt) {
 void world_render(world_t *self) {
     renderer_use_shader(SHADER_DEFAULT);
 
-    /* vao_bind(&self->vao); */
-    /* vbo_bind(&self->vbo); */
-    /* ibo_bind(&self->ibo); */
-    {
-        player_render(self->player, self);
-
-        for (int i = 0; i < 9; i++) {
-            page_t *page = &self->chunk.pages[i];
-            /* page_t *page = &self->chunk.pages[4]; */
-            size_t len = array_len(page->entities);
-            for (size_t j = 0; j < len; j++) {
-                entity_t *entity = &page->entities[j];
-                entity_render(entity, self);
-            }
+    for (int i = 0; i < 9; i++) {
+        page_t *page = &self->chunk.pages[i];
+        size_t len = array_len(page->entities);
+        for (size_t j = 0; j < len; j++) {
+            entity_t *entity = &page->entities[j];
+            entity_render(entity, self);
         }
-
-        chunk_render(&self->chunk);
     }
-    /* vao_unbind(); */
-    /* vbo_unbind(); */
-    /* ibo_unbind(); */
+
+    chunk_render(&self->chunk);
+    player_render(self->player, self);
 }
 
 void world_sync(world_t *self, float dt) {

@@ -9,11 +9,12 @@
 #define _GRAPHICS_RENDERER_H_
 
 #include "game/camera.h"
-#include "graphics/shader.h"
-#include "graphics/sprite.h"
 #include "graphics/texture.h"
 
 #include <glad/glad.h>
+
+struct sprite_batch_s;
+struct line_batch_s;
 
 /** @brief All possible shader types. */
 typedef enum shader_type_e {
@@ -30,8 +31,6 @@ typedef struct {
 
     /** @brief The currently bound shader. */
     GLint shader;
-
-    sprite_batch_t sprites;
 
     /** @brief */
     /* texture_t texture; */

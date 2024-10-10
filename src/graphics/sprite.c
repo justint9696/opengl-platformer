@@ -2,10 +2,13 @@
 
 #include "data/array.h"
 #include "graphics/drawing.h"
+#include "graphics/renderer.h"
 #include "graphics/shader.h"
 
 #include <cglm/struct.h>
 #include <string.h>
+
+static sprite_batch_t sprites;
 
 /** @brief Sprite vertex attributes layout. */
 typedef struct vertex_s {
@@ -16,30 +19,29 @@ typedef struct vertex_s {
 static const uint32_t SPRITE_INDICES[6];
 static const vertex_t SPRITE_VERTICES[4];
 
-void sprite_init(sprite_batch_t *self) {
-    self->sprites = array_alloc(sizeof(sprite_t), 128);
+void sprites_init() {
+    sprites.items = array_alloc(sizeof(sprite_t), 128);
 
-    self->vao = vao_create();
-    self->vbo = vbo_create(NULL, sizeof(vertex_t) * 1024);
-    self->ibo = ibo_create(NULL, sizeof(uint32_t) * 1024);
-
-    self->shader = shader_create("shaders/default.vs", "shaders/default.fs");
+    sprites.vao = vao_create();
+    sprites.vbo = vbo_create(NULL, sizeof(vertex_t) * 1024);
+    sprites.ibo = ibo_create(NULL, sizeof(uint32_t) * 1024);
 }
 
-void sprite_destroy(sprite_batch_t *self) {
-    array_free(self->sprites);
+void sprites_destroy() {
+    array_free(sprites.items);
 
-    vao_destroy(&self->vao);
-    vbo_destroy(&self->vbo);
-    ibo_destroy(&self->ibo);
-
-    shader_destroy(self->shader);
+    vao_destroy(&sprites.vao);
+    vbo_destroy(&sprites.vbo);
+    ibo_destroy(&sprites.ibo);
 }
 
-void sprite_push(sprite_batch_t *self, vec2s pos, vec2s dim, float z,
-                 uint32_t color) {
-    array_push(self->sprites,
-               &(sprite_t) { .pos = pos, .dim = dim, .z = z, .color = color, });
+void sprites_push(vec2s pos, vec2s dim, float z, uint32_t color) {
+    array_push(sprites.items, &(sprite_t) {
+        .pos = pos,
+        .dim = dim,
+        .z = z,
+        .color = color,
+    });
 }
 
 static void sprite_to_world(const sprite_t *sprite, vertex_t vertices[],
@@ -60,14 +62,13 @@ static void sprite_to_world(const sprite_t *sprite, vertex_t vertices[],
     }
 }
 
-void sprite_render(sprite_batch_t *self, const camera_t *camera) {
-    size_t len = array_len(self->sprites);
+void sprites_render(const camera_t *camera) {
+    size_t len = array_len(sprites.items);
     uint32_t indices[len * 6];
     vertex_t vertices[len * 4];
 
     for (size_t i = 0; i < len; i++) {
-        const sprite_t *sprite = &self->sprites[i];
-
+        const sprite_t *sprite = &sprites.items[i];
         for (size_t j = 0; j < 6; j++) {
             uint32_t idx = SPRITE_INDICES[j] + (i * 4);
             indices[(i * 6) + j] = idx;
@@ -76,26 +77,31 @@ void sprite_render(sprite_batch_t *self, const camera_t *camera) {
         sprite_to_world(sprite, vertices, (i * 4), camera);
     }
 
-    shader_use(self->shader);
+    GLint shader = renderer_use_shader(SHADER_DEFAULT);
 
-    vao_bind(&self->vao);
+    vao_bind(&sprites.vao);
+
+    ibo_bind(&sprites.ibo);
+    ibo_buffer_sub_data(indices, 0, sizeof(indices));
+
+    vbo_bind(&sprites.vbo);
+    vbo_buffer_sub_data(vertices, 0, sizeof(vertices));
+
     vao_attrib(0, 3, GL_FLOAT, sizeof(vertex_t),
                (void *)offsetof(vertex_t, pos));
     vao_attrib(1, 4, GL_FLOAT, sizeof(vertex_t),
                (void *)offsetof(vertex_t, color));
 
-    vbo_bind(&self->vbo);
-    vbo_buffer_sub_data(vertices, 0, sizeof(vertices));
-
-    ibo_bind(&self->ibo);
-    ibo_buffer_sub_data(indices, 0, sizeof(indices));
-
-    shader_uniform_mat4f(self->shader, "projection", camera->projection);
-    shader_uniform_mat4f(self->shader, "view", camera->view);
+    shader_uniform_mat4f(shader, "projection", camera->projection);
+    shader_uniform_mat4f(shader, "view", camera->view);
 
     glDrawElements(GL_TRIANGLES, (len * 6), GL_UNSIGNED_INT, 0);
 
-    array_clear(self->sprites);
+    vao_unbind();
+    vbo_unbind();
+    ibo_unbind();
+
+    array_clear(sprites.items);
 }
 
 static const uint32_t SPRITE_INDICES[6] = {

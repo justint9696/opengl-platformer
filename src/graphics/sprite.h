@@ -30,11 +30,8 @@ typedef struct sprite_s {
 } sprite_t;
 
 typedef struct sprite_batch_s {
-    /** @brief The current sprites to be rendered. */
-    sprite_t *sprites;
-
-    /** @brief The sprite shader. */
-    GLint shader;
+    /** @brief Dynamic array of sprites to be rendered. */
+    sprite_t *items;
 
     /** @brief Vertex buffer objects. */
     GLuint vao, vbo, ibo;
@@ -44,13 +41,13 @@ typedef struct sprite_batch_s {
  * @brief Allocates memory for the sprite batch.
  * @param self a pointer to a sprite batch
  */
-void sprite_init(sprite_batch_t *);
+void sprites_init();
 
 /**
  * @brief Released the memory allocated for a sprite batch.
  * @param self a pointer to a sprite batch
  */
-void sprite_destroy(sprite_batch_t *);
+void sprites_destroy();
 
 /**
  * @brief Creats a sprite and adds it to the batch.
@@ -60,14 +57,13 @@ void sprite_destroy(sprite_batch_t *);
  * @param z z position of the sprite
  * @param color color of the sprite
  */
-void sprite_push(sprite_batch_t *, vec2s pos, vec2s dim, float z,
-                 uint32_t color);
+void sprites_push(vec2s pos, vec2s dim, float z, uint32_t color);
 
 /**
  * @brief Renders the sprite batch and clears its contents.
  * @param self a pointer to a sprite batch
  * @param camera a pointer to the scene camera
  */
-void sprite_render(sprite_batch_t *, const camera_t *);
+void sprites_render(const camera_t *);
 
 #endif // ifndef _GRAPHICS_SPRITE_H_

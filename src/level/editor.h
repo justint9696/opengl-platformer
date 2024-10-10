@@ -50,32 +50,29 @@ typedef struct editor_s {
             vec2s start, end;
         };
     };
-
-    /** @brief Vertex buffer objects. */
-    GLuint vao, vbo, ibo;
 } editor_t;
 
-/** 
- * @brief Initializes the level editor. 
+/**
+ * @brief Initializes the level editor.
  * @param self a pointer to the level editor
  */
 void editor_init(editor_t *);
 
-/** 
- * @brief Releases the memory allocated for the level editor. 
+/**
+ * @brief Releases the memory allocated for the level editor.
  * @param self a pointer to the level editor
  */
 void editor_destroy(editor_t *);
 
 /**
- * @brief Synchronizes the level editor with the tick rate. 
+ * @brief Synchronizes the level editor with the tick rate.
  * @param self a pointer to the level editor
  * @param world a pointer to the game world
  */
 void editor_sync(editor_t *, world_t *);
 
 /**
- * @brief Renders the components of the level editor. 
+ * @brief Renders the components of the level editor.
  * @param self a pointer to the level editor
  * @param world a pointer to the game world
  */

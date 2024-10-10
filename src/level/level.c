@@ -459,5 +459,5 @@ void level_sync(world_t *world, float dt) {
     level_extend_bounds(world, tmp, index);
     level_swap_pages(world, tmp);
 
-    log_debug("Camera moved to page %d: %d.\n", world->chunk.index, index);
+    /* log_debug("Camera moved to page %d: %d.\n", world->chunk.index, index); */
 }

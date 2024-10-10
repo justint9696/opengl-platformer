@@ -10,7 +10,6 @@
 #include "entity/table.h"
 #include "game/input.h"
 #include "graphics/drawing.h"
-#include "graphics/renderer.h"
 #include "graphics/window.h"
 #include "level/level.h"
 
@@ -276,18 +275,10 @@ static void render(editor_t *self, world_t *world) {
 void editor_init(editor_t *self) {
     memset(self, 0, sizeof(editor_t));
     fsm_init(&self->fsm, ES_MAX, ES_IDLE, STATE_TABLE);
-
-    self->vao = vao_create();
-    self->vbo = vbo_create(NULL, 0);
-    self->ibo = vbo_create(NULL, 0);
 }
 
 void editor_destroy(editor_t *self) {
     fsm_destroy(&self->fsm);
-
-    vao_destroy(&self->vao);
-    vbo_destroy(&self->vbo);
-    ibo_destroy(&self->ibo);
 }
 
 void editor_sync(editor_t *self, world_t *world) {
@@ -348,18 +339,8 @@ void editor_render(editor_t *self, world_t *world) {
     draw_debug_text("Editor State: %s", state_to_string(self));
     draw_debug_text("Snap: %s", (self->snap) ? "true" : "false");
 
-    renderer_use_shader(SHADER_DEFAULT);
-
-    vao_bind(&self->vao);
-    vbo_bind(&self->vbo);
-    ibo_bind(&self->ibo);
-    {
-        grid_render(self, world);
-        fsm_render(&self->fsm, editor_fn_t, self, world);
-    }
-    vao_unbind();
-    vbo_unbind();
-    ibo_unbind();
+    grid_render(self, world);
+    fsm_render(&self->fsm, editor_fn_t, self, world);
 }
 
 static const state_t STATE_TABLE[ES_MAX] = {

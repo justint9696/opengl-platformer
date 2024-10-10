@@ -21,8 +21,7 @@ static inline void draw_debug(entity_t *self, world_t *world) {
                     self->body.pos.y);
     vec2s screen = world_to_screen(world, self->body.pos);
     draw_debug_text("Screen Position: (%.2f, %.2f)", screen.x, screen.y);
-    draw_debug_text("Current Chunk: %d: %d", world->chunk.index,
-                    self->body.page->index);
+    draw_debug_text("Current Chunk: %d", world->chunk.index);
 }
 
 static void init(entity_t *self, world_t *world) {

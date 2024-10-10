@@ -106,9 +106,6 @@ static void sync(game_t *self) {
 }
 
 static void render(game_t *self) {
-    world_render(&self->world);
-    /* ui_render(&self->world.camera); */
-
     switch (self->state) {
         case GS_EDIT:
             editor_render(&self->editor, &self->world);
@@ -116,6 +113,9 @@ static void render(game_t *self) {
         default:
             break;
     }
+
+    world_render(&self->world);
+    ui_render(&self->world.camera);
 }
 
 void game_run(game_t *self, const char *fpath) {
