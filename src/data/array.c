@@ -29,6 +29,7 @@ void *array_alloc(size_t size, size_t capacity) {
 
     self->size = size;
     self->capacity = capacity;
+    self->dynamic = true;
 
     return &self->data;
 }
@@ -46,19 +47,26 @@ void *array_resize(void *ptr, size_t capacity) {
     array_t *self = array_header(ptr);
     assert(capacity >= self->len);
 
-    self->capacity = capacity;
     self = realloc(self, self->size * capacity);
     assert(self);
+
+    self->capacity = capacity;
 
     return &self->data;
 }
 
-int array_push(void *ptr, const void *item) {
+int _array_push_intern(void **dataptr, const void *item) {
+    void *ptr = *dataptr;
+
     assert(ptr);
     array_t *self = array_header(ptr);
 
-    if (self->len > self->capacity)
-        return -1;
+    assert((self->len < self->capacity) || (self->dynamic));
+    if (self->len >= self->capacity - 1) {
+        self->capacity *= 2;
+        self = realloc(self, sizeof(array_t) + (self->size * self->capacity));
+        *dataptr = &self->data;
+    }
 
     void *dst = ((void *)&self->data + (self->size * self->len));
     memcpy(dst, item, self->size);

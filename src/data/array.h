@@ -8,11 +8,15 @@
 #ifndef _DATA_ARRAY_H_
 #define _DATA_ARRAY_H_
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
 /** @brief Internal header that manages arrays. */
 typedef struct array_s {
+    /** @brief Dynamically resize the array. */
+    bool dynamic;
+
     /** @brief The number of items in the array. */
     size_t len;
 
@@ -77,7 +81,13 @@ void *array_resize(void *ptr, size_t capacity);
  * @param item a pointer to the item being inserted into the array
  * @returns the index of insertion on success or -1 on failure
  */
-int array_push(void *ptr, const void *item);
+int _array_push_intern(void **dataptr, const void *item);
+
+/**
+ * @brief Macro to automatically convert the (void *) to a (void **) to
+ * dynamically resize the array and surpress conversion warnings.
+ */
+#define array_push(_ptr, _data) _array_push_intern((void **)&(_ptr), (_data))
 
 /**
  * @brief Removes an item from an array.
