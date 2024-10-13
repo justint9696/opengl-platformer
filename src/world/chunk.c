@@ -22,8 +22,10 @@ static flist_t entities;
 void chunk_init(chunk_t *self) {
     memset(self, 0, sizeof(chunk_t));
 
-    size_t capacity = ((CHUNK_MAX * 9) * sizeof(array_t));
-    flist_init(&entities, sizeof(entity_t), capacity);
+    size_t size = sizeof(array_t) + (sizeof(entity_t) * CHUNK_MAX);
+    size_t capacity = 9;
+
+    flist_init(&entities, size * capacity);
 
     for (int i = 0; i < 9; i++) {
         page_t *page = &self->pages[i];
@@ -64,7 +66,8 @@ int chunk_index_from_pos(chunk_t *self, vec2s pos) {
 }
 
 void *chunk_request_page(chunk_t *self, page_t *page) {
-    void *ptr = flist_request(&entities, CHUNK_MAX);
+    size_t size = sizeof(array_t) + (sizeof(entity_t) * CHUNK_MAX);
+    void *ptr = flist_request(&entities, size);
     return array_init(ptr, sizeof(entity_t), CHUNK_MAX);
 }
 

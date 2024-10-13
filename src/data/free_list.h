@@ -14,8 +14,8 @@
 
 /** @brief Internal headers for the unused blocks within a free list. */
 typedef struct fnode_s {
-    /** @brief The maximum number of items the block can hold. */
-    size_t capacity;
+    /** @brief The byte size of the current block. */
+    size_t size;
 
     /**
      * @brief Linked list node that points to the next item in the free list. */
@@ -27,10 +27,7 @@ typedef struct fnode_s {
 
 /** @brief Free list data structure. */
 typedef struct {
-    /** @brief The maximum number of items the free list can hold. */
-    size_t capacity;
-
-    /** @brief The size of each item in the free list. */
+    /** @brief The total byte size of the allocated block. */
     size_t size;
 
     /** @brief Linked list node that points to the free blocks of memory. */
@@ -43,10 +40,9 @@ typedef struct {
 /**
  * @brief Allocates a block of memory for a free list.
  * @param self a pointer to a free list
- * @param size the size of each item contained in the array
- * @param capacity the maximum number of items the free list can hold
+ * @param size number of bytes to allocate
  */
-void flist_init(flist_t *, size_t size, size_t capacity);
+void flist_init(flist_t *, size_t size);
 
 /**
  * @brief Releases the memeory allocated for a free list.
@@ -59,10 +55,10 @@ void flist_destroy(flist_t *);
  * If there is not a block of memory available, the program will log the error
  * and terminate the program.
  * @param self a pointer to a free list
- * @param count the maximum number of items the block needs to hold
+ * @param n the number of bytes being requested
  * @returns a pointer to a block of memory
  */
-void *flist_request(flist_t *, size_t count);
+void *flist_request(flist_t *, size_t n);
 
 /**
  * @brief Releases a block of memory from a free list.

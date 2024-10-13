@@ -14,21 +14,23 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define LIST_HEADER_MAX 32
+
 /** @brief Returns the header of a free list. */
 #define list_header(_d)\
     ((fnode_t *)(((void *)(_d)) - offsetof(fnode_t, data)))
 
-void flist_init(flist_t *self, size_t size, size_t capacity) {
+void flist_init(flist_t *self, size_t size) {
     memset(self, 0, sizeof(flist_t));
 
-    self->data = calloc(1, sizeof(fnode_t) + (size * capacity));
+    size_t n = offsetof(fnode_t, data);
+
+    self->data = calloc(1, (n * LIST_HEADER_MAX) + size);
     assert(self->data);
 
     self->size = size;
-    self->capacity = capacity;
-
     self->head = self->data;
-    self->head->capacity = capacity;
+    self->head->size = (n * LIST_HEADER_MAX - 1) + size;
 }
 
 void flist_destroy(flist_t *self) {
@@ -36,16 +38,16 @@ void flist_destroy(flist_t *self) {
     free(self->data);
 }
 
-void *flist_request(flist_t *self, size_t count) {
+void *flist_request(flist_t *self, size_t n) {
     for (fnode_t *tmp = self->head, *prev = NULL; tmp;
          prev = tmp, tmp = tmp->next) {
         // if the current node has enough requested space
-        if (tmp->capacity >= count) {
+        if (tmp->size >= n) {
             // initialize user data
-            memset(&tmp->data, 0, (count * self->size));
+            memset(&tmp->data, 0, n);
 
             // calculate the memory remaining from the requested segment
-            size_t bytes = ((tmp->capacity - count) * self->size);
+            size_t bytes = (tmp->size - n);
 
             // check if there is enough memory for another header
             if (bytes <= offsetof(fnode_t, data)) {
@@ -55,18 +57,16 @@ void *flist_request(flist_t *self, size_t count) {
             }
 
             // calculate the position of the next header
-            fnode_t *node = (((void *)tmp) + (count * self->size)
-                             + offsetof(fnode_t, data));
+            fnode_t *node = (((void *)&tmp->data) + n);
 
             // update the next header's parameters
-            node->capacity
-                = ((bytes - offsetof(fnode_t, data)) / self->size);
+            node->size = (bytes - offsetof(fnode_t, data));
 
             // insert next header into linked list, replacing the current header
             llist_replace(self, prev, tmp, node);
 
             // update current header's parameters
-            tmp->capacity = count;
+            tmp->size = n;
             tmp->next = NULL;
 
             // return the requested block of memory
@@ -79,15 +79,15 @@ void *flist_request(flist_t *self, size_t count) {
 
 static void consolidate_segs(flist_t *self, fnode_t *prev, fnode_t *src,
                              fnode_t *dst) {
-    size_t bytes = ((dst->capacity + src->capacity) * self->size);
-    dst->capacity = ((bytes + offsetof(fnode_t, data)) / self->size);
+    size_t bytes = (dst->size + src->size);
+    dst->size = (bytes + offsetof(fnode_t, data));
     llist_replace(self, prev, src, dst);
 }
 
 static inline bool adjacent_segs(const flist_t *self, const fnode_t *a,
                                  const fnode_t *b) {
-    return (((void *)&a->data + (self->size * a->capacity) == b)
-            || ((void *)&b->data + (self->size * b->capacity) == a));
+    return ((((void *)&a->data + a->size) == b) ||
+            (((void *)&b->data + b->size) == a));
 }
 
 static void defrag_segs(flist_t *self, fnode_t *prev, fnode_t *tmp,

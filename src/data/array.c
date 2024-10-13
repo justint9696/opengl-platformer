@@ -15,7 +15,7 @@ void *array_init(void *ptr, size_t size, size_t capacity) {
     assert(ptr);
 
     array_t *self = (array_t *)ptr;
-    memset(self, 0, size * capacity);
+    memset(self, 0, sizeof(array_t) + (size * capacity));
 
     self->capacity = capacity;
     self->size = size;
