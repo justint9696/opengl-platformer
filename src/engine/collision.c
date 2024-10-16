@@ -1,4 +1,3 @@
-#include "data/array.h"
 #include "entity/entity.h"
 #include "world/world.h"
 
@@ -27,6 +26,10 @@ static vec2s try_move(entity_t *self, world_t *world, collider_t arr[],
     // check for collision with entities
     for (size_t i = 0; i < len; i++) {
         collider_t *tmp = &arr[i];
+
+        if (self == tmp->data)
+            continue;
+
         for (int i = 0; i < 2; i++) {
             if (fabsf(movement.raw[i]) <= 0.000001f)
                 continue;
@@ -48,7 +51,7 @@ static vec2s try_move(entity_t *self, world_t *world, collider_t arr[],
 void collision_sync(entity_t *self, world_t *world, float dt) {
     // get possible colliders from uniform grid
     collider_t arr[64];
-    size_t n = world_get_colliders(world, self, arr, 64);
+    size_t n = world_get_colliders(world, self->body.pos, arr, 64);
 
     // attempt to move entity
     vec2s movement = try_move(self, world, arr, n, dt);

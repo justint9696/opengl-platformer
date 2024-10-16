@@ -14,6 +14,7 @@
 #include "graphics/window.h"
 
 #include "player.h"
+#include "util/log.h"
 
 #include <cglm/struct.h>
 #include <string.h>
@@ -50,8 +51,6 @@ void world_update(world_t *self, float dt) {
 }
 
 void world_render(world_t *self) {
-    renderer_use_shader(SHADER_DEFAULT);
-
     for (int i = 0; i < 9; i++) {
         page_t *page = &self->chunk.pages[i];
         size_t len = array_len(page->entities);
@@ -115,31 +114,50 @@ bool world_is_on_screen(const world_t *self, vec2s pos) {
             && (screen_pos.y > 0 && screen_pos.y < SCREEN_HEIGHT));
 }
 
-size_t world_get_colliders(world_t *self, entity_t *entity, collider_t arr[],
+static inline collider_t collider_from_entity(entity_t *entity) {
+    return (collider_t) {
+        .data = entity,
+        .box = entity->body.box,
+        .callback = entity->body.collision_callback,
+    };
+}
+
+size_t world_get_colliders(world_t *self, vec2s pos, collider_t arr[],
                            size_t len) {
-    cell_t *cell = grid_cell_from_pos(&self->grid,
-                                      world_to_screen(self, entity->body.pos));
+    cell_t *cell = grid_cell_from_pos(&self->grid, world_to_screen(self, pos));
     if (!cell)
         return 0;
 
     size_t n = 0;
-    ivec2s pos = cell->pos, dim = self->grid.dim;
-    for (int y = glm_max(pos.y - 1, 0); y <= glm_min(pos.y + 1, dim.y); y++) {
-        for (int x = glm_max(pos.x - 1, 0); x <= glm_min(pos.x + 1, dim.x);
-             x++) {
+    for (int y = glm_max(cell->pos.y - 1, 0);
+         y <= glm_min(cell->pos.y + 1, self->grid.dim.y); y++) {
+        for (int x = glm_max(cell->pos.x - 1, 0);
+             x <= glm_min(cell->pos.x + 1, self->grid.dim.x); x++) {
             cell_t *tmp = grid_cell_from_index(&self->grid, (ivec2s) { x, y });
             for (size_t i = 0; i < tmp->len; i++) {
-                entity_t *e = tmp->arr[i];
-                assert(e);
+                entity_t *entity = tmp->arr[i];
+                assert(entity);
 
-                if (entity == e)
-                    continue;
+                arr[n++] = collider_from_entity(entity);
+            }
+        }
+    }
 
-                arr[n++] = (collider_t) {
-                    .data = e,
-                    .box = e->body.box,
-                    .callback = e->body.collision_callback,
-                };
+    return n;
+}
+
+size_t world_get_region_colliders(world_t *self, const box_t *aabb,
+                                  collider_t arr[], size_t len) {
+    size_t n = 0;
+    for (int i = 0; i < 9; i++) {
+        const page_t *page = &self->chunk.pages[i];
+        if (aabb_collision_2d(&page->box, aabb)) {
+            size_t len = array_len(page->entities);
+            for (size_t j = 0; j < len; j++) {
+                entity_t *entity = &page->entities[j];
+                assert(entity);
+
+                arr[n++] = collider_from_entity(entity);
             }
         }
     }

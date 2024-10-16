@@ -89,13 +89,16 @@ vec2s screen_to_world(const world_t *, ivec2s pos);
 bool world_is_on_screen(const world_t *, vec2s pos);
 
 /**
- * @brief Builds an array of potential colliders around an entity.
+ * @brief Builds an array of potential colliders around a position.
  * @param self a pointer to the game world
- * @param entity a pointer to the current entity
+ * @param pos position of an object
  * @param arr the destination array
  * @param len the capacity of the array
  * @returns the number of items added to the array.
  */
-size_t world_get_colliders(world_t *, entity_t *, collider_t arr[], size_t len);
+size_t world_get_colliders(world_t *, vec2s pos, collider_t arr[], size_t len);
+
+size_t world_get_region_colliders(world_t *, const box_t *, collider_t arr[],
+                                  size_t len);
 
 #endif // ifndef _WORLD_WORLD_H_
