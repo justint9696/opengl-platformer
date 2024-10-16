@@ -167,3 +167,16 @@ void array_insert(void *ptr, uint32_t index, const void *item) {
 
     self->len++;
 }
+
+bool array_contains(void *ptr, const void *item) {
+    assert(ptr);
+
+    array_t *self = array_header(ptr);
+    for (size_t i = 0; i < self->len; i++) {
+        void *dst = array_at(ptr, i);
+        if (!memcmp(dst, item, self->size))
+            return true;
+    }
+
+    return false;
+}

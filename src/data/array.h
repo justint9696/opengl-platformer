@@ -140,4 +140,12 @@ void array_copy(void *dst, void *src);
  */
 void array_insert(void *ptr, uint32_t index, const void *item);
 
+/**
+ * @brief Determines if an array contains a specific item.
+ * @param ptr a pointer to the data section of an array
+ * @param item a pointer to an item
+ * @returns true if the array contais the item or false otherwise
+ */
+bool array_contains(void *ptr, const void *item);
+
 #endif // ifndef _DATA_ARRAY_H_
