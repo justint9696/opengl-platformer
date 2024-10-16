@@ -47,29 +47,32 @@ typedef struct input_s {
         button_t buttons[SDL_NUM_SCANCODES];
     } keyboard;
     struct {
+        struct {
+            ivec2s prev, curr;
+        } pos;
         button_t buttons[SDL_BUTTON_X2 + 1];
     } mouse;
 } input_t;
 
 /**
- * @brief Initializes the internal button state. 
+ * @brief Initializes the internal button state.
  */
 void buttons_init();
 
-/** 
- * @brief Updates the internal button state. 
+/**
+ * @brief Updates the internal button state.
  */
 void buttons_update();
 
-/** 
- * @brief Returns true if the button state is pressed. 
+/**
+ * @brief Returns true if the button state is pressed.
  * @param scancode SDL keyboard scancode
  * @returns true if button is pressed
  */
 bool button_pressed(SDL_Scancode);
 
-/** 
- * @brief Returns true if the button state is held after a certain time. 
+/**
+ * @brief Returns true if the button state is held after a certain time.
  * @param scancode SDL keyboard scancode
  * @param delay_ms time to wait since last button update
  * @returns true if button is held after the given delay
@@ -77,21 +80,21 @@ bool button_pressed(SDL_Scancode);
 bool button_held(SDL_Scancode, time_t delay_ms);
 
 /**
- * @brief Returns true if the button state is released. 
+ * @brief Returns true if the button state is released.
  * @param scancode SDL keyboard scancode
  * @returns true if the button is released
  */
 bool button_released(SDL_Scancode);
 
 /**
- * @brief Returns true if the button state is pressed. 
+ * @brief Returns true if the button state is pressed.
  * @param index SDL mouse button index
  * @returns true if the button is pressed
  */
 bool mouse_pressed(uint32_t);
 
 /**
- * @brief Returns true if the button state is held after a certain time. 
+ * @brief Returns true if the button state is held after a certain time.
  * @param index SDL mouse button index
  * @param delay_ms time to wait since last button update
  * @returns true if button is held after the given delay
@@ -99,14 +102,20 @@ bool mouse_pressed(uint32_t);
 bool mouse_held(uint32_t, time_t delay_ms);
 
 /**
- * @brief Returns true if the button state is released. 
+ * @brief Returns true if the button state is released.
  * @param index SDL mouse button index
  * @returns true if the button is released
  */
 bool mouse_released(uint32_t);
 
 /**
- * @brief Returns the screen position of the mouse. 
+ * @brief Returns the screen position of the mouse for the previous frame.
+ * @returns the previous screen position of the mouse
+ */
+ivec2s mouse_previous_position();
+
+/**
+ * @brief Returns the screen position of the mouse.
  * @returns the screen position of the mouse
  */
 ivec2s mouse_position();

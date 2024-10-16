@@ -53,6 +53,9 @@ void buttons_update() {
         button_t *button = &input.mouse.buttons[i];
         update_button_state(button, pressed);
     }
+
+    input.mouse.pos.prev = input.mouse.pos.curr;
+    SDL_GetMouseState(&input.mouse.pos.curr.x, &input.mouse.pos.curr.y);
 }
 
 bool button_pressed(SDL_Scancode scancode) {
@@ -97,8 +100,10 @@ bool mouse_released(uint32_t index) {
             && time_since(button->released_tick) < NS_PER_MS);
 }
 
+ivec2s mouse_previous_position() {
+    return input.mouse.pos.prev;
+}
+
 ivec2s mouse_position() {
-    int x, y;
-    SDL_GetMouseState(&x, &y);
-    return (ivec2s) { .x = x, .y = y };
+    return input.mouse.pos.curr;
 }
