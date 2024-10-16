@@ -35,11 +35,11 @@ typedef struct editor_s {
     /** @brief Editor state manager. */
     fsm_t fsm;
 
-    /** @brief Offset from the mouse world position to entity position. */
-    vec2s offset;
+    /** @brief Current entity grabbed by the mouse. */
+    entity_t(*target);
 
-    /** @brief The currently selected entity. */
-    entity_t(*entity);
+    /** @brief Dynamic array of selected entities. */
+    entity_t *(*entities);
 
     union {
         /** @brief The bounding box of the selection rectangle. */

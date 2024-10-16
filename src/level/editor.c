@@ -3,10 +3,14 @@
  * @author Justin Tonkinson
  * @date 2024/06/10
  * @brief Level editor implementation functions.
+ * @bug Editor does not always transition to the move state when entities are
+ * attempted to be moved.
+ * @bug Deleting entities does not always remove all of them.
  */
 
 #include "level/editor.h"
 
+#include "data/array.h"
 #include "entity/table.h"
 #include "game/input.h"
 #include "graphics/drawing.h"
@@ -14,8 +18,8 @@
 #include "level/level.h"
 
 #include <assert.h>
-#include <string.h>
 #include <cglm/struct.h>
+#include <string.h>
 
 static const uint32_t COLOR_RED_FADE = 0xFF000080;
 static const uint32_t COLOR_BLUE_FADE = 0x0078D780;
@@ -30,21 +34,20 @@ static inline vec2s mouse_to_world(world_t *world) {
     return screen_to_world(world, mouse_position());
 }
 
-static vec2s grid_offset(vec2s mouse) {
+static vec2s grid_snap(vec2s pos) {
     vec2s offset = (vec2s) {
-        .x = fmodf(mouse.x, 50.f),
-        .y = fmodf(mouse.y, 50.f),
+        .x = fmodf(pos.x, 50.f),
+        .y = fmodf(pos.y, 50.f),
     };
     return (vec2s) {
-        .x = mouse.x - ((mouse.x < 0.f) ? offset.x + 50.f : offset.x),
-        .y = mouse.y - ((mouse.y < 0.f) ? offset.y + 50.f : offset.y),
+        .x = pos.x - ((pos.x < 0.f) ? (offset.x + 50.f) : offset.x),
+        .y = pos.y - ((pos.y < 0.f) ? (offset.y + 50.f) : offset.y),
     };
 }
 
 static entity_t *get_hovered_entity(world_t *world, vec2s mouse) {
     collider_t arr[64];
-    size_t n = world_get_colliders(world, &(entity_t) { .body.pos = mouse },
-                                   arr, 64);
+    size_t n = world_get_colliders(world, mouse, arr, 64);
 
     for (size_t i = 0; i < n; i++) {
         collider_t *tmp = &arr[i];
@@ -101,17 +104,18 @@ static void place_update(editor_t *self, world_t *world) {
     create_fn_t fn = table_lookup(ET_PLATFORM);
     assert(fn);
 
-    vec2s dim = (vec2s) { 50.f, 50.f };
     vec2s pos = GLMS_VEC2_ZERO;
+    vec2s dim = (vec2s) { 50.f, 50.f };
     if (self->snap) {
-        pos = grid_offset(mouse);
+        pos = grid_snap(mouse);
     } else {
         pos = glms_vec2_sub(mouse, glms_vec2_scale(dim, 0.5f));
     }
-    self->entity = fn(pos, dim, world);
 
-    // calculate the offset from the entity pos to the mouse
-    self->offset = glms_vec2_sub(mouse, self->entity->body.pos);
+    array_clear(self->entities);
+
+    self->target = fn(pos, dim, world);
+    array_push(self->entities, &self->target);
 
     fsm_transition(&self->fsm, ES_MOVE, editor_fn_t, self, world);
 }
@@ -121,7 +125,7 @@ static void place_render(editor_t *self, world_t *world) {
     vec2s mouse = mouse_to_world(world);
     vec2s pos = GLMS_VEC2_ZERO;
     if (self->snap) {
-        pos = grid_offset(mouse);
+        pos = grid_snap(mouse);
     } else {
         pos = glms_vec2_sub(mouse, glms_vec2_scale(dim, 0.5f));
     }
@@ -137,18 +141,18 @@ static void edit_update(editor_t *self, world_t *world) {
         return;
 
     vec2s mouse = mouse_to_world(world);
-    if (self->entity != get_hovered_entity(world, mouse)) {
-        self->entity = NULL;
+    entity_t *e = get_hovered_entity(world, mouse);
+    if ((!e) || (e && !array_contains(self->entities, &e))) {
+        array_clear(self->entities);
         fsm_transition(&self->fsm, ES_IDLE, editor_fn_t, self, world);
         return;
     }
 
+    self->target = e;
+
     // if left mouse is pressed && there is an entity under the mouse,
     // transition to move state
     if (left) {
-        // calculate the offset from the entity pos to the mouse
-        self->offset = glms_vec2_sub(mouse, self->entity->body.pos);
-
         fsm_transition(&self->fsm, ES_MOVE, editor_fn_t, self, world);
         return;
     }
@@ -156,8 +160,16 @@ static void edit_update(editor_t *self, world_t *world) {
     // if right mouse pressed && there is an entity under the mouse,
     // delete the selected entities and transitoin to idle state
     if (right) {
-        entity_destroy(self->entity, world);
-        self->entity = NULL;
+        entity_destroy(self->target, world);
+
+        size_t len = array_len(self->entities);
+        for (size_t i = 0; i < len; i++) {
+            e = self->entities[0];
+            assert(e);
+
+            array_remove(self->entities, &e);
+            entity_destroy(e, world);
+        }
 
         fsm_transition(&self->fsm, ES_IDLE, editor_fn_t, self, world);
         return;
@@ -172,13 +184,32 @@ static void move_update(editor_t *self, world_t *world) {
         return;
     }
 
-    assert(self->entity);
+    size_t len = array_len(self->entities);
+    assert((len > 0) || (self->target));
 
-    vec2s mouse = mouse_to_world(world);
+    vec2s prev = screen_to_world(world, mouse_previous_position());
+    vec2s curr = mouse_to_world(world);
+
+    if (glms_vec2_eqv(prev, curr))
+        return;
+
+    assert(self->target);
+
+    vec2s pos = self->target->body.pos;
     if (self->snap) {
-        self->entity->body.pos = grid_offset(mouse);
+        self->target->body.pos = grid_snap(curr);
     } else {
-        self->entity->body.pos = glms_vec2_sub(mouse, self->offset);
+        self->target->body.pos
+            = glms_vec2_add(pos, glms_vec2_sub(curr, prev));
+    }
+
+    for (size_t i = 0; i < len; i++) {
+        entity_t *e = self->entities[i];
+        assert(e);
+
+        e->body.pos
+            = glms_vec2_add(self->target->body.pos,
+                            glms_vec2_sub(e->body.pos, pos));
     }
 }
 
@@ -209,35 +240,57 @@ static void idle_update(editor_t *self, world_t *world) {
 }
 
 static void move_enter(editor_t *self, world_t *world) {
-    assert(self->entity);
+    size_t len = array_len(self->entities);
+    assert((len > 0) || (self->target));
 
-    if (self->entity->body.cell) {
-        cell_remove(self->entity->body.cell, self);
+    for (size_t i = 0; i < len; i++) {
+        entity_t *entity = self->entities[i];
+        assert(entity && entity->body.cell);
+
+        cell_remove(entity->body.cell, entity);
     }
+
+    array_remove(self->entities, &self->target);
 }
 
 static void move_exit(editor_t *self, world_t *world) {
-    assert(self->entity);
+    size_t len = array_len(self->entities);
+    assert((len > 0) || (self->target));
 
-    vec2s pos = world_to_screen(world, self->entity->body.pos);
-    cell_t *cell = grid_cell_from_pos(&world->grid, pos);
-    assert(cell);
+    array_push(self->entities, &self->target);
+    self->target = NULL;
 
-    cell_insert(cell, self->entity);
-    self->entity->body.cell = cell;
+    for (size_t i = 0; i < len; i++) {
+        entity_t *entity = self->entities[i];
+        assert(entity);
+
+        vec2s pos = world_to_screen(world, entity->body.pos);
+        cell_t *cell = grid_cell_from_pos(&world->grid, pos);
+        assert(cell);
+
+        cell_insert(cell, entity);
+        entity->body.cell = cell;
+    }
 }
 
 static void select_update(editor_t *self, world_t *world) {
     if (button_released(SDL_SCANCODE_LCTRL)) {
         int previous = self->fsm.previous;
-        fsm_transition(&self->fsm, (self->entity) ? ES_EDIT : previous,
+        fsm_transition(&self->fsm,
+                       (array_len(self->entities)) ? ES_EDIT : previous,
                        editor_fn_t, self, world);
         return;
     }
 
     if (mouse_pressed(SDL_BUTTON_LEFT)) {
         vec2s mouse = mouse_to_world(world);
-        self->entity = get_hovered_entity(world, mouse);
+        entity_t *e = get_hovered_entity(world, mouse);
+        if (e) {
+            array_push(self->entities, &e);
+        } else {
+            array_clear(self->entities);
+        }
+
         return;
     }
 }
@@ -245,16 +298,37 @@ static void select_update(editor_t *self, world_t *world) {
 static void highlight_enter(editor_t *self, world_t *world) {
     self->select.dim = GLMS_VEC2_ZERO;
     self->select.pos = mouse_to_world(world);
+    array_clear(self->entities);
 }
 
 static void highlight_exit(editor_t *self, world_t *world) {
-    // TODO: add all higlighted entities to dynamic array
+    // get trhe bottom left position of the select rectangle
+    if (self->select.dim.x <= 0.000001f) {
+        self->select.pos.x += self->select.dim.x;
+        self->select.dim.x = fabsf(self->select.dim.x);
+    }
+
+    if (self->select.dim.y <= 0.000001f) {
+        self->select.pos.y += self->select.dim.y;
+        self->select.dim.y = fabsf(self->select.dim.y);
+    }
+
+    collider_t arr[64];
+    size_t n = world_get_region_colliders(world, &self->select, arr, 64);
+    for (size_t i = 0; i < n; i++) {
+        collider_t *tmp = &arr[i];
+        if (aabb_collision_2d(&self->select, &tmp->box)) {
+            array_push(self->entities, &tmp->data);
+        }
+    }
 }
 
 static void highlight_update(editor_t *self, world_t *world) {
-    if (button_released(SDL_SCANCODE_LSHIFT)
-        || mouse_released(SDL_BUTTON_LEFT)) {
-        fsm_transition(&self->fsm, ES_IDLE, editor_fn_t, self, world);
+    if (mouse_released(SDL_BUTTON_LEFT)) {
+        int previous = self->fsm.previous;
+        fsm_transition(&self->fsm,
+                       (array_len(self->entities)) ? ES_EDIT : previous,
+                       editor_fn_t, self, world);
         return;
     }
 
@@ -266,19 +340,27 @@ static void highlight_render(editor_t *self, world_t *world) {
 }
 
 static void render(editor_t *self, world_t *world) {
-    if (self->entity) {
-        draw_quad_line(self->entity->body.pos, self->entity->body.dim,
-                       COLOR_RED);
+    size_t len;
+    if ((len = array_len(self->entities))) {
+        for (size_t i = 0; i < len; i++) {
+            entity_t *entity = self->entities[i];
+            draw_quad_line(entity->body.pos, entity->body.dim, COLOR_RED);
+        }
+    }
+    if (self->target) {
+        draw_quad_line(self->target->body.pos, self->target->body.dim, COLOR_RED);
     }
 }
 
 void editor_init(editor_t *self) {
     memset(self, 0, sizeof(editor_t));
     fsm_init(&self->fsm, ES_MAX, ES_IDLE, STATE_TABLE);
+    self->entities = array_alloc(sizeof(entity_t *), 128);
 }
 
 void editor_destroy(editor_t *self) {
     fsm_destroy(&self->fsm);
+    array_free(self->entities);
 }
 
 void editor_sync(editor_t *self, world_t *world) {
