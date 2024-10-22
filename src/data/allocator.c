@@ -55,9 +55,6 @@ static void *preprare(flist_t *tmp, size_t n) {
     node->size = (tmp->size - size);
     node->next = tmp->next;
 
-    tmp->size = n;
-    tmp->next = NULL;
-
     return node;
 }
 
@@ -65,13 +62,17 @@ void *allocator_request(allocator_t *self, size_t n) {
     for (flist_t *tmp = self->head, *prev = NULL; tmp;
          prev = tmp, tmp = tmp->next) {
         if (tmp->size >= n) {
-            void *ptr = preprare(tmp, n);
-
-            if (prev) {
-                prev->next = ptr;
-            } else {
-                self->head = ptr;
+            flist_t *node = preprare(tmp, n);
+            if (!node) {
+                llist_remove(self, prev, tmp);
+                goto done;
             }
+
+            llist_replace(self, prev, tmp, node);
+
+        done:
+            tmp->size = n;
+            tmp->next = NULL;
 
             return &tmp->data;
         }
@@ -88,7 +89,7 @@ static void consolidate(flist_t *a, flist_t *b) {
 }
 
 static inline bool contiguous(flist_t *a, flist_t *b) {
-    return ((flist_t *)((char *)&a->data + a->size) == b);
+    return ((flist_t *)(((char *)&a->data) + a->size) == b);
 }
 
 static void defrag(flist_t *prev, flist_t *next, flist_t *node) {
@@ -110,12 +111,13 @@ void allocator_release(allocator_t *self, void *ptr) {
     flist_t *prev = NULL;
     flist_t *tmp = self->head;
     for (; tmp; prev = tmp, tmp = tmp->next) {
-        if ((((char *)tmp - (char *)ptr)) ||
-            (prev && ((char *)prev - (char *)ptr)))
+        if (((char *)tmp - (char *)ptr) > 0)
             break;
+
     }
 
     flist_t *node = list_header(ptr);
     llist_insert(self, prev, tmp, node);
+
     defrag(prev, tmp, node);
 }

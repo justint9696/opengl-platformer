@@ -22,8 +22,6 @@ void chunk_init(chunk_t *self) {
     memset(self, 0, sizeof(chunk_t));
 
     size_t size = sizeof(array_t) + (sizeof(entity_t) * CHUNK_MAX);
-    size_t capacity = 9;
-
     allocator_alloc(&allocator, size * 9);
 
     for (int i = 0; i < 9; i++) {
