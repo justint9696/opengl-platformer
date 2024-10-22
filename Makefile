@@ -12,8 +12,6 @@ CFLAGS = -std=c11 \
 		 -O2 \
 		 -Wall \
 		 -Wextra \
-		 -Wstrict-aliasing \
-		 -Wfloat-equal \
 		 -Wundef \
 		 -Wno-unused-parameter \
 		 -Wno-missing-braces \
@@ -43,9 +41,8 @@ run: all
 	@$(OUT)
 
 libs:
-	@cd lib/SDL && mkdir -p build && cd build && ../configure && make -j 6
-	@cd lib/SDL_ttf && mkdir -p build && cd build && ../configure && make -j 6
-	@cd lib/cglm && mkdir -p build && cd build && cmake .. && make -j 6
+	@cd lib/SDL2 && mkdir -p build && cd build && ../configure && make -j 6 && sudo make install
+	@cd lib/cglm && mkdir -p build && cd build && cmake .. && make -j 6 && sudo make install
 	@cd lib/glad && $(CC) -o libglad.a -Iinclude -c src/glad.c
 
 $(OUT): $(OBJS)
@@ -65,7 +62,7 @@ $(INC_DST):
 	@mkdir -p $(dir $@)
 	@cp -f $(patsubst test/include/%, src/%, $@) $@
 
-tests: $(INC_DST)
+tests: all $(INC_DST)
 	@cp -r build test
 	@if test -f test/Makefile; then (cd test; $(MAKE) run); fi
 

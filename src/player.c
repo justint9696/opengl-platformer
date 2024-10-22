@@ -13,6 +13,7 @@
 #include "graphics/window.h"
 #include "world/world.h"
 
+#include <assert.h>
 #include <cglm/struct.h>
 #include <string.h>
 

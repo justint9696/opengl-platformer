@@ -8,9 +8,7 @@ CFLAGS = -std=c99 \
 		 -g \
 		 -Wall \
 		 -Wextra \
-		 -Wpedantic \
-		 -Wstrict-aliasing \
-		 -Wfloat-equal \
+		 -Wno-missing-braces \
 		 -Iinclude
 
 LDFLAGS = -lm
@@ -21,6 +19,9 @@ dirs:
 	@mkdir -p bin build
 
 all: dirs $(OBJS)
+
+bin/%.o: %.c
+	$(CC) -o $@ $< -MMD $(CFLAGS) $(LDFLAGS)
 
 bin/allocator.o: allocator.c
 	$(CC) -o $@ $< -MMD $(CFLAGS) $(LDFLAGS) build/data/allocator.o
