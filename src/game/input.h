@@ -8,8 +8,8 @@
 #ifndef _GAME_INPUT_H_
 #define _GAME_INPUT_H_
 
-#include <SDL_events.h>
-#include <SDL_scancode.h>
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_scancode.h>
 
 #include <cglm/types-struct.h>
 #include <stdbool.h>

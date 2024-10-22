@@ -8,7 +8,7 @@
 #ifndef _GRAPHICS_WINDOW_H_
 #define _GRAPHICS_WINDOW_H_
 
-#include <SDL_video.h>
+#include <SDL2/SDL_video.h>
 #include <stdbool.h>
 
 #define SCREEN_WIDTH  1280

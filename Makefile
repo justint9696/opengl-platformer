@@ -4,73 +4,69 @@ SRCS = $(wildcard src/*.c src/**/*.c)
 OBJS = $(patsubst src/%, build/%, $(SRCS:.c=.o))
 DEPS = $(patsubst src/%, build/%, $(SRCS:.c=.d))
 
-CPPFLAGS := -MMD -MP
-CPPFLAGS += -Isrc
-CPPFLAGS += -Ilib/glad/include
-CPPFLAGS += -Ilib/stb
-CPPFLAGS += -Ilib/SDL2/include
-CPPFLAGS += -Ilib/cglm/include
-CPPFLAGS += -I/usr/include/freetype2
-CPPFLAGS += -I/usr/include/libpng16
-CPPFLAGS += -D_DEBUG
-CPPFLAGS += -D_EDITOR
+INC_SRC = $(wildcard src/*.h src/**/*.h)
+INC_DST = $(addprefix test/, $(patsubst src/%, include/%, $(INC_SRC)))
 
-CFLAGS := -std=c11
-CFLAGS += -g
-CFLAGS += -O2
-CFLAGS += -Wall
-CFLAGS += -Wextra
-CFLAGS += -Wno-unused-parameter
-CFLAGS += -Wno-missing-braces
-CFLAGS += -Wno-unused-result
-CFLAGS += $(CPPFLAGS)
+CFLAGS = -std=c11 \
+		 -g \
+		 -O2 \
+		 -Wall \
+		 -Wextra \
+		 -Wstrict-aliasing \
+		 -Wfloat-equal \
+		 -Wundef \
+		 -Wno-unused-parameter \
+		 -Wno-missing-braces \
+		 -Wno-unused-result \
+		 -Isrc \
+		 -Ilib/glad/include \
+		 -Ilib/stb \
+		 -I/usr/include/freetype2 \
+		 -I/usr/include/libpng16 \
+		 -D_DEBUG \
+		 -D_EDITOR
 
-LDLIBS := -lm
-LDLIBS += -lSDL2
-LDLIBS += -lglad
-LDLIBS += -lcglm
-LDLIBS += -lfreetype
+LDFLAGS = -Llib/glad \
+		  -lcglm \
+		  -lglad \
+		  -lSDL2 \
+		  -lfreetype \
+		  -lm
 
-LDFLAGS := -Llib/glad
-LDFLAGS += -Llib/SDL2/build/build/.libs
-LDFLAGS += -Llib/cglm/build
-LDFLAGS += -Wl,--start-group $(LDLIBS) -Wl,--end-group
-LDFLAGS += -Wl,-rpath=lib/SDL2/build/build/.libs
-
-TARGET = bin/game
+OUT = bin/game
 
 .PHONY: all clean
 
-all: $(TARGET)
+all: $(OUT)
 
 run: all
-	@$(TARGET) $(FNAME)
+	@$(OUT)
 
-glad:
+libs:
+	@cd lib/SDL && mkdir -p build && cd build && ../configure && make -j 6
+	@cd lib/SDL_ttf && mkdir -p build && cd build && ../configure && make -j 6
+	@cd lib/cglm && mkdir -p build && cd build && cmake .. && make -j 6
 	@cd lib/glad && $(CC) -o libglad.a -Iinclude -c src/glad.c
 
-sdl:
-	@cd lib/SDL2 && mkdir -p build && cd build && ../configure && make -j 6
-
-cglm:
-	@cd lib/cglm && mkdir -p build && cd build && cmake .. && make -j 6
-
-libs: glad sdl cglm
-
-$(TARGET): $(OBJS)
+$(OUT): $(OBJS)
 	@mkdir -p $(dir $@)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 build/%.o: src/%.c
 	@mkdir -p $(dir $@)
-	$(CC) -o $@ -c $< $(CFLAGS)
+	$(CC) -o $@ -c $< -MMD -MP $(CFLAGS)
 
 clean:
-	rm -f $(TARGET) $(OBJS) $(DEPS)
+	rm -f $(OUT) $(DEPS) $(OBJS)
+	@if test -f test/Makefile; then (cd test; $(MAKE) $@); fi
 
-.PHONY: tests
+.PHONY: $(INC_DST)
+$(INC_DST):
+	@mkdir -p $(dir $@)
+	@cp -f $(patsubst test/include/%, src/%, $@) $@
 
-tests:
-	@cd tests && $(MAKE) run
+tests: $(INC_DST)
+	@cp -r build test
+	@if test -f test/Makefile; then (cd test; $(MAKE) run); fi
 
 -include $(DEPS)

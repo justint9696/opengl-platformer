@@ -2,7 +2,7 @@
 #include "util/log.h"
 
 #define SDL_MAIN_HANDLED
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 int main(int argc, char *argv[]) {
     const char *fname = NULL;
@@ -10,6 +10,8 @@ int main(int argc, char *argv[]) {
         fname = argv[1];
         log_debug("Loading level: `%s`\n", fname);
     }
+
+    log_debug("%ld\n", NOW());
 
     game_t game;
     game_run(&game, fname);

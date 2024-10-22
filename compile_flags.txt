@@ -1,6 +1,4 @@
 -Isrc
 -Ilib/stb
 -Ilib/glad/include
--Ilib/SDL2/include
--Ilib/cglm/include
 -I/usr/include/freetype2

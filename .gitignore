@@ -6,3 +6,4 @@ lib/
 *.a
 *.d
 *.o
+game.log

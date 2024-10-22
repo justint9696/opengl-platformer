@@ -3,21 +3,20 @@
  * @author Justin Tonkinson
  * @date 2024/07/04
  * @brief Chunk implementation functions.
- * @bug chunk_page_from_pos() has the wrong index now.
  */
 
 #include "world/chunk.h"
 
+#include "data/allocator.h"
 #include "data/array.h"
-#include "data/free_list.h"
 #include "graphics/drawing.h"
 
 #include <assert.h>
 #include <cglm/struct.h>
 #include <string.h>
 
-/** @brief Internal free list that manages the memory of the current pages. */
-static flist_t entities;
+/** @brief Internal allocator that manages the memory of the current pages. */
+static allocator_t allocator;
 
 void chunk_init(chunk_t *self) {
     memset(self, 0, sizeof(chunk_t));
@@ -25,7 +24,7 @@ void chunk_init(chunk_t *self) {
     size_t size = sizeof(array_t) + (sizeof(entity_t) * CHUNK_MAX);
     size_t capacity = 9;
 
-    flist_init(&entities, size * capacity);
+    allocator_alloc(&allocator, size * 9);
 
     for (int i = 0; i < 9; i++) {
         page_t *page = &self->pages[i];
@@ -37,7 +36,7 @@ void chunk_init(chunk_t *self) {
 }
 
 void chunk_destroy(chunk_t *self) {
-    flist_destroy(&entities);
+    allocator_free(&allocator);
 }
 
 void chunk_render(chunk_t *self) {
@@ -66,11 +65,12 @@ int chunk_index_from_pos(chunk_t *self, vec2s pos) {
 }
 
 void *chunk_request_page(chunk_t *self, page_t *page) {
-    size_t size = sizeof(array_t) + (sizeof(entity_t) * CHUNK_MAX);
-    void *ptr = flist_request(&entities, size);
+    size_t n = sizeof(array_t) + (sizeof(entity_t) * CHUNK_MAX);
+    void *ptr = allocator_request(&allocator, n);
+    assert(ptr);
     return array_init(ptr, sizeof(entity_t), CHUNK_MAX);
 }
 
 void chunk_release_page(chunk_t *self, page_t *page) {
-    flist_release(&entities, array_header(page->entities));
+    allocator_release(&allocator, array_header(page->entities));
 }
