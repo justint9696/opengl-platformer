@@ -8,13 +8,11 @@ int main(int argc, char *argv[]) {
     const char *fname = NULL;
     if (argc > 1) {
         fname = argv[1];
-        log_debug("Loading level: `%s`\n", fname);
+        log_debug("Loading level: `%s`", fname);
     }
-
-    log_debug("%ld\n", NOW());
 
     game_t game;
     game_run(&game, fname);
-    log_debug("Program exited normally.\n");
+    log_debug("Program exited normally.");
     return 0;
 }

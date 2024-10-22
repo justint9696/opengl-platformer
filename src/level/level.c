@@ -53,7 +53,7 @@ static void page_calculate_aabb(page_t *page, world_t *world) {
 /** @brief Loads level data into the provided page. */
 static void page_load_data(page_t *page, world_t *world, ldata_t arr[],
                            size_t len) {
-    /* log_debug("Loading %ld entities into page %d\n", len, page->index); */
+    log_debug("Loading %ld entities into page %d", len, page->index);
     for (size_t i = 0; i < len; i++) {
         ldata_t *data = &arr[i];
 
@@ -139,7 +139,7 @@ void level_import(world_t *world, const char *fpath) {
         if ((i - target) >= 2)
             target = world->chunk.box.dim.x + target;
 
-        /* log_debug("Loading index %d into memory\n", i); */
+        log_debug("Loading index %d into memory", i);
 
         page_t *page = &world->chunk.pages[index++];
         page->dim = glms_vec2_fill(CHUNK_SIZE);
@@ -215,7 +215,7 @@ void level_export(world_t *world, const char *fpath) {
     }
 
     fclose(fp);
-    log_debug("Level exported to file `%s`\n", fpath);
+    log_debug("Level exported to file `%s`", fpath);
 }
 
 /** @brief Shifts the provided page indicies around the iterator. */
@@ -229,8 +229,7 @@ static void pages_shift(world_t *world, uint32_t indices[], int it) {
         ldata_t data[CHUNK_MAX];
         size_t len = array_len(page->entities);
 
-        /* log_debug("Releasing %ld entities from page %d\n", len, page->index);
-         */
+        log_debug("Releasing %ld entities from page %d", len, page->index);
         for (size_t n = 0; n < len; n++) {
             // index 0 because as entities are destroyed, their indices offset
             entity_t *entity = &page->entities[0];
@@ -282,14 +281,13 @@ static void pages_replace(world_t *world, uint32_t indices[], int it) {
 
         int index = chunk_index_from_pos(&world->chunk, page->pos);
 
-        /* log_debug("Requesting index %d for page %d\n", index, page->index); */
+        log_debug("Requesting index %d for page %d", index, page->index);
         uint64_t offset = level.offsets[index];
         fseek(level.fp, offset, SEEK_SET);
 
         fread(&len, sizeof(size_t), 1, level.fp);
         fread(&data, sizeof(ldata_t), len, level.fp);
 
-        /* log_debug("Loading %ld entities into page %d\n", len, page->index); */
         page_load_data(page, world, data, len);
     }
 }
@@ -365,7 +363,7 @@ static void extend_bounds(world_t *world, uint32_t start, size_t n, int it) {
 
         // insert temp file offset into the offsets array at the current index
         uint64_t offset = ftell(level.fp);
-        /* log_debug("Inserting offset %ld into index %d\n", offset, index); */
+        log_debug("Inserting file offset %ld into index %d", offset, index);
         array_insert(level.offsets, index, &offset);
 
         // write empty data to temp file with padding
@@ -438,9 +436,9 @@ static void level_extend_bounds(world_t *world, page_t *page, int index) {
                 break;
         }
 
-        /* log_debug("Extended level bounds: (%.2f, %.2f) %d\n", */
-        /*           world->chunk.box.dim.x, world->chunk.box.dim.y, */
-        /*           world->chunk.index); */
+        log_debug("Extended level bounds: (%.2f, %.2f) %d",
+                  world->chunk.box.dim.x, world->chunk.box.dim.y,
+                  world->chunk.index);
     }
 }
 
@@ -459,5 +457,5 @@ void level_sync(world_t *world, float dt) {
     level_extend_bounds(world, tmp, index);
     level_swap_pages(world, tmp);
 
-    /* log_debug("Camera moved to page %d: %d.\n", world->chunk.index, index); */
+    log_debug("Camera moved to page %d: %d.", world->chunk.index, index);
 }

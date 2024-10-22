@@ -41,7 +41,7 @@ static void monitor_input(game_t *game) {
                 game->state = GS_EDIT;
                 break;
         }
-        log_debug("Game state set to: %d\n", game->state);
+        log_debug("Game state set to: %d", game->state);
     }
 }
 
@@ -70,12 +70,18 @@ static void init(game_t *self) {
     time_init(&self->time);
     world_init(&self->world);
     ui_init();
+#ifdef _EDITOR
     editor_init(&self->editor);
+#endif
 }
 
 static void destroy(game_t *self) {
     ui_destroy();
+
+#ifdef _EDITOR
     editor_destroy(&self->editor);
+#endif // ifdef _EDITOR
+
     level_shutdown(&self->world);
     world_destroy(&self->world);
     window_destroy(&self->window);
@@ -92,6 +98,7 @@ static void sync(game_t *self) {
         monitor_input(self);
         level_sync(&self->world, self->time.delta_fixed);
 
+#ifdef _EDITOR
         switch (self->state) {
             case GS_EDIT:
                 editor_sync(&self->editor, &self->world);
@@ -99,6 +106,7 @@ static void sync(game_t *self) {
             default:
                 break;
         }
+#endif // ifdef _EDITOR
 
         // synchonize game world
         world_sync(&self->world, self->time.delta_fixed);
@@ -106,6 +114,7 @@ static void sync(game_t *self) {
 }
 
 static void render(game_t *self) {
+#ifdef _EDITOR
     switch (self->state) {
         case GS_EDIT:
             editor_render(&self->editor, &self->world);
@@ -113,6 +122,7 @@ static void render(game_t *self) {
         default:
             break;
     }
+#endif // ifdef _EDITOR
 
     world_render(&self->world);
     ui_render(&self->world.camera);

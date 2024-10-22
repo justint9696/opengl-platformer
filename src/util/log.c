@@ -10,7 +10,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <time.h>
 
 static FILE *fp;
@@ -44,6 +43,7 @@ void _log_message(int level, const char *file, const char *function, int line,
     switch (level) {
         case LOG_FATAL:
         case LOG_ERROR:
+            fclose(fp);
             exit(1);
         default:
             break;

@@ -44,8 +44,10 @@ typedef struct game_s {
     /** @brief The game world. */
     world_t world;
 
+#ifdef _EDITOR
     /** @brief The level editor. */
     editor_t editor;
+#endif // ifdef _EDITOR
 } game_t;
 
 /**
